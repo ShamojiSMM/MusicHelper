@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>簡易レール演奏補助</title>
+  <meta charset="UTF-8">
+  <link rel="sounds" href="sounds/sound0.mp3">
+</head>
+
+<body bgcolor="#f9ffff">
+  <h1>簡易レール演奏補助 - SMM2</h1>
+  音の間隔確認や周期作成など。<font size="2">(最終更新: 23/07/13)</font>
+
+  <hr>
+  <font size="5"><b>BPMと音符間隔</b></font>
+  <font size="2"> 1拍(=4分音符)の長さから各音符とBPMを計算。</font>
+  <br><br>
+
+  <b>1拍の長さ(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_beat" value="" oninput="function_beat()">
+  <b>BPM:</b> <span id="result_bpm"></span>
+  <br><br>
+
+  <font size="2">
+  <table border="0" align="left">
+    <tr bgcolor="pink">
+      <th>符(拍)</th><th>記号</th><th>長さ(f)</th>
+    </tr>
+    <tr>
+      <th>1分(4)</th><th>&#x1D15D;</th><th><span id="table0_0"></span></th>
+    </tr>
+    <tr>
+        <th>付点2分(3)</th><th>&#x1D15E;.</th><th><span id="table0_1"></span></th>
+    </tr>
+    <tr>
+        <th>2分(2)</th><th>&#x1D15E;</th><th><span id="table0_2"></span></th>
+    </tr>
+    <tr>
+        <th>付点4分(1.5)</th><th>&#x1D15F;.</th><th><span id="table0_3"></span></th>
+    </tr>
+    <tr bgcolor="#98fb98">
+        <th>4分(1)</th><th>&#x1D15F;</th><th><span id="table0_4"></span></th>
+    </tr>
+    <tr>
+      <th>付点8分(0.75)</th><th>&#x1D160;.</th><th><span id="table0_5"></span></th>
+    </tr>
+    <tr>
+        <th>8分(0.5)</th><th>&#x1D160;</th><th><span id="table0_6"></span></th>
+    </tr>
+    <tr>
+        <th>16分(0.25)</th><th>&#x1D161;</th><th><span id="table0_7"></span></th>
+    </tr>
+    <tr bgcolor="#ffffe0">
+        <th>3分(1.33)</th><th>&#x1D15E;&#x1D15E;&#x1D15E;</th><th><span id="table0_8"></span></th>
+    </tr>
+    <tr bgcolor="#ffffe0">
+        <th>6分(0.67)</th><th>&#x1D15F;&#x1D15F;&#x1D15F;</th><th><span id="table0_9"></span></th>
+    </tr>
+    <tr bgcolor="#ffffe0">
+        <th>12分(0.33)</th><th>&#x1D160;&#x1D160;&#x1D160;</th><th><span id="table0_10"></span></th>
+    </tr>
+  </table>
+ 
+  <script>
+    function function_beat() {
+      var beat = parseFloat(input_beat.value);
+      var splits = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 4 / 3, 4 / 6, 4 / 12];
+
+      document.getElementById("result_bpm").textContent = (3600 / beat).toFixed(2);
+      
+      splits.forEach((splits, table0_index) => {
+      document.getElementById(`table0_${table0_index}`).textContent = (beat * splits).toFixed(2);
+    });
+    }
+  </script>
+
+  ・3分,6分,12分は 3連2分,3連4分,3連8分 と同義。<br>
+  ・小数第3位を四捨五入。<br>
+  ・下の3つは記号の1つ分の長さ。<br>
+  (記号はUnicodeの関係で表示されないかも？)
+  </font><br><br><br><br><br><br><br><br><br>
+
+  <!--<hr>
+  <font size="5"><b>音間隔の確認</b></font>
+  <font size="2"> f単位で音が鳴らせます。</font>
+  <br><br>
+  <b>音の長さ(f):</b> <input type="text" style="height: 30px; width: 800px;" id="input_intervals" value="22, 22, 22, 22, 22, 5.5, 5.5, 11, 5.5, 5.5, 11, 5.5, 5.5, 11, 11, 5.5, 5.5, 11, 11, 11, 11, 11, 5.5, 5.5, 11, 11, 11, 11, 11, 11, 11">
+  <br><input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="0">
+  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="1">
+  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="2">
+  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="3">
+  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="4">
+  <font size="2">始めは正常に鳴らない場合があるので複数回お試しください。</font>
+
+  <audio id="sounds" src="sounds/sound0.mp3" src="sounds/sound1.mp3" src="sounds/sound2.mp3" src="sounds/sound3.mp3" src="sounds/sound4.mp3" preload="auto">
+  </audio>
+
+  <script>
+    function button_play(button_play_id) {
+      var intervals = (input_intervals.value).split(",").map(Number);
+      var time = 0;
+
+      document.getElementById("sounds").src = `sounds/sound${button_play_id}.mp3`;
+      document.getElementById("sounds").load();
+      document.getElementById("sounds").play();
+
+      intervals.forEach((interval, index) => {
+        time += interval;
+
+        setTimeout(() => {
+          document.getElementById("sounds").currentTime = 0;
+          document.getElementById("sounds").play();
+        }, time * 50 / 3);
+      });
+    }
+  </script>
+  -->
+  <hr>
+
+  <font size="5"><b>レールループ生成</b></font>
+  <font size="2"> 作りたいレールループを作成します。</font>
+  <br><br>
+  <b><select id="select_cycle" style="height: 35px;">
+    <option>羽あり往復</option>
+    <option>羽あり特殊</option>
+    <option>羽あり周回</option>
+  </select>(f):</b>
+  
+  <input type="number" style="height: 30px; width: 120px;" id="input_cycle" value="672">
+  <input type="button" style="height: 35px;" value="生成" onclick="function_cycle()">
+
+  <font size="2">( 直線, 斜め, 曲線, うるう距離 )の本数。</font>
+  <br><br>
+  <span id="result_cycle"></span><br>
+  <img id="image" height="200">
+
+  <script>
+    function function_cycle() {
+      var cycle = parseInt(input_cycle.value);  
+      var result_cycle = [];
+      var s, d, c, u = 0;
+    
+      switch (select_cycle.selectedIndex) {
+        case 0:
+          document.getElementById("image").src = "";
+    
+          for (s = 0; s <= cycle / 42; s++) {
+            for (d = 0; d <= cycle / 60; d++) {
+              for (c = 0; c <= cycle / 72; c++) {
+                for (u = 0; u <= Math.min(3, Math.floor((cycle - (42 * s + 60 * d + 72 * c)) / 2)); u++) {
+
+                  if ((42 * s + 60 * d + 72 * c + u * 2 == cycle) && (3 * u <= s)) {
+                    result_cycle.push(` (${s}, ${d}, ${c}, ${u}) `);
+                  }
+                }
+              }
+            }
+          }
+    
+          if (result_cycle.length != 0) {
+            document.getElementById("result_cycle").textContent = result_cycle.reverse();
+          } else {
+            document.getElementById("result_cycle").textContent = "Not Found";
+          }
+          break;
+        
+        case 1:
+          const sub = [1,3,3,4,3,4,3,4,4,3,3,4,4,4,3,2,4,4,1,4,4,3,4,3,4,4,4,2,4,4,1,4,4,4,4,2,2,2,4,4,4,4];
+          //           0         5         10        15        20        25        30        35        40
+    
+          var add = Math.floor(cycle / 42) - sub[cycle % 42];
+    
+          if ((Number.isInteger(cycle) && cycle >= 0) && (add >= 0)) {
+            document.getElementById("image").src = `images/base${cycle % 42}.jpg`;
+                  
+            document.getElementById("result_cycle").textContent = `直線追加(本): ${add}`;
+          } else {
+            if ([90, 96].includes(cycle)) {
+              document.getElementById("image").src = `images/other${cycle}.jpg`;
+    
+              document.getElementById("result_cycle").textContent = "直線追加(本): 0";
+            } else {
+              document.getElementById("result_cycle").textContent = "Not Found";
+              document.getElementById("image").src = "";        
+            }
+          }
+          break;
+
+        case 2:
+          document.getElementById("image").src = "";
+    
+          for (s = 0; s <= cycle / 21; s++) {
+            for (d = 0; d <= cycle / 30; d++) {
+              for (c = 0; c <= cycle / 36; c++) {
+                for (u = 0; u <= Math.min(3, Math.floor(cycle - (21 * s + 30 * d + 36 * c))); u++) {
+
+                  if ((21 * s + 30 * d + 36 * c + u == cycle) && (3 * u <= s) && (s % 2 == 0)) {
+                    result_cycle.push(` (${s}, ${d}, ${c}, ${u}) `);
+                  }
+                }
+              }
+            }
+          }
+    
+          if (result_cycle.length != 0) {
+            document.getElementById("result_cycle").textContent = result_cycle.reverse();
+          } else {
+            document.getElementById("result_cycle").textContent = "Not Found";
+          }
+      }
+    }
+  </script>
+
+  <hr>
+  <font size="5"><b>レール周期確認</b></font>
+  <font size="2"> 各レール本数で周期を確認できます。</font>
+  <br><br>
+  <b><select id="select_shape" style="height: 35px;">
+    <option>羽あり往復</option>
+    <option>羽あり周回</option>
+    <option>羽なし往復</option>
+    <option>羽なし周回</option>
+  </select>:</b>
+  <input type="button" style="height: 35px;" value="確認" onclick="function_shape()">
+  <br>
+  <b>直線(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_straight">
+  <b>斜め(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_diagonal">
+  <b>曲線(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_curve">
+  <b>うるう距離(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_correction">  
+  <br><br>
+  <b>周期(f):</b>
+  <span id="result_shape"></span>
+
+  <script>
+    function function_shape() {
+      var straight = parseInt(input_straight.value);
+      var diagonal = parseInt(input_diagonal.value);
+      var curve = parseInt(input_curve.value);
+      var correction = parseInt(input_correction.value);
+
+      switch (select_shape.selectedIndex) {
+        case 0:
+          document.getElementById("result_shape").textContent = (42 * straight + 60 * diagonal + 72 * curve + 2 * correction);
+          break;
+        
+        case 1:
+          document.getElementById("result_shape").textContent = (21 * straight + 30 * diagonal + 36 * curve + 1 * correction);
+          break;
+        
+        case 2:
+          document.getElementById("result_shape").textContent = (84 * straight + 120 * diagonal + 140 * curve + 2 * correction);
+          break;
+
+        case 3:
+          document.getElementById("result_shape").textContent = (42 * straight + 60 * diagonal + 70 * curve + 1 * correction);
+      }
+    }
+  </script>
+
+  <hr>
+  <font size="5"><b>表計算</b></font>
+  <font size="2">内容は保存されません。</font>
+  <br><br>
+
+  <b>読み込みタイプ:</b> <select id="select_loading" onchange="function_loading()">
+    <option>開始画面(全部同時)</option>
+    <option>落下集音</option>
+    <option>上下カスタム</option>
+    <option>横スクロール</option>
+  </select>
+  <b>集音速度(f/b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_loading_speed" disabled="true" oninput="function_loading_speed()">
+  <font size="2">下向き、右向きを正とする。</font><br>
+  <b>着線パターン:</b> <select id="select_landing" onchange="function_landing()">
+    <option>カスタム</option>
+    <option>1</option>
+    <option>2</option>
+    <option>3</option>
+    <option>4</option>
+  </select>
+  <br>
+  <b>4分符長(f): </b><input type="number" style="height: 30px; width: 60px;" id="input_beat_table" oninput="function_beat_table()">
+  <b>BPM: </b><span id="bpm_table"></span>
+
+  <table border="1" width="1800" id="table_wiring">
+    <tr bgcolor="#ffffe0">
+      <th bgcolor="#dcdcdc" width="7%">番号</th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th><th>08</th><th>09</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th><th>32</th>
+    </tr>
+    <tr bgcolor="#ffffff">
+      <th bgcolor="#dcdcdc" width="7%">メモ</th><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+    </tr>
+    <tr bgcolor="#ffffff">
+      <th bgcolor="#dcdcdc" width="7%">n分符</th><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td>
+    </tr>
+    <tr bgcolor="#fffff7">
+      <th bgcolor="#dcdcdc" width="7%">符長(f)</th><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+    </tr>
+    <tr  bgcolor="#fffff7">
+      <th bgcolor="#dcdcdc" width="7%">xズレ(f)</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+    </tr>
+    <tr  bgcolor="#fffff7" id="table_wiring_y">
+      <th bgcolor="#dcdcdc" width="7%">yズレ(b)</th><td>0</td><td contenteditable="true" id="table_wiring_y"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+    </tr>
+    <tr bgcolor="#f0ffff">
+      <th bgcolor="#afeeee" width="7%">結果(f)</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr bgcolor="#fff2e9">
+      <th bgcolor="#ffc0cb" width="7%">高さ(b)</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr bgcolor="#ffffff">
+      <th bgcolor="#dcdcdc" width="7%">配置</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+  </table>
+
+  <b>基準遅延(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_delay">
+  <b>基準着線レール間(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_height">
+  <input type="button" style="height: 35px;" value="生成" onclick="function_table()">
+  <br>
+  <input type="button" style="height: 35px;" value="検証" onclick="function_test()">
+  <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font><br>
+  <input type="checkbox" id="check_test_terminal" onclick="function_test_terminal()">
+  <font size="2">終端速度を使用(8b以上あける)。</font>
+
+  <script>
+    var table_wiring = document.getElementById("table_wiring");
+
+    function function_beat_table() {
+      document.getElementById("bpm_table").textContent = (3600 / parseFloat(input_beat_table.value)).toFixed(2);
+    }
+
+    function function_note() {
+      table_wiring.rows[3].cells[event.target.cellIndex].textContent = ((parseFloat(input_beat_table.value) * 4) / event.target.textContent).toFixed(2);
+    }
+
+    function function_loading() {
+      if (select_loading.selectedIndex == 2 || select_loading.selectedIndex == 3) {
+        input_loading_speed.disabled = false;
+
+      } else {
+        input_loading_speed.disabled = true;
+      } 
+    }
+
+    function function_landing() {
+      var row4_pattern = [];
+      table_wiring.rows[4].cells[1].textContent = 0;
+
+      switch (select_landing.selectedIndex) {
+        case 0:
+          for (var column_index = 2; column_index < 32; column_index ++) {
+            table_wiring.rows[4].cells[column_index].textContent = "";
+          }
+          break;
+
+        case 1:
+          row4_pattern = [9, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10];
+          break;
+        
+        case 2:
+          row4_pattern = [11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11];
+          break;
+
+        case 3:
+          row4_pattern = [10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10];
+          break;
+
+        case 4:
+          row4_pattern = [11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11];
+      }
+
+      for (var column_index = 2; column_index < table_wiring.rows[4].cells.length; column_index ++) {
+        table_wiring.rows[4].cells[column_index].textContent = row4_pattern[column_index - 2] + (select_loading.selectedIndex == 3 ? parseFloat(input_loading_speed.value) : 0);
+      }
+    }
+
+    function function_loading_speed() {
+      if (select_loading.selectedIndex == 3 && select_landing.selectedIndex != 0) {
+        switch (select_landing.selectedIndex) {
+          case 1:
+            row4_pattern = [9, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10];
+            break;
+        
+          case 2:
+            row4_pattern = [11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11];
+            break;
+
+          case 3:
+            row4_pattern = [10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10];
+            break;
+
+          case 4:
+            row4_pattern = [11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11, 11, 10, 11];
+        }
+
+        for (var column_index = 2; column_index < table_wiring.rows[4].cells.length; column_index ++) {
+          table_wiring.rows[4].cells[column_index].textContent = row4_pattern[column_index - 2] + parseFloat(input_loading_speed.value);
+        }
+      }
+    }
+
+    function function_table() {
+      var total_note_delay = 0;
+      var total_x_delay = 0;
+      var loading_speed = 0;
+
+      switch (select_loading.selectedIndex) {
+        case 0:
+          loading_speed = 0;
+          break;
+
+        case 1:
+          loading_speed = 4;
+          break;
+
+        case 2:
+          loading_speed = parseFloat(input_loading_speed.value);
+      }
+
+      for (var column_index = 1; column_index < table_wiring.rows[0].cells.length; column_index ++) {
+        total_note_delay += (column_index != 1 ? parseFloat(table_wiring.rows[3].cells[column_index - 1].textContent) : 0);
+        total_x_delay += parseFloat(table_wiring.rows[4].cells[column_index].textContent);
+
+        table_wiring.rows[6].cells[column_index].textContent = parseInt(parseInt(input_base_delay.value) + total_note_delay - total_x_delay - ((select_loading.selectedIndex != 1 ? parseInt(table_wiring.rows[5].cells[column_index].textContent) : 0) * (4 - loading_speed)));
+
+        table_wiring.rows[7].cells[column_index].textContent = parseInt(parseInt(input_base_height.value) + parseInt(table_wiring.rows[5].cells[column_index].textContent));
+      }
+    }
+
+    function function_test() {
+      for (var column_index = 1; column_index < table_wiring.rows[0].cells.length; column_index ++) {
+        var result_same = [];
+        var result_near = [];
+        var result_near_near = [];
+
+        var target = parseInt(table_wiring.rows[6].cells[column_index].textContent);
+        var height = (check_test_terminal.checked ? 9999 : parseInt(table_wiring.rows[7].cells[column_index].textContent) - 1);
+
+        for (var i = 0; i < starting_list.length; i ++) {
+          var starting = starting_list[i];
+          if (starting > target + 11) {
+            return;
+          }  
+
+          for (var j = 0; j < gap_list.length; j ++) {
+            var gap0 = gap_list[j];
+
+            for (var k = j; k < gap_list.length; k ++) {
+              var gap1 = gap_list[k];
+
+              for (var l = k; l < gap_list.length; l ++) {
+                var gap2 = gap_list[l];
+                var total_height = starting.height + gap0.height + gap1.height + gap2.height;
+                var distance = height - total_height;
+
+                if (distance >= 0) {
+                  var total_delay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (document.getElementById("check_test_terminal").checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
+
+                  if (total_delay == target) {
+                    result_same.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+
+                  } else if (total_delay == target + 1 || total_delay == target - 1) {
+                    result_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+
+                  } else if (total_delay == target + 2 || total_delay == target - 2) {
+                    result_near_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (result_same.length > 0) {
+          table_wiring.rows[8].cells[column_index].textContent = "◎";
+
+        } else if (result_near.length > 0) {
+          table_wiring.rows[8].cells[column_index].textContent = "○";
+
+        } else if (result_near_near.length > 0) {
+          table_wiring.rows[8].cells[column_index].textContent = "△";
+
+        } else {
+          table_wiring.rows[8].cells[column_index].textContent = "×";
+        }
+      }
+    }
+  </script>
+
+  <hr>
+  <font size="5"><b>縦集音配置生成</b></font>
+  <font size="2"> 縦レールによる集音(ぜんまいメソッド)の配置を探します。</font>
+  <br><br>
+
+  <b>狙いの値(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_target" value="100">
+  <b>着線レールとの距離(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_height" value="11">
+  <input type="button" style="height: 35px;" value="生成" onclick="function_target()"><br>
+  <input type="checkbox" id="check_terminal" onclick="function_terminal()">
+  <font size="2">終端速度を使用(8b以上あける)。</font><br>
+  <font size="2">( 遅延 / 下向きの長さ / 表記 )</font>。
+  <br><br>
+
+  <b>一致:</b><br>
+  <span id="result_same"></span><br>
+  <b>誤差:</b><br>
+  <span id="result_near"></span><br>
+  <b>もっと誤差:</b><br>
+  <span id="result_near_near"></span> 
+
+  <script>
+    var starting_list = [
+      {delay: 0, display: "↓-", height: 0},
+      {delay: 14, display: "↓-R1", height: 2},
+      {delay: 27, display: "↓-R2", height: 4},
+      {delay: 40, display: "↓-R3", height: 6},
+      {delay: 54, display: "↓-R4", height: 8},
+      {delay: 67, display: "↓-R5", height: 10},
+      {delay: 80, display: "↓-R6", height: 12},
+
+      {delay: 21, display: "↑R0-", height: 0},
+      {delay: 34, display: "↑R0-R1", height: 2},
+      {delay: 48, display: "↑R0-R2", height: 4},
+      {delay: 61, display: "↑R0-R3", height: 6},
+      {delay: 74, display: "↑R0-R4", height: 8},
+      {delay: 88, display: "↑R0-R5", height: 10},
+      {delay: 101, display: "↑R0-R6", height: 12},
+
+      {delay: 64, display: "↑R1-", height: 0},
+      {delay: 78, display: "↑R1-R1", height: 2},
+      {delay: 91, display: "↑R1-R2", height: 4},
+      {delay: 104, display: "↑R1-R3", height: 6},
+      {delay: 118, display: "↑R1-R4", height: 8},
+      {delay: 131, display: "↑R1-R5", height: 10},
+      {delay: 144, display: "↑R1-R6", height: 12},
+
+      {delay: 81, display: "↑G1R1-", height: 0},
+      {delay: 94, display: "↑G1R1-R1", height: 2},
+      {delay: 107, display: "↑G1R1-R2", height: 4},
+      {delay: 121, display: "↑G1R1-R3", height: 6},
+      {delay: 134, display: "↑G1R1-R4", height: 8},
+      {delay: 147, display: "↑G1R1-R5", height: 10},
+      {delay: 161, display: "↑G1R1-R6", height: 12},
+
+      {delay: 98, display: "↑G2R1-", height: 0},
+      {delay: 112, display: "↑G2R1-R1", height: 2},
+      {delay: 125, display: "↑G2R1-R2", height: 4},
+      {delay: 138, display: "↑G2R1-R3", height: 6},
+      {delay: 152, display: "↑G2R1-R4", height: 8},
+      {delay: 165, display: "↑G2R1-R5", height: 10},
+      {delay: 178, display: "↑G2R1-R6", height: 12},
+
+      {delay: 107, display: "↑R2-", height: 0},
+      {delay: 120, display: "↑R2-R1", height: 2},
+      {delay: 133, display: "↑R2-R2", height: 4},
+      {delay: 147, display: "↑R2-R3", height: 6},
+      {delay: 160, display: "↑R2-R4", height: 8},
+      {delay: 173, display: "↑R2-R5", height: 10},
+      {delay: 187, display: "↑R2-R6", height: 12},
+
+      {delay: 111, display: "↑F-", height: 0},
+      {delay: 124, display: "↑F-R1", height: 2},
+      {delay: 137, display: "↑F-R2", height: 4},
+      {delay: 151, display: "↑F-R3", height: 6},
+      {delay: 164, display: "↑F-R4", height: 8},
+      {delay: 177, display: "↑F-R5", height: 10},
+      {delay: 191, display: "↑F-R6", height: 12},
+
+      {delay: 120, display: "↑G3R1-", height: 0},
+      {delay: 133, display: "↑G3R1-R1", height: 2},
+      {delay: 146, display: "↑G3R1-R2", height: 4},
+      {delay: 160, display: "↑G3R1-R3", height: 6},
+      {delay: 173, display: "↑G3R1-R4", height: 8},
+      {delay: 186, display: "↑G3R1-R5", height: 10},
+      {delay: 200, display: "↑G3R1-R6", height: 12},
+
+      {delay: 124, display: "↑G1R2-", height: 0},
+      {delay: 137, display: "↑G1R2-R1", height: 2},
+      {delay: 150, display: "↑G1R2-R2", height: 4},
+      {delay: 164, display: "↑G1R2-R3", height: 6},
+      {delay: 177, display: "↑G1R2-R4", height: 8},
+      {delay: 190, display: "↑G1R2-R5", height: 10},
+      {delay: 204, display: "↑G1R2-R6", height: 12},
+
+      {delay: 124, display: "↑R1G1R1-", height: 0},
+      {delay: 137, display: "↑R1G1R1-R1", height: 2},
+      {delay: 151, display: "↑R1G1R1-R2", height: 4},
+      {delay: 164, display: "↑R1G1R1-R3", height: 6},
+      {delay: 177, display: "↑R1G1R1-R4", height: 8},
+      {delay: 191, display: "↑R1G1R1-R5", height: 10},
+      {delay: 204, display: "↑R1G1R1-R6", height: 12},
+
+      {delay: 140, display: "↑G2R2-", height: 0},
+      {delay: 154, display: "↑G2R2-R1", height: 2},
+      {delay: 167, display: "↑G2R2-R2", height: 4},
+      {delay: 180, display: "↑G2R2-R3", height: 6},
+      {delay: 194, display: "↑G2R2-R4", height: 8},
+      {delay: 207, display: "↑G2R2-R5", height: 10},
+      {delay: 220, display: "↑G2R2-R6", height: 12},
+
+      {delay: 148, display: "↑R3-", height: 0},
+      {delay: 161, display: "↑R3-R1", height: 2},
+      {delay: 175, display: "↑R3-R2", height: 4},
+      {delay: 188, display: "↑R3-R3", height: 6},
+      {delay: 201, display: "↑R3-R4", height: 8},
+      {delay: 215, display: "↑R3-R5", height: 10},
+      {delay: 228, display: "↑R3-R6", height: 12},
+
+      {delay: 157, display: "↑G1R1G2R1-", height: 0},
+      {delay: 170, display: "↑G1R1G2R1-R1", height: 2},
+      {delay: 183, display: "↑G1R1G2R1-R2", height: 4},
+      {delay: 197, display: "↑G1R1G2R1-R3", height: 6},
+      {delay: 210, display: "↑G1R1G2R1-R4", height: 8},
+      {delay: 223, display: "↑G1R1G2R1-R5", height: 10},
+      {delay: 237, display: "↑G1R1G2R1-R6", height: 12},
+
+      {delay: 157, display: "↑G2R1G1R1-", height: 0},
+      {delay: 171, display: "↑G2R1G1R1-R1", height: 2},
+      {delay: 183, display: "↑G2R1G1R1-R2", height: 4},
+      {delay: 197, display: "↑G2R1G1R1-R3", height: 6},
+      {delay: 211, display: "↑G2R1G1R1-R4", height: 8},
+      {delay: 224, display: "↑G2R1G1R1-R5", height: 10},
+      {delay: 237, display: "↑G2R1G1R1-R6", height: 12},
+
+      {delay: 161, display: "↑G3R2-", height: 0},
+      {delay: 174, display: "↑G3R2-R1", height: 2},
+      {delay: 187, display: "↑G3R2-R2", height: 4},
+      {delay: 201, display: "↑G3R2-R3", height: 6},
+      {delay: 214, display: "↑G3R2-R4", height: 8},
+      {delay: 227, display: "↑G3R2-R5", height: 10},
+      {delay: 242, display: "↑G3R2-R6", height: 12},
+
+      {delay: 162, display: "↑R1G3R1-", height: 0},
+      {delay: 175, display: "↑R1G3R1-R1", height: 2},
+      {delay: 189, display: "↑R1G3R1-R2", height: 4},
+      {delay: 202, display: "↑R1G3R1-R3", height: 6},
+      {delay: 215, display: "↑R1G3R1-R4", height: 8},
+      {delay: 229, display: "↑R1G3R1-R5", height: 10},
+      {delay: 243, display: "↑R1G3R1-R6", height: 12},
+
+      {delay: 153, display: "↑R1F-", height: 0},
+      {delay: 166, display: "↑R1F-R1", height: 2},
+      {delay: 180, display: "↑R1F-R2", height: 4},
+      {delay: 193, display: "↑R1F-R3", height: 6},
+      {delay: 206, display: "↑R1F-R4", height: 8},
+      {delay: 220, display: "↑R1F-R5", height: 10},
+      {delay: 233, display: "↑R1F-R6", height: 12},
+
+      {delay: 142, display: "↑R1G2R1-", height: 0},
+      {delay: 155, display: "↑R1G2R1-R1", height: 2},
+      {delay: 168, display: "↑R1G2R1-R2", height: 4},
+      {delay: 182, display: "↑R1G2R1-R3", height: 6},
+      {delay: 195, display: "↑R1G2R1-R4", height: 8},
+      {delay: 208, display: "↑R1G2R1-R5", height: 10},
+      {delay: 222, display: "↑R1G2R1-R6", height: 12},
+
+      {delay: 141, display: "↑G1R1G1R1-", height: 0},
+      {delay: 154, display: "↑G1R1G1R1-R1", height: 2},
+      {delay: 167, display: "↑G1R1G1R1-R2", height: 4},
+      {delay: 181, display: "↑G1R1G1R1-R3", height: 6},
+      {delay: 194, display: "↑G1R1G1R1-R4", height: 8},
+      {delay: 207, display: "↑G1R1G1R1-R5", height: 10},
+      {delay: 221, display: "↑G1R1G1R1-R6", height: 12},
+
+      {delay: 167, display: "↑G1R3-", height: 0},
+      {delay: 180, display: "↑G1R3-R1", height: 2},
+      {delay: 193, display: "↑G1R3-R2", height: 4},
+      {delay: 207, display: "↑G1R3-R3", height: 6},
+      {delay: 220, display: "↑G1R3-R4", height: 8},
+      {delay: 233, display: "↑G1R3-R5", height: 10},
+      {delay: 247, display: "↑G1R3-R6", height: 12},
+
+      {delay: 175, display: "↑G2R1G2R1-", height: 0},
+      {delay: 189, display: "↑G2R1G2R1-R1", height: 2},
+      {delay: 202, display: "↑G2R1G2R1-R2", height: 4},
+      {delay: 215, display: "↑G2R1G2R1-R3", height: 6},
+      {delay: 229, display: "↑G2R1G2R1-R4", height: 8},
+      {delay: 242, display: "↑G2R1G2R1-R5", height: 10},
+      {delay: 255, display: "↑G2R1G2R1-R6", height: 12},
+
+      {delay: 167, display: "↑R1G1R2-", height: 0},
+      {delay: 180, display: "↑R1G1R2-R1", height: 2},
+      {delay: 194, display: "↑R1G1R2-R2", height: 4},
+      {delay: 207, display: "↑R1G1R2-R3", height: 6},
+      {delay: 220, display: "↑R1G1R2-R4", height: 8},
+      {delay: 234, display: "↑R1G1R2-R5", height: 10},
+      {delay: 247, display: "↑R1G1R2-R6", height: 12},
+
+      {delay: 166, display: "↑R2G1R1-", height: 0},
+      {delay: 180, display: "↑R2G1R1-R1", height: 2},
+      {delay: 193, display: "↑R2G1R1-R2", height: 4},
+      {delay: 206, display: "↑R2G1R1-R3", height: 6},
+      {delay: 220, display: "↑R2G1R1-R4", height: 8},
+      {delay: 233, display: "↑R2G1R1-R5", height: 10},
+      {delay: 246, display: "↑R2G1R1-R6", height: 12},
+
+      {delay: 184, display: "↑G2R3-", height: 0},
+      {delay: 198, display: "↑G2R3-R1", height: 2},
+      {delay: 211, display: "↑G2R3-R2", height: 4},
+      {delay: 224, display: "↑G2R3-R3", height: 6},
+      {delay: 238, display: "↑G2R3-R4", height: 8},
+      {delay: 251, display: "↑G2R3-R5", height: 10},
+      {delay: 264, display: "↑G2R3-R6", height: 12},
+
+      {delay: 184, display: "↑R1G2R2-", height: 0},
+      {delay: 197, display: "↑R1G2R2-R1", height: 2},
+      {delay: 210, display: "↑R1G2R2-R2", height: 4},
+      {delay: 224, display: "↑R1G2R2-R3", height: 6},
+      {delay: 237, display: "↑R1G2R2-R4", height: 8},
+      {delay: 250, display: "↑R1G2R2-R5", height: 10},
+      {delay: 264, display: "↑R1G2R2-R6", height: 12},
+
+      {delay: 184, display: "↑R2G2R1-", height: 0},
+      {delay: 197, display: "↑R2G2R1-R1", height: 2},
+      {delay: 211, display: "↑R2G2R1-R2", height: 4},
+      {delay: 224, display: "↑R2G2R1-R3", height: 6},
+      {delay: 237, display: "↑R2G2R1-R4", height: 8},
+      {delay: 251, display: "↑R2G2R1-R5", height: 10},
+      {delay: 264, display: "↑R2G2R1-R6", height: 12}
+    ];
+
+    var gap_list = [
+      {delay: 0, display: "", height: 0},
+
+      {delay: 19, display: "G1R1", height: 3},
+      {delay: 32, display: "G1R2", height: 5},
+      {delay: 45, display: "G1R3", height: 7},
+
+      {delay: 22, display: "G2R1", height: 4},
+      {delay: 36, display: "G2R2", height: 6},
+      {delay: 49, display: "G2R3", height: 8},
+
+      {delay: 25, display: "G3R1", height: 5},
+      {delay: 38, display: "G3R2", height: 7},
+      {delay: 51, display: "G3R3", height: 9},
+
+      {delay: 26, display: "G4R1", height: 6},
+      {delay: 40, display: "G4R2", height: 8},
+      {delay: 53, display: "G4R3", height: 10},
+
+      {delay: 28, display: "G5R1", height: 7},
+      {delay: 41, display: "G5R2", height: 9},
+      {delay: 54, display: "G5R3", height: 11},
+
+      {delay: 28, display: "G6R1", height: 8},
+      {delay: 42, display: "G6R2", height: 10},
+      {delay: 55, display: "G6R3", height: 12},
+
+      {delay: 30, display: "G7R1", height: 9},
+      {delay: 43, display: "G7R2", height: 11},
+      {delay: 56, display: "G7R3", height: 13},
+
+      {delay: 29, display: "G8R1", height: 10},
+      {delay: 42, display: "G8R2", height: 12},
+      {delay: 56, display: "G8R3", height: 14}
+    ];
+
+    var accelerations = [11, 8, 5, 3, 2, 1, 1];
+
+    function function_terminal() {
+      input_height.disabled = (check_terminal.checked ? true : false);
+    }
+
+    function function_target() {
+      var target = parseInt(input_target.value);
+      var height = (check_terminal.checked ? 9999 : parseInt(input_height.value) - 1);
+      var result_same = [], result_near = [], result_near_near = [];
+
+      for (var i = 0; i < starting_list.length; i ++) {
+        var starting = starting_list[i];
+        if (starting > target + 11) {
+          return;
+        }  
+
+        for (var j = 0; j < gap_list.length; j ++) {
+          var gap0 = gap_list[j];
+
+          for (var k = j; k < gap_list.length; k ++) {
+            var gap1 = gap_list[k];
+
+            for (var l = k; l < gap_list.length; l ++) {
+              var gap2 = gap_list[l];
+              var total_height = starting.height + gap0.height + gap1.height + gap2.height;
+              var distance = height - total_height;
+
+              if (distance >= 0) {
+                var total_delay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (document.getElementById("check_terminal").checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
+
+                if (total_delay == target) {
+                  result_same.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+
+                } else if (total_delay == target + 1 || total_delay == target - 1) {
+                  result_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+
+                } else if (total_delay == target + 2 || total_delay == target - 2) {
+                  result_near_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                }
+              }
+            }
+          }
+        }
+      }
+
+      result_same.sort((m, n) => m.height - n.height);
+      result_near.sort((m, n) => m.height - n.height);
+      result_near_near.sort((m, n) => m.height - n.height);
+
+      var new_result_same = [];
+      var new_result_near = [];
+      var new_result_near_near = [];
+
+      result_same.forEach(result => {
+        new_result_same.push([` (${result.delay}/${result.height}/${result.display}) `]);
+      });
+      result_near.forEach(result => {
+        new_result_near.push([` (${result.delay}/${result.height}/${result.display}) `]);
+      });
+      result_near_near.forEach(result => {
+        new_result_near_near.push([` (${result.delay}/${result.height}/${result.display}) `]);
+      });
+
+      document.getElementById("result_same").textContent = new_result_same;
+      document.getElementById("result_near").textContent = new_result_near;
+      document.getElementById("result_near_near").textContent = new_result_near_near;
+    }
+  </script>
+
+  <hr>
+  <font size="5"><b>説明</b></font>
+  <br><br>
+  <img src="images/info/loop.jpg" height="200">
+  <font size="2">分からないところ等あったら言ってください。</font>
+  <br>
+  <img src="images/info/gaps.jpg" height="160">
+  <img src="images/info/height.jpg" height="160">
+  <br>
+  <img src="images/info/landing0.jpg" height="160">
+  <img src="images/info/landing1.jpg" height="220">
+  <br><br>
+
+  <font size="5"><b>表と縦集音配置生成について</b></font>
+  <br>
+  <font size="3"><a href="https://www.youtube.com/watch?v=OZPpbKYsIv0">解説動画(より詳細なのでこっちを見た方がいい)</a></font>
+  <br><font size="2">
+  <b>0.</b> SMM内でメロディ通りに左から右へレール音符を配置し、適当な高さに着線レールをひく。<br>
+  <img src="images/info/score.png" height="40"><br>
+  <img src="images/info/track0.jpg" height="200"><br>
+
+  <b>1.</b> 作りたいメロディのBPM(4分符長)を入力。<br>
+  <b>2.</b> 読み込みタイプと、画像を参照して着線パターンを選択。<br>
+  <img src="images/info/wiring0.png" height="200"><br>
+
+  <b>3.</b> 音符の長さをどちらかの方法で入力(一番最後の音符は入力しなくてもよい)。<br>
+  <img src="images/info/wiring1.png" height="160"><br>
+
+  <b>4.</b> (落下集音ならばスキップ) SMM2内を参照して、yズレを入力。<br>
+  <img src="images/info/track1.jpg" height="200"><br>
+  <img src="images/info/wiring2.png" height="15"><br>
+
+  <b>5.</b> 基準となる音符の着線レールとの距離を入力。<br>
+  <img src="images/info/track2.jpg" height="200"><br>
+
+  <b>6.</b> 基準遅延を入力。30 ~ 120ぐらいで調整する。小さいほどスペースと時間を節約できるが、配線が見つかりづらくなる。<br>
+  <b>7.</b>生成ボタンを押し、出てきた下2つの値を縦配置生成に入れる。<br>
+  <img src="images/info/wiring3.png" height="200">
+  <img src="images/info/wiring4.png" height="60"><br>
+  <img src="images/info/wiring5.png" height="200">
+  <img src="images/info/track3.jpg" height="200"><br>
+
+  <b>8.</b>SMM内で配置し、完成！<br>
+  <img src="images/info/track4.jpg" height="200"><br>
+
+  <b>9.</b>生成された配置は正確でない場合があるので、聞いて手直しするといいかも。
+  <br></font>
+
+  <hr>
+  <font size="5"><b>雑記</b></font>
+  <br><br>
+  て～すと<br>
+  間違い、改善点、こんなの追加してほしい～ などあれば。いい感じの機能は追加していきます。
+  <br><br>
+  縦ギャップの値をある程度集めたけど色々合致しない...<br>
+  座標依存含めて要検証。
+  <br><br>
+  <font size="3"><b>【用語と単位集】</b><br>
+  ・f, フレーム ... <font size="2">1/60秒, SMM2の時間最小単位。時間という意味で1f = 1cuである。</font><br>
+  ・cu, うるう距離 ... <font size="2">羽あり音符などで直線3レール曲がらずに進んだ時に発生するズレ。レール1本を整数fで表せないために小数部分が蓄積した結果周期的に表れるものと考えられる。時間、長さ、速さとして用いられる。</font><br>
+  ・b, ブロック幅 ... <font size="2">SMM2の1マス。隣接するブロック間の距離は1bとなる。</font><br>
+  ・G, ギャップ ... <font size="2">縦断線レールなどの距離または遅延。</font><br>
+  ・R, レール ... <font size="2">レールの本数。ここでは直線レールを指す。</font><br>
+  ・A, アセレレーション ... <font size="2">着線レールまでの距離で終端速度に達していないときの加速。</font><br>
+  ・終端速度 ... <font size="2">マリオやレール音符が自由落下し、十分に加速しきった速度。1bあたり4f。落下集音はこの速度でマリオが落下していくものと考える。</font><br>
+  ・レール音符の速度 ... <font size="2">羽ありは直線21f, 斜め30f, 曲線36fで通過する。直線レールを曲がらずにまっすぐ進む場合、3b/32f。</font><br>
+  ・集音 ... <font size="2">レール音符を集めること。また、集音レールはレール音符を集めるためのレール。</font><br>
+  ・着線 ... <font size="2">レール音符が落下などして、集音レールに乗ること。</font><br>
+  ・(自由)落下集音 ... <font size="2">マリオが自由落下し、一定の速度で集音すること。この時レール音符は、マリオと落下速度が同じため水平に一列に並ぶ。</font><br>
+  <font size="2">ここで定めたものは独自のものであり、ゲーム上正しくない、また、他の人には伝わらない可能性があります。</font></font>
+
+  <hr>
+  <font size="5"><b>参考文献・資料</b></font>
+  <font size="2">おいしくいただいております(敬称略)。</font>
+  <br><br>
+
+  <a href="https://www.youtube.com/watch?v=r1Lp6UY5NIc"><b>ぜんまいメソッド解説</b></a><br>
+  <a href="https://www.youtube.com/watch?v=IE5-31xXOFE&list=PLkijGuhvmuKTG2Ve2n2juJwGoFnTa6tLY"><b>レール演奏解説</b></a><br>
+  <a href="https://twitter.com/fnjxbf0b5/status/1601536592879161345"><b>レールループ生成</b></a>
+  <br><br><br><br>
+
+  <font size="1">(C)opyRight 2023 いっぱい</font>
+</body>
+</html>
