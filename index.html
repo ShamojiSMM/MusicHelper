@@ -84,7 +84,7 @@
     }
 
     function function_bpm() {
-      document.getElementById("result_beat").textContent = 3600 / parseFloat(input_bpm.value);
+      document.getElementById("result_beat").textContent = 3600 / parseFloat(input_bpm.value).toFixed(2);
     }
   </script>
 
