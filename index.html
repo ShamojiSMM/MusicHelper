@@ -3,7 +3,6 @@
 <head>
   <title>レール演奏補助</title>
   <meta charset="UTF-8">
-  <link rel="sounds" href="sounds/sound0.mp3">
 </head>
 
 <body bgcolor="#f9ffff" style="-webkit-text-size-adjust: 100%;">
@@ -84,45 +83,9 @@
     }
 
     function function_bpm() {
-      document.getElementById("result_beat").textContent = (3600 / parseFloat(input_bpm.value)).toFixed(2);
+      document.getElementById("result_beat").textContent = 3600 / parseFloat(input_bpm.value);
     }
   </script>
-
-  <!--<hr>
-  <font size="5"><b>音間隔の確認</b></font>
-  <font size="2"> f単位で音が鳴らせます。</font>
-  <br><br>
-  <b>音の長さ(f):</b> <input type="text" style="height: 30px; width: 800px;" id="input_intervals" value="22, 22, 22, 22, 22, 5.5, 5.5, 11, 5.5, 5.5, 11, 5.5, 5.5, 11, 11, 5.5, 5.5, 11, 11, 11, 11, 11, 5.5, 5.5, 11, 11, 11, 11, 11, 11, 11">
-  <br><input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="0">
-  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="1">
-  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="2">
-  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="3">
-  <input type="button" style="height: 35px;" value="鳴らす" onclick="button_play(this.id)" id="4">
-  <font size="2">始めは正常に鳴らない場合があるので複数回お試しください。</font>
-
-  <audio id="sounds" src="sounds/sound0.mp3" src="sounds/sound1.mp3" src="sounds/sound2.mp3" src="sounds/sound3.mp3" src="sounds/sound4.mp3" preload="auto">
-  </audio>
-
-  <script>
-    function button_play(button_play_id) {
-      var intervals = (input_intervals.value).split(",").map(Number);
-      var time = 0;
-
-      document.getElementById("sounds").src = `sounds/sound${button_play_id}.mp3`;
-      document.getElementById("sounds").load();
-      document.getElementById("sounds").play();
-
-      intervals.forEach((interval, index) => {
-        time += interval;
-
-        setTimeout(() => {
-          document.getElementById("sounds").currentTime = 0;
-          document.getElementById("sounds").play();
-        }, time * 50 / 3);
-      });
-    }
-  </script>
-  -->
   <hr>
 
   <font size="5"><b>レールループ生成</b></font>
@@ -270,15 +233,19 @@
   <font size="2"><a href="https://www.youtube.com/watch?v=OZPpbKYsIv0">中途半端な解説動画</a></font>
   <br><br>
 
-  <b>読み込みタイプ:</b> <select id="select_loading" onchange="function_loading()">
+  <b>読み込みタイプ:</b>
+  <select id="select_loading" onchange="function_loading()">
     <option>開始画面(全部同時)</option>
     <option>落下</option>
     <option>縦スクロール</option>
     <option>横スクロール</option>
   </select>
-  <b>集音速度(f/b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_loading_speed" disabled="true" oninput="function_loading_speed()">
+  <b>集音速度(f/b):</b>
+  <input type="number" style="height: 30px; width: 60px;" id="input_loading_speed" disabled="true" oninput="function_loading_speed()">
   <font size="2">下向き, 右向きを正とする。</font><br>
-  <b>着線パターン:</b> <select id="select_landing" onchange="function_landing()">
+
+  <b>着線パターン:</b>
+  <select id="select_landing" onchange="function_landing()">
     <option>カスタム</option>
     <option>1</option>
     <option>2</option>
@@ -286,8 +253,43 @@
     <option>4</option>
   </select>
   <br>
-  <b>4分符長(f): </b><input type="number" style="height: 30px; width: 60px;" id="input_beat_table" oninput="function_beat_table()">
-  <b>BPM: </b><span id="bpm_table"></span>
+  <b>4分符長(f): </b>
+  <input type="number" style="height: 30px; width: 60px;" id="input_beat_table" oninput="function_beat_table()">
+  <b>BPM: </b><span id="bpm_table"></span><br>
+
+  <b>基準音階:</b>
+  <select id="select_scale">
+    <option style="color: #5d78ff;">LowC 低ド</option>
+    <option>LowC# 低ド#</option>
+    <option>LowD 低レ</option>
+    <option>LowD# 低レ#</option>
+    <option>LowE 低ミ</option>
+    <option>LowF 低ファ</option>
+    <option>LowF# 低ファ#</option>
+    <option>LowG 低ソ</option>
+    <option>LowG# 低ソ#</option>
+    <option>LowA 低ラ</option>
+    <option>LowA# 低ラ#</option>
+    <option>LowB 低いシ</option>
+    <option style="color: #26e100;">MidC 中ド</option>
+    <option>MidC# 中ド#</option>
+    <option>MidD 中レ</option>
+    <option>MidD# 中レ#</option>
+    <option>MidE 中ミ</option>
+    <option>MidF 中ファ</option>
+    <option>MidF# 中ファ#</option>
+    <option>MidG 中ソ</option>
+    <option>MidG# 中ソ#</option>
+    <option>MidA 中ラ</option>
+    <option>MidA# 中ラ#</option>
+    <option>MidB 中シ</option>
+    <option style="color: #ff8045;">HigC 高ド</option>
+    <option>HigC# 高ド#</option>
+    <option>HigD 高レ</option>
+    <option>HigD# 高レ#</option>
+  </select>
+  <input type="button" style="height: 35px;" value="鳴らす" onclick="function_play()">
+  <font size="2">初めの1回は正常に鳴らないかも。</font>
 
   <div style="overflow-x: scroll;">
     <table id="table_wiring" border="1" style="width: 6000px; border-collapse: collapse; table-layout: fixed;">
@@ -324,9 +326,8 @@
     </table>
   </div>
 
-  <b>基準遅延(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_delay">
-  <b>基準着線レール間(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_height">
-  <input type="button" style="height: 35px;" value="生成" onclick="function_table()">
+  <b>基準遅延(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_delay" oninput="function_table()">
+  <b>基準着線レール間(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_height" oninput="function_table()">
   <br><br>
   <input type="button" style="height: 35px;" value="検証" onclick="function_test()">
   <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font><br>
@@ -346,6 +347,25 @@
       cell.style.textAlign = "center";
       cell.style.varticalAlign = "middle";
       cell.appendChild(button);
+    }
+
+    function sleep(f) {
+      return new Promise(resolve => setTimeout(resolve, f * 50 / 3));
+    }
+
+    async function function_play() {
+      var context = new (window.AudioContext || window.webkitAudioContext)();
+
+      for (var play_column_index = 1; play_column_index < table_wiring.rows[3].cells.length; play_column_index ++) {
+        var oscillator = context.createOscillator();
+        oscillator.type = "sawtooth";
+        oscillator.frequency.setValueAtTime(((440 * (2 ** ((select_scale.selectedIndex + parseFloat(table_wiring.rows[5].cells[play_column_index].textContent) - 9) / 12))).toFixed(3)), context.currentTime);
+        oscillator.connect(context.destination);
+
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.1);
+        await sleep(parseFloat(table_wiring.rows[3].cells[play_column_index].textContent));
+      }
     }
 
     function function_beat_table() {
