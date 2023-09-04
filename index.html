@@ -259,34 +259,34 @@
 
   <b>基準音階:</b>
   <select id="select_scale">
-    <option style="color: #5d78ff;">LowC 低ド</option>
-    <option>LowC# 低ド#</option>
-    <option>LowD 低レ</option>
-    <option>LowD# 低レ#</option>
-    <option>LowE 低ミ</option>
-    <option>LowF 低ファ</option>
-    <option>LowF# 低ファ#</option>
-    <option>LowG 低ソ</option>
-    <option>LowG# 低ソ#</option>
-    <option>LowA 低ラ</option>
-    <option>LowA# 低ラ#</option>
-    <option>LowB 低いシ</option>
-    <option style="color: #26e100;">MidC 中ド</option>
-    <option>MidC# 中ド#</option>
-    <option>MidD 中レ</option>
-    <option>MidD# 中レ#</option>
-    <option>MidE 中ミ</option>
-    <option>MidF 中ファ</option>
-    <option>MidF# 中ファ#</option>
-    <option>MidG 中ソ</option>
-    <option>MidG# 中ソ#</option>
-    <option>MidA 中ラ</option>
-    <option>MidA# 中ラ#</option>
-    <option>MidB 中シ</option>
-    <option style="color: #ff8045;">HigC 高ド</option>
-    <option>HigC# 高ド#</option>
-    <option>HigD 高レ</option>
     <option>HigD# 高レ#</option>
+    <option>HigD 高レ</option>
+    <option>HigC# 高ド#</option>
+    <option style="color: #ff8045;">HigC 高ド</option>
+    <option>MidB 中シ</option>
+    <option>MidA# 中ラ#</option>
+    <option>MidA 中ラ</option>
+    <option>MidG# 中ソ#</option>
+    <option>MidG 中ソ</option>
+    <option>MidF# 中ファ#</option>
+    <option>MidF 中ファ</option>
+    <option>MidE 中ミ</option>
+    <option>MidD# 中レ#</option>
+    <option>MidD 中レ</option>
+    <option>MidC# 中ド#</option>
+    <option style="color: #26e100;" selected>MidC 中ド</option>
+    <option>LowB 低いシ</option>
+    <option>LowA# 低ラ#</option>
+    <option>LowA 低ラ</option>
+    <option>LowG# 低ソ#</option>
+    <option>LowG 低ソ</option>
+    <option>LowF# 低ファ#</option>
+    <option>LowF 低ファ</option>
+    <option>LowE 低ミ</option>
+    <option>LowD# 低レ#</option>
+    <option>LowD 低レ</option>
+    <option>LowC# 低ド#</option>
+    <option style="color: #5d78ff;">LowC 低ド</option>
   </select>
   <input type="button" style="height: 35px;" value="鳴らす" onclick="function_play()">
   <font size="2">初めの1回は正常に鳴らないかも。</font>
@@ -351,25 +351,35 @@
 
     function sleep(f) {
       return new Promise(resolve => setTimeout(resolve, f * 50 / 3));
-    }
+    } 
 
     async function function_play() {
       var context = new (window.AudioContext || window.webkitAudioContext)();
+      await sleep(1);
 
       for (var play_column_index = 1; play_column_index < table_wiring.rows[3].cells.length; play_column_index ++) {
-        var oscillator = context.createOscillator();
-        oscillator.type = "sawtooth";
-        oscillator.frequency.setValueAtTime(((440 * (2 ** ((select_scale.selectedIndex + parseFloat(table_wiring.rows[5].cells[play_column_index].textContent) - 9) / 12))).toFixed(3)), context.currentTime);
-        oscillator.connect(context.destination);
+        if (!isNaN(parseInt(table_wiring.rows[5].cells[play_column_index].textContent))) {
+          var oscillator = context.createOscillator();
 
-        oscillator.start();
-        oscillator.stop(context.currentTime + 0.1);
+          oscillator.type = "sawtooth"
+          oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - select_scale.selectedIndex + parseFloat(table_wiring.rows[5].cells[play_column_index].textContent)) / 12)), context.currentTime);
+          oscillator.connect(context.destination);
+
+          oscillator.start();
+          oscillator.stop(context.currentTime + 0.1);
+        }
+
         await sleep(parseFloat(table_wiring.rows[3].cells[play_column_index].textContent));
       }
     }
 
     function function_beat_table() {
       document.getElementById("bpm_table").textContent = (3600 / parseFloat(input_beat_table.value)).toFixed(2);
+
+      for (var column_index = 1; column_index < table_wiring.rows[3].cells.length; column_index ++)
+        if (table_wiring.rows[2].cells[column_index].textContent != "") {
+          table_wiring.rows[3].cells[column_index].textContent = ((parseFloat(input_beat_table.value) * 4) / table_wiring.rows[2].cells[column_index].textContent).toFixed(2);
+        }
     }
 
     function function_note() {
