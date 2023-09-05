@@ -3,12 +3,16 @@
 <head>
   <title>レール演奏補助</title>
   <meta charset="UTF-8">
+
+  <style>
+
+  </style>
 </head>
 
-<body bgcolor="#f9ffff" style="-webkit-text-size-adjust: 100%;">
+<body bgcolor="#f9ffff" style="-webkit-text-size-adjust: 100%; font-family: Arial, Helvetica, sans-serif;">
   <h1>レール演奏補助 - SMM2</h1>
   <font size="3">周期生成, 集音配置生成などいろいろ。</font><br>
-  <font size="2">(最終更新: 23/09/04)</font>
+  <font size="2">(最終更新: 23/09/05)</font>
 
   <hr>
   <font size="5"><b>BPMと音符間隔</b></font>
@@ -233,6 +237,7 @@
   <font size="2"><a href="https://www.youtube.com/watch?v=OZPpbKYsIv0">中途半端な解説動画</a></font>
   <br><br>
 
+  <font size="2">01を基準とする。</font><br>
   <b>読み込みタイプ:</b>
   <select id="select_loading" onchange="function_loading()">
     <option>開始画面(全部同時)</option>
@@ -289,7 +294,7 @@
     <option style="color: #5d78ff;">LowC 低ド</option>
   </select>
   <input type="button" style="height: 35px;" value="鳴らす" onclick="function_play()">
-  <font size="2">初めの1回は正常に鳴らないかも。</font>
+  <font size="2">初めは正常に鳴らないかも。</font>
 
   <div style="overflow-x: scroll;">
     <table id="table_wiring" border="1" style="width: 6000px; border-collapse: collapse; table-layout: fixed;">
@@ -312,10 +317,10 @@
         <th bgcolor="#dcdcdc" width="1.3%">yズレ(b)</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
       </tr>
       <tr bgcolor="#f0ffff">
-        <th bgcolor="#afeeee" width="1.3%">結果(f)</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <th bgcolor="#afeeee" width="1.3%">結果(f)</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
       <tr bgcolor="#fff2e9">
-        <th bgcolor="#ffc0cb" width="1.3%">高さ(b)</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <th bgcolor="#ffc0cb" width="1.3%">高さ(b)</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
       <tr bgcolor="#ffffff">
         <th bgcolor="#dcdcdc" width="1.3%">配置</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -326,8 +331,7 @@
     </table>
   </div>
 
-  <b>基準遅延(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_delay" oninput="function_table()">
-  <b>基準着線レール間(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_base_height" oninput="function_table()">
+  <input type="button" value="更新" style="height: 35px;" onclick="function_table()">
   <br><br>
   <input type="button" style="height: 35px;" value="検証" onclick="function_test()">
   <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font><br>
@@ -472,10 +476,6 @@
       var loading_speed = 0;
 
       switch (select_loading.selectedIndex) {
-        case 0:
-          loading_speed = 0;
-          break;
-
         case 1:
           loading_speed = 4;
           break;
@@ -484,13 +484,13 @@
           loading_speed = parseFloat(input_loading_speed.value);
       }
 
-      for (var column_index = 1; column_index < table_wiring.rows[0].cells.length; column_index ++) {
+      for (var column_index = 2; column_index < table_wiring.rows[0].cells.length; column_index ++) {
         total_note_delay += (column_index != 1 ? parseFloat(table_wiring.rows[3].cells[column_index - 1].textContent) : 0);
         total_x_delay += parseFloat(table_wiring.rows[4].cells[column_index].textContent);
 
-        table_wiring.rows[6].cells[column_index].textContent = parseInt(parseInt(input_base_delay.value) + total_note_delay - total_x_delay - ((select_loading.selectedIndex != 1 ? parseInt(table_wiring.rows[5].cells[column_index].textContent) : 0) * (4 - loading_speed)));
+        table_wiring.rows[6].cells[column_index].textContent = parseInt(parseInt(table_wiring.rows[6].cells[1].textContent) + total_note_delay - total_x_delay - ((select_loading.selectedIndex != 1 ? parseInt(table_wiring.rows[5].cells[column_index].textContent) : 0) * (4 - loading_speed)));
 
-        table_wiring.rows[7].cells[column_index].textContent = parseInt(parseInt(input_base_height.value) + parseInt(table_wiring.rows[5].cells[column_index].textContent));
+        table_wiring.rows[7].cells[column_index].textContent = parseInt(parseInt(table_wiring.rows[7].cells[1].textContent) + parseInt(table_wiring.rows[5].cells[column_index].textContent));
       }
     }
 
@@ -745,13 +745,13 @@
       {delay: 131, display: "↑R1-R5", height: 10},
       {delay: 144, display: "↑R1-R6", height: 12},
 
-      {delay: 81, display: "↑G1R1-", height: 0},
-      {delay: 94, display: "↑G1R1-R1", height: 2},
-      {delay: 107, display: "↑G1R1-R2", height: 4},
-      {delay: 121, display: "↑G1R1-R3", height: 6},
-      {delay: 134, display: "↑G1R1-R4", height: 8},
-      {delay: 147, display: "↑G1R1-R5", height: 10},
-      {delay: 161, display: "↑G1R1-R6", height: 12},
+      {delay: 82, display: "↑G1R1-", height: 0},
+      {delay: 95, display: "↑G1R1-R1", height: 2},
+      {delay: 108, display: "↑G1R1-R2", height: 4},
+      {delay: 122, display: "↑G1R1-R3", height: 6},
+      {delay: 135, display: "↑G1R1-R4", height: 8},
+      {delay: 148, display: "↑G1R1-R5", height: 10},
+      {delay: 162, display: "↑G1R1-R6", height: 12},
 
       {delay: 98, display: "↑G2R1-", height: 0},
       {delay: 112, display: "↑G2R1-R1", height: 2},
