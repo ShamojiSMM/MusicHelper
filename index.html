@@ -1,8 +1,10 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>レール演奏補助</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
@@ -18,7 +20,7 @@
   <font size="2"> 1拍(=4分音符)の長さから各音符とBPMを計算。</font>
   <br><br>
 
-  <b>1拍の長さ(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_beat" value="" oninput="function_beat()">
+  <b>1拍の長さ[f]:</b> <input type="number" style="height: 30px; width: 60px;" id="input_beat" value="" oninput="function_beat()">
   <b>BPM:</b> <span id="result_bpm"></span>
   <br><br>
 
@@ -66,12 +68,12 @@
   ・小数第3位を四捨五入。<br>
   ・下の3つは記号の1つ分の長さ。<br>
   (記号はUnicodeの関係で表示されないかも？)
-  </font><br><br><br><br><br><br><br><br><br><br>
+  </font><br><br><br><br><br><br><br><br><br>
 
   <b>BPM:</b>
   <input type="number" style="height: 30px; width: 60px;" id="input_bpm" value="" oninput="function_bpm()">
-  1拍の長さ(f):
-  <span id="result_beat"></span>
+  <b>1拍の長さ[f]</b>:
+  <span id="result_beat"></span><br><br>
 
   <script>
     function function_beat() {
@@ -98,7 +100,7 @@
     <option>羽あり往復</option>
     <option>羽あり特殊</option>
     <option>羽あり周回</option>
-  </select>(f):</b>
+  </select>[f]:</b>
   
   <input type="number" style="height: 30px; width: 120px;" id="input_cycle" value="672">
   <input type="button" style="height: 35px;" value="生成" onclick="function_cycle()">
@@ -147,12 +149,12 @@
           if ((Number.isInteger(cycle) && cycle >= 0) && (add >= 0)) {
             document.getElementById("image").src = `images/base${cycle % 42}.jpg`;
                   
-            document.getElementById("result_cycle").textContent = `直線追加(本): ${add}`;
+            document.getElementById("result_cycle").textContent = `直線追加[本]: ${add}`;
           } else {
             if ([90, 96].includes(cycle)) {
               document.getElementById("image").src = `images/other${cycle}.jpg`;
     
-              document.getElementById("result_cycle").textContent = "直線追加(本): 0";
+              document.getElementById("result_cycle").textContent = "直線追加[本]: 0";
             } else {
               document.getElementById("result_cycle").textContent = "Not Found";
               document.getElementById("image").src = "";        
@@ -197,12 +199,12 @@
   </select>:</b>
   <input type="button" style="height: 35px;" value="確認" onclick="function_shape()">
   <br>
-  <b>直線(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_straight">
-  <b>斜め(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_diagonal">
-  <b>曲線(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_curve">
-  <b>うるう距離(本):</b> <input type="number" style="height: 30px; width: 60px;" id="input_correction">  
+  <b>直線[本]:</b> <input type="number" style="height: 30px; width: 60px;" id="input_straight">
+  <b>斜め[本]:</b> <input type="number" style="height: 30px; width: 60px;" id="input_diagonal">
+  <b>曲線[本]:</b> <input type="number" style="height: 30px; width: 60px;" id="input_curve">
+  <b>うるう距離[本]:</b> <input type="number" style="height: 30px; width: 60px;" id="input_correction">  
   <br><br>
-  <b>周期(f):</b>
+  <b>周期[f]:</b>
   <span id="result_shape"></span>
 
   <script>
@@ -244,9 +246,9 @@
     <option>縦スクロール</option>
     <option>横スクロール</option>
   </select>
-  <b>集音速度(f/b):</b>
+  <b>スクロール遅度[f/b]:</b>
   <input type="number" style="height: 30px; width: 60px;" id="input_loading_speed" disabled="true" oninput="function_loading_speed()">
-  <font size="2">下向き, 右向きを正とする。</font><br>
+  <font size="2">上向き, 右向きを正とする(自由落下 = -4)。</font><br>
 
   <b>着線パターン:</b>
   <select id="select_landing" onchange="function_landing()">
@@ -257,7 +259,7 @@
     <option>4</option>
   </select>
   <br>
-  <b>4分符長(f): </b>
+  <b>4分符長[f]: </b>
   <input type="number" style="height: 30px; width: 60px;" id="input_beat_table" oninput="function_beat_table()">
   <b>BPM: </b><span id="bpm_table"></span><br>
 
@@ -307,19 +309,19 @@
         <th bgcolor="#dcdcdc" width="1.3%">n分符</th><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td><td contenteditable="true" oninput="function_note()"></td>
       </tr>
       <tr bgcolor="#fffff7">
-        <th bgcolor="#dcdcdc" width="1.3%">符長(f)</th><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        <th bgcolor="#dcdcdc" width="1.3%">符長[f]</th><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
       </tr>
       <tr bgcolor="#fffff7">
-        <th bgcolor="#dcdcdc" width="1.3%">xズレ(f)</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        <th bgcolor="#dcdcdc" width="1.3%">xズレ[f]</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
       </tr>
       <tr bgcolor="#fffff7">
-        <th bgcolor="#dcdcdc" width="1.3%">yズレ(b)</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        <th bgcolor="#dcdcdc" width="1.3%">yズレ[b]</th><td>0</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
       </tr>
       <tr bgcolor="#f0ffff">
-        <th bgcolor="#afeeee" width="1.3%">結果(f)</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <th bgcolor="#afeeee" width="1.3%">結果[f]</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
       <tr bgcolor="#fff2e9">
-        <th bgcolor="#ffc0cb" width="1.3%">高さ(b)</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        <th bgcolor="#ffc0cb" width="1.3%">高さ[b]</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="function_table()"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
       <tr bgcolor="#ffffff">
         <th bgcolor="#dcdcdc" width="1.3%">配置</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -334,8 +336,8 @@
   <br><br>
   <input type="button" style="height: 35px;" value="検証" onclick="function_test()">
   <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font><br>
-  <input type="checkbox" id="check_test_terminal" onclick="function_test_terminal()">
-  <font size="2">終端速度を使用(8b以上あける)。</font><br>
+  <input type="checkbox" id="check_test_terminal">
+  <font size="2">終端遅度を使用(8b以上あける)。</font><br>
   <font size="2">代入ボタンで↓に結果を代入・表示します。</font>
 
   <script>
@@ -476,18 +478,18 @@
 
       switch (select_loading.selectedIndex) {
         case 1:
-          loading_speed = 4;
+          loading_speed = -4;
           break;
 
         case 2:
-          loading_speed = parseFloat(input_loading_speed.value);
+          loading_speed = -parseFloat(input_loading_speed.value);
       }
 
       for (var column_index = 2; column_index < table_wiring.rows[0].cells.length; column_index ++) {
         total_note_delay += (column_index != 1 ? parseFloat(table_wiring.rows[3].cells[column_index - 1].textContent) : 0);
         total_x_delay += parseFloat(table_wiring.rows[4].cells[column_index].textContent);
 
-        table_wiring.rows[6].cells[column_index].textContent = parseInt(parseInt(table_wiring.rows[6].cells[1].textContent) + total_note_delay - total_x_delay - ((select_loading.selectedIndex != 1 ? parseInt(table_wiring.rows[5].cells[column_index].textContent) : 0) * (4 - loading_speed)));
+        table_wiring.rows[6].cells[column_index].textContent = parseInt(parseInt(table_wiring.rows[6].cells[1].textContent) + total_note_delay - total_x_delay - ((select_loading.selectedIndex != 1 ? parseInt(table_wiring.rows[5].cells[column_index].textContent) : 0) * (loading_speed + 4)));
 
         table_wiring.rows[7].cells[column_index].textContent = parseInt(parseInt(table_wiring.rows[7].cells[1].textContent) + parseInt(table_wiring.rows[5].cells[column_index].textContent));
       }
@@ -495,38 +497,41 @@
 
     function function_test() {
       for (var column_index = 1; column_index < table_wiring.rows[0].cells.length; column_index ++) {
-        var result_same = [], result_near = [], result_near_near = [];
-
         var target = parseInt(table_wiring.rows[6].cells[column_index].textContent);
         var height = (check_test_terminal.checked ? 15 : parseInt(table_wiring.rows[7].cells[column_index].textContent) - 1);
+        var result_same = [], result_near = [], result_near_near = [];
 
         if (!isNaN(table_wiring.rows[6].cells[column_index].textContent + table_wiring.rows[7].cells[column_index].textContent)) {
           for (var i = 0; i < starting_list.length; i ++) {
             var starting = starting_list[i];
 
-            if (starting.delay < target + 11) {
+            if (starting.delay <= target + 11 && starting.height <= height) {
               for (var j = 0; j < gap_list.length; j ++) {
                 var gap0 = gap_list[j];
-
-                for (var k = j; k < gap_list.length; k ++) {
+    
+                for (var k = 0; k < gap_list.length; k ++) {
                   var gap1 = gap_list[k];
-
-                  for (var l = k; l < gap_list.length; l ++) {
+    
+                  for (var l = 0; l < gap_list.length; l ++) {
                     var gap2 = gap_list[l];
                     var total_height = starting.height + gap0.height + gap1.height + gap2.height;
                     var distance = height - total_height;
-
+    
                     if (distance >= 0) {
-                      var total_delay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (check_test_terminal.checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
-
-                      if (total_delay == target) {
-                        result_same.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
-
-                      } else if (total_delay == target + 1 || total_delay == target - 1) {
-                        result_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
-
-                      } else if (total_delay == target + 2 || total_delay == target - 2) {
-                        result_near_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                      var total_delay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (check_terminal.checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
+                      var target_result = {delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display};
+    
+                      switch (total_delay) {
+                        case target:
+                          result_same.push(target_result);
+                          break;
+    
+                        case (target + 1 || target - 1):
+                          result_near.push(target_result);
+                          break;
+    
+                        case (target + 2 || target - 2):
+                          result_near_near.push(target_result);
                       }
                     }
                   }
@@ -571,11 +576,13 @@
   <font size="2"> 縦レールによる集音(ぜんまいメソッド)の配置を探します。</font>
   <br><br>
 
-  <b>狙いの値(f):</b> <input type="number" style="height: 30px; width: 60px;" id="input_target" value="100">
-  <b>着線レールとの距離(b):</b> <input type="number" style="height: 30px; width: 60px;" id="input_height" value="11">
+  <b>狙いの値[f]:</b>
+  <input type="number" style="height: 30px; width: 60px;" id="input_target">
+  <b>着線レールとの距離[b]:</b>
+  <input type="number" style="height: 30px; width: 60px;" id="input_height">
   <input type="button" style="height: 35px;" value="生成" onclick="function_target()"><br>
   <input type="checkbox" id="check_terminal" onclick="function_terminal()">
-  <font size="2">終端速度を使用(8b以上あける)。<br>
+  <font size="2">終端遅度を使用(8b以上あける)。<br>
   ( 遅延 / 下向きの長さ / 表記 )</font>。
   <br><br>
 
@@ -599,29 +606,33 @@
       for (var i = 0; i < starting_list.length; i ++) {
         var starting = starting_list[i];
 
-        if (starting.delay < target + 11) {
+        if (starting.delay <= target + 11 && starting.height <= height) {
           for (var j = 0; j < gap_list.length; j ++) {
             var gap0 = gap_list[j];
 
-            for (var k = j; k < gap_list.length; k ++) {
+            for (var k = 0; k < gap_list.length; k ++) {
               var gap1 = gap_list[k];
 
-              for (var l = k; l < gap_list.length; l ++) {
+              for (var l = 0; l < gap_list.length; l ++) {
                 var gap2 = gap_list[l];
                 var total_height = starting.height + gap0.height + gap1.height + gap2.height;
                 var distance = height - total_height;
 
                 if (distance >= 0) {
                   var total_delay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (check_terminal.checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
+                  var target_result = {delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display};
 
-                  if (total_delay == target) {
-                    result_same.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                  switch (total_delay) {
+                    case target:
+                      result_same.push(target_result);
+                      break;
 
-                  } else if (total_delay == target + 1 || total_delay == target - 1) {
-                    result_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                    case (target + 1 || target - 1):
+                      result_near.push(target_result);
+                      break;
 
-                  } else if (total_delay == target + 2 || total_delay == target - 2) {
-                    result_near_near.push({delay: total_delay, height: starting.height + gap0.height + gap1.height + gap2.height, display: starting.display + gap0.display + gap1.display + gap2.display});
+                    case (target + 2 || target - 2):
+                      result_near_near.push(target_result);
                   }
                 }
               }
@@ -657,13 +668,88 @@
   <hr>
   <font size="5"><b>画像</b></font>
   <br><br>
-  <img src="images/info/loop.jpg" height="200">
+  <img src="images/info/loop.jpg" height="180">
   <br>
-  <img src="images/info/gaps.jpg" height="160">
-  <img src="images/info/height.jpg" height="160">
+  <img src="images/info/gaps.jpg" height="140">
+  <img src="images/info/height.jpg" height="140">
   <br>
-  <img src="images/info/landing0.jpg" height="160">
-  <img src="images/info/landing1.jpg" height="220">
+  <img src="images/info/landing0.jpg" height="140">
+  <img src="images/info/landing1.jpg" height="200">
+  <br><br>
+
+  <font size="5"><b>スクロール遅度表</b></font>
+  <font size="2"><a href="https://www.youtube.com/watch?v=3VlLrf_5KvA">一部参考</a></font><br>
+  <font size="2">数値の単位は[f/b], 1b進むのにかかる時間。</font>
+
+  <table border="1" style="border-collapse: collapse;">
+    <tr style="background-color: #ffffd1;">
+      <th rowspan="100" style="background-color: #d5ffd2;">横</th><th>スクロール方法</th><th>平均遅度</th><th>周期</th>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>強制(遅), クリボー</td><td>32.00</td><td>32...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>強制(中), コンベア(中)</td><td>16.00</td><td>16...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>強制(速), コンベア(速)</td><td>8.00</td><td>8...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>青ドクロ, コンベア(中)+歩き, コンベア(速)+クリボー</td><td>6.40</td><td>6, 6, 7, 6, 7...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>走り, ドッスン</td><td>5.33</td><td>5, 5, 6...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>歩き, 羽レールブロック</td><td>10.66</td><td>10, 11, 11...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>レールブロック</td><td>21.33</td><td>21, 21, 22...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>コンベア(速)+走り</td><td>3.20</td><td>3, 3, 3, 3, 4...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>コンベア(中)+走り</td><td>4.00</td><td>4...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>コンベア(速)+歩き</td><td>4.57</td><td>4, 5, 4, 5, 4, 5, 5...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>コンベア(速)+チョロプー</td><td>4.33 (終端)</td><td>(16, 7, 7, 6, 6, 6, 6, 5, 6, 5, 5, 4, 5, 5, ) 4, 5, 4...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>コンベア(速)+怒ハナチャン</td><td>5.00</td><td>5...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>コンベア(速)+青トゲメット</td><td>5.83</td><td>5, 6, 6, 6, 6, 6...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>赤砲台メット</td><td>3.60</td><td>3, 4, 3, 4, 4...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>コンベア(中)+赤砲台メット</td><td>3.00</td><td>3...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>コンベア(速)+赤砲台メット</td><td>2.50</td><td>2, 3...</td>
+    </tr>
+  </table><br>
+
+  <table border="1" style="border-collapse: collapse;">
+    <tr style="background-color: #ffffd1;">
+      <th rowspan="100" style="background-color: #d5ffd2;">縦</th><th>スクロール方法</th><th>平均遅度</th><th>周期</th>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>↓自由落下</td><td>4.00</td><td>4...</td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td>↓デブロス落下</td><td>2.00</td><td>2...</td>
+    </tr>
+    <tr style="background-color: #f1f1f1;">
+      <td>↑ブンブン急上昇</td><td>5.33</td><td>5, 5, 6...</td>
+    </tr>
+  </table>
+
 
   <hr>
   <font size="5"><b>雑記</b></font>
@@ -671,8 +757,6 @@
   間違い, 改善点, こんなの追加してほしい, ここが解らない など言ってください。<br>
   いい感じの機能は追加していきます。
   <br><br>
-  縦ギャップの値をある程度集めたけど色々合致しない...<br>
-  座標依存含めて要検証。<br>
   データは全部ソースの中に入ってるので興味があれば(穢いけど)。
   </font>
   <br><br>
@@ -688,14 +772,16 @@
   縦断線レールなどの距離または遅延。<br>
   <b>・R, レール</b> ... 
   レールの本数。ここでは直線レールを指す。<br>
-  <b>・終端速度</b> ... 
-  マリオやレール音符が自由落下し, 十分に加速しきった速度。1bあたり4f。落下集音はこの速度でマリオが落下していくものと考える。<br>
+  <b>・f/b, 遅度</b> ...
+  ある距離を進むのにかかる時間。速度の逆数で表される。<br>
+  <b>・終端遅度</b> ... 
+  マリオやレール音符が自由落下し, 十分に加速しきった遅度。1bあたり4f。落下集音はこの遅度でマリオが落下していくものと考える。<br>
   <b>・集音</b> ... 
   レール音符を集めること。また, 集音レールはレール音符を集めるためのレール。<br>
   <b>・着線</b> ... 
   レール音符が落下などして, 集音レールに乗ること。<br>
   <b>・(自由)落下集音</b> ... 
-  マリオが自由落下し, 一定の速度で集音すること。この時レール音符は, マリオと落下速度が同じため水平に一列に並ぶ。<br>
+  マリオが自由落下し, 一定の遅度で集音すること。この時レール音符は, マリオと落下遅度が同じため水平に一列に並ぶ。<br>
   <b>・座標</b> ... 
   ここでは横軸をx, 縦軸をyとする。<br>
   
