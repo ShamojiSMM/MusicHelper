@@ -98,11 +98,13 @@
   <span id="resultBeatLength"></span>
   
   <script>
+    var splits = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, (4 / 3), (4 / 6), (4 / 12)];
+
     function funBeatLength(beatLengthValue) {
       resultBpm.textContent = (3600 / beatLengthValue).toFixed(2);
 
       for (var tableBeatsRow = 1; tableBeatsRow < tableBeats.rows.length; tableBeatsRow ++) {
-        tableBeats.rows[tableBeatsRow].cells[3].textContent = (beatLengthValue * tableBeats.rows[tableBeatsRow].cells[1].textContent).toFixed(2);
+        tableBeats.rows[tableBeatsRow].cells[3].textContent = (beatLengthValue * splits[tableBeatsRow - 1]).toFixed(2);
       }
     }
 
