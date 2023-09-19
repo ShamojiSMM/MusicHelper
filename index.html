@@ -37,9 +37,25 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 23/09/18)</font>
+  <font size="2">(最終更新日: 23/09/19)</font>
 
   <hr>
+  <font size="5"><b>目次</b></font>
+  <br><br>
+  <div style="border: 1px solid #000000; background-color: #f1f1f1;">
+    <ol>
+      <li><a href="#bpmAndNoteLength">BPMと符長</a></li>
+      <li><a href="#railLoopGenerator">レールループ生成</a></li>
+      <li><a href="#railLoopShape">レールループ周期確認</a></li>
+      <li><a href="#tableCulculator">表計算</a></li>
+      <li><a href="#wiringGenerator">縦集音配置生成</a></li>
+      <li><a href="#imageGallery">画像</a></li>
+      <li><a href="#scrollSpeedTable">スクロール遅度表</a></li>
+      <li><a href="#diary">雑記 / 参考文献・資料</a></li>
+    </ol>
+  </div>
+
+  <hr id="bpmAndNoteLength">
   <font size="5"><b>BPMと符長</b></font>
   <font size="3">レール演奏で必須となる音符の長さを計算。</font>
   <br><br>
@@ -114,7 +130,7 @@
 
   </script>
   
-  <hr>
+  <hr id="railLoopGenerator">
   <font size="5"><b>レールループ生成</b></font>
   <font size="3">レール演奏以外でも使えます。</font>
   <br><br>
@@ -220,7 +236,7 @@
     }
   </script>
 
-  <hr>
+  <hr id="railLoopShape">
   <font size="5"><b>レールループ周期確認</b></font>
   <font size="3">断線は未実装です。</font>
   <br><br>
@@ -275,7 +291,7 @@
     }
   </script>
 
-  <hr>
+  <hr id="tableCulculator">
   <font size="5"><b>表計算</b></font>
   <font size="3">縦断線式集音に必要な計算をします。<a href="https://www.youtube.com/watch?v=DFh_rsFVZ8c">解説動画</a></font>
   <br><br>
@@ -714,7 +730,7 @@
     }
   </script>
 
-  <hr>
+  <hr id="wiringGenerator">
   <font size="5"><b>縦集音配置生成</b></font>
   <font size="3">縦レールによる集音(ぜんまいメソッド)の配置を探します。</font>
   <br><br>
@@ -814,7 +830,7 @@
     }
   </script>
 
-<hr>
+<hr id="imageGallery">
 <font size="5"><b>画像</b></font>
 <br><br>
 <img src="images/info/loop.jpg" height="180">
@@ -824,8 +840,8 @@
 <br>
 <img src="images/info/landing0.jpg" height="140">
 <img src="images/info/landing1.jpg" height="200">
-<br><br>
 
+<hr id="scrollSpeedTable">
 <font size="5"><b>スクロール遅度表</b></font>
 <font size="2"><a href="https://www.youtube.com/watch?v=3VlLrf_5KvA">一部参考</a></font><br>
 <font size="2">数値の単位は[f/b], 1b進むのにかかる時間。</font>
@@ -903,456 +919,456 @@
 </table>
 
 
-<hr>
-<font size="5"><b>雑記</b></font>
-<br><br><font size="2">
-(ギャップ)遅延データやスクロール遅度データなどに誤りがあった場合教えてください。
-<br><br>
-羽なしや水中verもやってみたいけどデータ集めるのが面倒...<br>
-だれかやってくださいw
-</font>
-<br><br>
+  <hr id="diary">
+  <font size="5"><b>雑記</b></font>
+  <br><br><font size="2">
+  (ギャップ)遅延データやスクロール遅度データなどに誤りがあった場合教えてください。
+  <br><br>
+  羽なしや水中verもやってみたいけどデータ集めるのが面倒...<br>
+  だれかやってくださいw
+  </font>
+  <br><br>
 
-<font size="4"><b>用語と単位集</b></font><br>
-<font size="2">
-<b>・f, フレーム</b> ... 
-1/60秒, 観測しうるSMM2の時間最小単位。時間という意味で1f = 1cuである。<br>
-<b>・b, ブロック幅</b> ... 
-SMM2の1マス。隣接するブロック間の距離は1bとなる。<br>
-<b>・cu, うるう距離</b> ... 
-いい感じの定義募集中。<br>
-<b>・G, ギャップ</b> ... 
-縦断線レールなどの距離または遅延。<br>
-<b>・R, レール</b> ... 
-レールの本数。ここでは直線レールを指す。<br>
-<b>・f/b, 遅度</b> ...
-ある距離を進むのにかかる時間。速度の逆数で表される。<br>
-<b>・終端遅度</b> ... 
-マリオやレールブロックが自由落下し, 充分に加速しきった遅度。1bあたり4f。<br>
-<b>・集音</b> ... 
-レール音符を集めること。また, 集音レールはレール音符を集めるためのレール。<br>
-<b>・着線</b> ... 
-レール音符が落下などして, 集音レールに乗ること。<br>
-<b>・(自由)落下集音</b> ... 
-マリオが自由落下し, 一定の遅度で集音すること。この時レール音符は, マリオと落下遅度が同じため水平に一列に並ぶ。<br>
-<b>・座標</b> ... 
-ここでは右向きをx, 上向きをyとする。<br>
+  <font size="4"><b>用語と単位集</b></font><br>
+  <font size="2">
+  <b>・f, フレーム</b> ... 
+  1/60秒, 観測しうるSMM2の時間最小単位。時間という意味で1f = 1cuである。<br>
+  <b>・b, ブロック幅</b> ... 
+  SMM2の1マス。隣接するブロック間の距離は1bとなる。<br>
+  <b>・cu, うるう距離</b> ... 
+  いい感じの定義募集中。<br>
+  <b>・G, ギャップ</b> ... 
+  縦断線レールなどの距離または遅延。<br>
+  <b>・R, レール</b> ... 
+  レールの本数。ここでは直線レールを指す。<br>
+  <b>・f/b, 遅度</b> ...
+  ある距離を進むのにかかる時間。速度の逆数で表される。<br>
+  <b>・終端遅度</b> ... 
+  マリオやレールブロックが自由落下し, 充分に加速しきった遅度。1bあたり4f。<br>
+  <b>・集音</b> ... 
+  レール音符を集めること。また, 集音レールはレール音符を集めるためのレール。<br>
+  <b>・着線</b> ... 
+  レール音符が落下などして, 集音レールに乗ること。<br>
+  <b>・(自由)落下集音</b> ... 
+  マリオが自由落下し, 一定の遅度で集音すること。この時レール音符は, マリオと落下遅度が同じため水平に一列に並ぶ。<br>
+  <b>・座標</b> ... 
+  ここでは右向きをx, 上向きをyとする。<br>
 
-ここで定めたものは独自のものであり, ゲーム・数学・物理学上正しくない, また, 他の人に伝わらない可能性があります。
-</font>
+  ここで定めたものは独自のものであり, ゲーム・数学・物理学上正しくない, また, 他の人に伝わらない可能性があります。
+  </font>
 
-<hr>
-<font size="5"><b>参考文献・資料</b></font>
-<font size="2">おいしくいただいております。</font>
-<br><br>
-<font size="3">
-<a href="https://www.youtube.com/watch?v=r1Lp6UY5NIc"><b>ぜんまいメソッド解説</b></a><br>
-<a href="https://www.youtube.com/watch?v=IE5-31xXOFE&list=PLkijGuhvmuKTG2Ve2n2juJwGoFnTa6tLY"><b>レール演奏解説</b></a><br>
-<a href="https://twitter.com/fnjxbf0b5/status/1601536592879161345"><b>レールループ生成</b></a>
-</font>
-<br><br><br>
+  <hr>
+  <font size="5"><b>参考文献・資料</b></font>
+  <font size="2">おいしくいただいております。</font>
+  <br><br>
+  <font size="3">
+  <a href="https://www.youtube.com/watch?v=r1Lp6UY5NIc"><b>ぜんまいメソッド解説</b></a><br>
+  <a href="https://www.youtube.com/watch?v=IE5-31xXOFE&list=PLkijGuhvmuKTG2Ve2n2juJwGoFnTa6tLY"><b>レール演奏解説</b></a><br>
+  <a href="https://twitter.com/fnjxbf0b5/status/1601536592879161345"><b>レールループ生成</b></a>
+  </font>
+  <br><br><br>
 
-<font size="3"><a href="https://twitter.com/Shamoji_SMM">作った人</a></font><br>
-<font size="2">(C)opyRight 2023 無し</font>
+  <font size="3"><a href="https://twitter.com/Shamoji_SMM">作った人</a></font><br>
+  <font size="2">(C)opyRight 2023 無し</font>
 
-<script>
-  var accelerations = [11, 8, 5, 3, 2, 1, 1];
+  <script>
+    var accelerations = [11, 8, 5, 3, 2, 1, 1];
 
-  var startingList = [
-    {delay: 0, display: "↓-", height: 0},
-    {delay: 14, display: "↓-R1", height: 2},
-    {delay: 27, display: "↓-R2", height: 4},
-    {delay: 40, display: "↓-R3", height: 6},
-    {delay: 54, display: "↓-R4", height: 8},
-    {delay: 67, display: "↓-R5", height: 10},
-    {delay: 80, display: "↓-R6", height: 12},
+    var startingList = [
+      {delay: 0, display: "↓-", height: 0},
+      {delay: 14, display: "↓-R1", height: 2},
+      {delay: 27, display: "↓-R2", height: 4},
+      {delay: 40, display: "↓-R3", height: 6},
+      {delay: 54, display: "↓-R4", height: 8},
+      {delay: 67, display: "↓-R5", height: 10},
+      {delay: 80, display: "↓-R6", height: 12},
 
-    {delay: 21, display: "↑R0-", height: 0},
-    {delay: 34, display: "↑R0-R1", height: 2},
-    {delay: 48, display: "↑R0-R2", height: 4},
-    {delay: 61, display: "↑R0-R3", height: 6},
-    {delay: 74, display: "↑R0-R4", height: 8},
-    {delay: 88, display: "↑R0-R5", height: 10},
-    {delay: 101, display: "↑R0-R6", height: 12},
+      {delay: 21, display: "↑R0-", height: 0},
+      {delay: 34, display: "↑R0-R1", height: 2},
+      {delay: 48, display: "↑R0-R2", height: 4},
+      {delay: 61, display: "↑R0-R3", height: 6},
+      {delay: 74, display: "↑R0-R4", height: 8},
+      {delay: 88, display: "↑R0-R5", height: 10},
+      {delay: 101, display: "↑R0-R6", height: 12},
 
-    {delay: 64, display: "↑R1-", height: 0},
-    {delay: 78, display: "↑R1-R1", height: 2},
-    {delay: 91, display: "↑R1-R2", height: 4},
-    {delay: 104, display: "↑R1-R3", height: 6},
-    {delay: 118, display: "↑R1-R4", height: 8},
-    {delay: 131, display: "↑R1-R5", height: 10},
-    {delay: 144, display: "↑R1-R6", height: 12},
+      {delay: 64, display: "↑R1-", height: 0},
+      {delay: 78, display: "↑R1-R1", height: 2},
+      {delay: 91, display: "↑R1-R2", height: 4},
+      {delay: 104, display: "↑R1-R3", height: 6},
+      {delay: 118, display: "↑R1-R4", height: 8},
+      {delay: 131, display: "↑R1-R5", height: 10},
+      {delay: 144, display: "↑R1-R6", height: 12},
 
-    {delay: 82, display: "↑G1R1-", height: 0},
-    {delay: 95, display: "↑G1R1-R1", height: 2},
-    {delay: 108, display: "↑G1R1-R2", height: 4},
-    {delay: 122, display: "↑G1R1-R3", height: 6},
-    {delay: 135, display: "↑G1R1-R4", height: 8},
-    {delay: 148, display: "↑G1R1-R5", height: 10},
-    {delay: 162, display: "↑G1R1-R6", height: 12},
+      {delay: 82, display: "↑G1R1-", height: 0},
+      {delay: 95, display: "↑G1R1-R1", height: 2},
+      {delay: 108, display: "↑G1R1-R2", height: 4},
+      {delay: 122, display: "↑G1R1-R3", height: 6},
+      {delay: 135, display: "↑G1R1-R4", height: 8},
+      {delay: 148, display: "↑G1R1-R5", height: 10},
+      {delay: 162, display: "↑G1R1-R6", height: 12},
 
-    {delay: 98, display: "↑G2R1-", height: 0},
-    {delay: 112, display: "↑G2R1-R1", height: 2},
-    {delay: 125, display: "↑G2R1-R2", height: 4},
-    {delay: 138, display: "↑G2R1-R3", height: 6},
-    {delay: 152, display: "↑G2R1-R4", height: 8},
-    {delay: 165, display: "↑G2R1-R5", height: 10},
-    {delay: 178, display: "↑G2R1-R6", height: 12},
+      {delay: 98, display: "↑G2R1-", height: 0},
+      {delay: 112, display: "↑G2R1-R1", height: 2},
+      {delay: 125, display: "↑G2R1-R2", height: 4},
+      {delay: 138, display: "↑G2R1-R3", height: 6},
+      {delay: 152, display: "↑G2R1-R4", height: 8},
+      {delay: 165, display: "↑G2R1-R5", height: 10},
+      {delay: 178, display: "↑G2R1-R6", height: 12},
 
-    {delay: 107, display: "↑R2-", height: 0},
-    {delay: 120, display: "↑R2-R1", height: 2},
-    {delay: 133, display: "↑R2-R2", height: 4},
-    {delay: 147, display: "↑R2-R3", height: 6},
-    {delay: 160, display: "↑R2-R4", height: 8},
-    {delay: 173, display: "↑R2-R5", height: 10},
-    {delay: 187, display: "↑R2-R6", height: 12},
+      {delay: 107, display: "↑R2-", height: 0},
+      {delay: 120, display: "↑R2-R1", height: 2},
+      {delay: 133, display: "↑R2-R2", height: 4},
+      {delay: 147, display: "↑R2-R3", height: 6},
+      {delay: 160, display: "↑R2-R4", height: 8},
+      {delay: 173, display: "↑R2-R5", height: 10},
+      {delay: 187, display: "↑R2-R6", height: 12},
 
-    {delay: 111, display: "↑F-", height: 0},
-    {delay: 124, display: "↑F-R1", height: 2},
-    {delay: 137, display: "↑F-R2", height: 4},
-    {delay: 151, display: "↑F-R3", height: 6},
-    {delay: 164, display: "↑F-R4", height: 8},
-    {delay: 177, display: "↑F-R5", height: 10},
-    {delay: 191, display: "↑F-R6", height: 12},
+      {delay: 111, display: "↑F-", height: 0},
+      {delay: 124, display: "↑F-R1", height: 2},
+      {delay: 137, display: "↑F-R2", height: 4},
+      {delay: 151, display: "↑F-R3", height: 6},
+      {delay: 164, display: "↑F-R4", height: 8},
+      {delay: 177, display: "↑F-R5", height: 10},
+      {delay: 191, display: "↑F-R6", height: 12},
 
-    {delay: 120, display: "↑G3R1-", height: 0},
-    {delay: 133, display: "↑G3R1-R1", height: 2},
-    {delay: 146, display: "↑G3R1-R2", height: 4},
-    {delay: 160, display: "↑G3R1-R3", height: 6},
-    {delay: 173, display: "↑G3R1-R4", height: 8},
-    {delay: 186, display: "↑G3R1-R5", height: 10},
-    {delay: 200, display: "↑G3R1-R6", height: 12},
+      {delay: 120, display: "↑G3R1-", height: 0},
+      {delay: 133, display: "↑G3R1-R1", height: 2},
+      {delay: 146, display: "↑G3R1-R2", height: 4},
+      {delay: 160, display: "↑G3R1-R3", height: 6},
+      {delay: 173, display: "↑G3R1-R4", height: 8},
+      {delay: 186, display: "↑G3R1-R5", height: 10},
+      {delay: 200, display: "↑G3R1-R6", height: 12},
 
-    {delay: 124, display: "↑G1R2-", height: 0},
-    {delay: 137, display: "↑G1R2-R1", height: 2},
-    {delay: 150, display: "↑G1R2-R2", height: 4},
-    {delay: 164, display: "↑G1R2-R3", height: 6},
-    {delay: 177, display: "↑G1R2-R4", height: 8},
-    {delay: 190, display: "↑G1R2-R5", height: 10},
-    {delay: 204, display: "↑G1R2-R6", height: 12},
+      {delay: 124, display: "↑G1R2-", height: 0},
+      {delay: 137, display: "↑G1R2-R1", height: 2},
+      {delay: 150, display: "↑G1R2-R2", height: 4},
+      {delay: 164, display: "↑G1R2-R3", height: 6},
+      {delay: 177, display: "↑G1R2-R4", height: 8},
+      {delay: 190, display: "↑G1R2-R5", height: 10},
+      {delay: 204, display: "↑G1R2-R6", height: 12},
 
-    {delay: 124, display: "↑R1G1R1-", height: 0},
-    {delay: 137, display: "↑R1G1R1-R1", height: 2},
-    {delay: 151, display: "↑R1G1R1-R2", height: 4},
-    {delay: 164, display: "↑R1G1R1-R3", height: 6},
-    {delay: 177, display: "↑R1G1R1-R4", height: 8},
-    {delay: 191, display: "↑R1G1R1-R5", height: 10},
-    {delay: 204, display: "↑R1G1R1-R6", height: 12},
+      {delay: 124, display: "↑R1G1R1-", height: 0},
+      {delay: 137, display: "↑R1G1R1-R1", height: 2},
+      {delay: 151, display: "↑R1G1R1-R2", height: 4},
+      {delay: 164, display: "↑R1G1R1-R3", height: 6},
+      {delay: 177, display: "↑R1G1R1-R4", height: 8},
+      {delay: 191, display: "↑R1G1R1-R5", height: 10},
+      {delay: 204, display: "↑R1G1R1-R6", height: 12},
 
-    {delay: 140, display: "↑G2R2-", height: 0},
-    {delay: 154, display: "↑G2R2-R1", height: 2},
-    {delay: 167, display: "↑G2R2-R2", height: 4},
-    {delay: 180, display: "↑G2R2-R3", height: 6},
-    {delay: 194, display: "↑G2R2-R4", height: 8},
-    {delay: 207, display: "↑G2R2-R5", height: 10},
-    {delay: 220, display: "↑G2R2-R6", height: 12},
+      {delay: 140, display: "↑G2R2-", height: 0},
+      {delay: 154, display: "↑G2R2-R1", height: 2},
+      {delay: 167, display: "↑G2R2-R2", height: 4},
+      {delay: 180, display: "↑G2R2-R3", height: 6},
+      {delay: 194, display: "↑G2R2-R4", height: 8},
+      {delay: 207, display: "↑G2R2-R5", height: 10},
+      {delay: 220, display: "↑G2R2-R6", height: 12},
 
-    {delay: 148, display: "↑R3-", height: 0},
-    {delay: 161, display: "↑R3-R1", height: 2},
-    {delay: 175, display: "↑R3-R2", height: 4},
-    {delay: 188, display: "↑R3-R3", height: 6},
-    {delay: 201, display: "↑R3-R4", height: 8},
-    {delay: 215, display: "↑R3-R5", height: 10},
-    {delay: 228, display: "↑R3-R6", height: 12},
+      {delay: 148, display: "↑R3-", height: 0},
+      {delay: 161, display: "↑R3-R1", height: 2},
+      {delay: 175, display: "↑R3-R2", height: 4},
+      {delay: 188, display: "↑R3-R3", height: 6},
+      {delay: 201, display: "↑R3-R4", height: 8},
+      {delay: 215, display: "↑R3-R5", height: 10},
+      {delay: 228, display: "↑R3-R6", height: 12},
 
-    {delay: 157, display: "↑G1R1G2R1-", height: 0},
-    {delay: 170, display: "↑G1R1G2R1-R1", height: 2},
-    {delay: 183, display: "↑G1R1G2R1-R2", height: 4},
-    {delay: 197, display: "↑G1R1G2R1-R3", height: 6},
-    {delay: 210, display: "↑G1R1G2R1-R4", height: 8},
-    {delay: 223, display: "↑G1R1G2R1-R5", height: 10},
-    {delay: 237, display: "↑G1R1G2R1-R6", height: 12},
+      {delay: 157, display: "↑G1R1G2R1-", height: 0},
+      {delay: 170, display: "↑G1R1G2R1-R1", height: 2},
+      {delay: 183, display: "↑G1R1G2R1-R2", height: 4},
+      {delay: 197, display: "↑G1R1G2R1-R3", height: 6},
+      {delay: 210, display: "↑G1R1G2R1-R4", height: 8},
+      {delay: 223, display: "↑G1R1G2R1-R5", height: 10},
+      {delay: 237, display: "↑G1R1G2R1-R6", height: 12},
 
-    {delay: 157, display: "↑G2R1G1R1-", height: 0},
-    {delay: 171, display: "↑G2R1G1R1-R1", height: 2},
-    {delay: 183, display: "↑G2R1G1R1-R2", height: 4},
-    {delay: 197, display: "↑G2R1G1R1-R3", height: 6},
-    {delay: 211, display: "↑G2R1G1R1-R4", height: 8},
-    {delay: 224, display: "↑G2R1G1R1-R5", height: 10},
-    {delay: 237, display: "↑G2R1G1R1-R6", height: 12},
+      {delay: 157, display: "↑G2R1G1R1-", height: 0},
+      {delay: 171, display: "↑G2R1G1R1-R1", height: 2},
+      {delay: 183, display: "↑G2R1G1R1-R2", height: 4},
+      {delay: 197, display: "↑G2R1G1R1-R3", height: 6},
+      {delay: 211, display: "↑G2R1G1R1-R4", height: 8},
+      {delay: 224, display: "↑G2R1G1R1-R5", height: 10},
+      {delay: 237, display: "↑G2R1G1R1-R6", height: 12},
 
-    {delay: 161, display: "↑G3R2-", height: 0},
-    {delay: 174, display: "↑G3R2-R1", height: 2},
-    {delay: 187, display: "↑G3R2-R2", height: 4},
-    {delay: 201, display: "↑G3R2-R3", height: 6},
-    {delay: 214, display: "↑G3R2-R4", height: 8},
-    {delay: 227, display: "↑G3R2-R5", height: 10},
-    {delay: 242, display: "↑G3R2-R6", height: 12},
+      {delay: 161, display: "↑G3R2-", height: 0},
+      {delay: 174, display: "↑G3R2-R1", height: 2},
+      {delay: 187, display: "↑G3R2-R2", height: 4},
+      {delay: 201, display: "↑G3R2-R3", height: 6},
+      {delay: 214, display: "↑G3R2-R4", height: 8},
+      {delay: 227, display: "↑G3R2-R5", height: 10},
+      {delay: 242, display: "↑G3R2-R6", height: 12},
 
-    {delay: 162, display: "↑R1G3R1-", height: 0},
-    {delay: 175, display: "↑R1G3R1-R1", height: 2},
-    {delay: 189, display: "↑R1G3R1-R2", height: 4},
-    {delay: 202, display: "↑R1G3R1-R3", height: 6},
-    {delay: 215, display: "↑R1G3R1-R4", height: 8},
-    {delay: 229, display: "↑R1G3R1-R5", height: 10},
-    {delay: 243, display: "↑R1G3R1-R6", height: 12},
+      {delay: 162, display: "↑R1G3R1-", height: 0},
+      {delay: 175, display: "↑R1G3R1-R1", height: 2},
+      {delay: 189, display: "↑R1G3R1-R2", height: 4},
+      {delay: 202, display: "↑R1G3R1-R3", height: 6},
+      {delay: 215, display: "↑R1G3R1-R4", height: 8},
+      {delay: 229, display: "↑R1G3R1-R5", height: 10},
+      {delay: 243, display: "↑R1G3R1-R6", height: 12},
 
-    {delay: 153, display: "↑R1F-", height: 0},
-    {delay: 166, display: "↑R1F-R1", height: 2},
-    {delay: 180, display: "↑R1F-R2", height: 4},
-    {delay: 193, display: "↑R1F-R3", height: 6},
-    {delay: 206, display: "↑R1F-R4", height: 8},
-    {delay: 220, display: "↑R1F-R5", height: 10},
-    {delay: 233, display: "↑R1F-R6", height: 12},
+      {delay: 153, display: "↑R1F-", height: 0},
+      {delay: 166, display: "↑R1F-R1", height: 2},
+      {delay: 180, display: "↑R1F-R2", height: 4},
+      {delay: 193, display: "↑R1F-R3", height: 6},
+      {delay: 206, display: "↑R1F-R4", height: 8},
+      {delay: 220, display: "↑R1F-R5", height: 10},
+      {delay: 233, display: "↑R1F-R6", height: 12},
 
-    {delay: 142, display: "↑R1G2R1-", height: 0},
-    {delay: 155, display: "↑R1G2R1-R1", height: 2},
-    {delay: 168, display: "↑R1G2R1-R2", height: 4},
-    {delay: 182, display: "↑R1G2R1-R3", height: 6},
-    {delay: 195, display: "↑R1G2R1-R4", height: 8},
-    {delay: 208, display: "↑R1G2R1-R5", height: 10},
-    {delay: 222, display: "↑R1G2R1-R6", height: 12},
+      {delay: 142, display: "↑R1G2R1-", height: 0},
+      {delay: 155, display: "↑R1G2R1-R1", height: 2},
+      {delay: 168, display: "↑R1G2R1-R2", height: 4},
+      {delay: 182, display: "↑R1G2R1-R3", height: 6},
+      {delay: 195, display: "↑R1G2R1-R4", height: 8},
+      {delay: 208, display: "↑R1G2R1-R5", height: 10},
+      {delay: 222, display: "↑R1G2R1-R6", height: 12},
 
-    {delay: 167, display: "↑G1R3-", height: 0},
-    {delay: 180, display: "↑G1R3-R1", height: 2},
-    {delay: 193, display: "↑G1R3-R2", height: 4},
-    {delay: 207, display: "↑G1R3-R3", height: 6},
-    {delay: 220, display: "↑G1R3-R4", height: 8},
-    {delay: 233, display: "↑G1R3-R5", height: 10},
-    {delay: 247, display: "↑G1R3-R6", height: 12},
+      {delay: 167, display: "↑G1R3-", height: 0},
+      {delay: 180, display: "↑G1R3-R1", height: 2},
+      {delay: 193, display: "↑G1R3-R2", height: 4},
+      {delay: 207, display: "↑G1R3-R3", height: 6},
+      {delay: 220, display: "↑G1R3-R4", height: 8},
+      {delay: 233, display: "↑G1R3-R5", height: 10},
+      {delay: 247, display: "↑G1R3-R6", height: 12},
 
-    {delay: 175, display: "↑G2R1G2R1-", height: 0},
-    {delay: 189, display: "↑G2R1G2R1-R1", height: 2},
-    {delay: 202, display: "↑G2R1G2R1-R2", height: 4},
-    {delay: 215, display: "↑G2R1G2R1-R3", height: 6},
-    {delay: 229, display: "↑G2R1G2R1-R4", height: 8},
-    {delay: 242, display: "↑G2R1G2R1-R5", height: 10},
-    {delay: 255, display: "↑G2R1G2R1-R6", height: 12},
+      {delay: 175, display: "↑G2R1G2R1-", height: 0},
+      {delay: 189, display: "↑G2R1G2R1-R1", height: 2},
+      {delay: 202, display: "↑G2R1G2R1-R2", height: 4},
+      {delay: 215, display: "↑G2R1G2R1-R3", height: 6},
+      {delay: 229, display: "↑G2R1G2R1-R4", height: 8},
+      {delay: 242, display: "↑G2R1G2R1-R5", height: 10},
+      {delay: 255, display: "↑G2R1G2R1-R6", height: 12},
 
-    {delay: 167, display: "↑R1G1R2-", height: 0},
-    {delay: 180, display: "↑R1G1R2-R1", height: 2},
-    {delay: 194, display: "↑R1G1R2-R2", height: 4},
-    {delay: 207, display: "↑R1G1R2-R3", height: 6},
-    {delay: 220, display: "↑R1G1R2-R4", height: 8},
-    {delay: 234, display: "↑R1G1R2-R5", height: 10},
-    {delay: 247, display: "↑R1G1R2-R6", height: 12},
+      {delay: 167, display: "↑R1G1R2-", height: 0},
+      {delay: 180, display: "↑R1G1R2-R1", height: 2},
+      {delay: 194, display: "↑R1G1R2-R2", height: 4},
+      {delay: 207, display: "↑R1G1R2-R3", height: 6},
+      {delay: 220, display: "↑R1G1R2-R4", height: 8},
+      {delay: 234, display: "↑R1G1R2-R5", height: 10},
+      {delay: 247, display: "↑R1G1R2-R6", height: 12},
 
-    {delay: 166, display: "↑R2G1R1-", height: 0},
-    {delay: 180, display: "↑R2G1R1-R1", height: 2},
-    {delay: 193, display: "↑R2G1R1-R2", height: 4},
-    {delay: 206, display: "↑R2G1R1-R3", height: 6},
-    {delay: 220, display: "↑R2G1R1-R4", height: 8},
-    {delay: 233, display: "↑R2G1R1-R5", height: 10},
-    {delay: 246, display: "↑R2G1R1-R6", height: 12},
+      {delay: 166, display: "↑R2G1R1-", height: 0},
+      {delay: 180, display: "↑R2G1R1-R1", height: 2},
+      {delay: 193, display: "↑R2G1R1-R2", height: 4},
+      {delay: 206, display: "↑R2G1R1-R3", height: 6},
+      {delay: 220, display: "↑R2G1R1-R4", height: 8},
+      {delay: 233, display: "↑R2G1R1-R5", height: 10},
+      {delay: 246, display: "↑R2G1R1-R6", height: 12},
 
-    {delay: 172, display: "↑G1R1F-", height: 0},
-    {delay: 185, display: "↑G1R1F-R1", height: 2},
-    {delay: 198, display: "↑G1R1F-R2", height: 4},
-    {delay: 212, display: "↑G1R1F-R3", height: 6},
-    {delay: 225, display: "↑G1R1F-R4", height: 8},
-    {delay: 238, display: "↑G1R1F-R5", height: 10},
-    {delay: 252, display: "↑G1R1F-R6", height: 12},
+      {delay: 172, display: "↑G1R1F-", height: 0},
+      {delay: 185, display: "↑G1R1F-R1", height: 2},
+      {delay: 198, display: "↑G1R1F-R2", height: 4},
+      {delay: 212, display: "↑G1R1F-R3", height: 6},
+      {delay: 225, display: "↑G1R1F-R4", height: 8},
+      {delay: 238, display: "↑G1R1F-R5", height: 10},
+      {delay: 252, display: "↑G1R1F-R6", height: 12},
 
-    {delay: 184, display: "↑G2R3-", height: 0},
-    {delay: 198, display: "↑G2R3-R1", height: 2},
-    {delay: 211, display: "↑G2R3-R2", height: 4},
-    {delay: 224, display: "↑G2R3-R3", height: 6},
-    {delay: 238, display: "↑G2R3-R4", height: 8},
-    {delay: 251, display: "↑G2R3-R5", height: 10},
-    {delay: 264, display: "↑G2R3-R6", height: 12},
+      {delay: 184, display: "↑G2R3-", height: 0},
+      {delay: 198, display: "↑G2R3-R1", height: 2},
+      {delay: 211, display: "↑G2R3-R2", height: 4},
+      {delay: 224, display: "↑G2R3-R3", height: 6},
+      {delay: 238, display: "↑G2R3-R4", height: 8},
+      {delay: 251, display: "↑G2R3-R5", height: 10},
+      {delay: 264, display: "↑G2R3-R6", height: 12},
 
-    {delay: 184, display: "↑R1G2R2-", height: 0},
-    {delay: 197, display: "↑R1G2R2-R1", height: 2},
-    {delay: 210, display: "↑R1G2R2-R2", height: 4},
-    {delay: 224, display: "↑R1G2R2-R3", height: 6},
-    {delay: 237, display: "↑R1G2R2-R4", height: 8},
-    {delay: 250, display: "↑R1G2R2-R5", height: 10},
-    {delay: 264, display: "↑R1G2R2-R6", height: 12},
+      {delay: 184, display: "↑R1G2R2-", height: 0},
+      {delay: 197, display: "↑R1G2R2-R1", height: 2},
+      {delay: 210, display: "↑R1G2R2-R2", height: 4},
+      {delay: 224, display: "↑R1G2R2-R3", height: 6},
+      {delay: 237, display: "↑R1G2R2-R4", height: 8},
+      {delay: 250, display: "↑R1G2R2-R5", height: 10},
+      {delay: 264, display: "↑R1G2R2-R6", height: 12},
 
-    {delay: 184, display: "↑R2G2R1-", height: 0},
-    {delay: 197, display: "↑R2G2R1-R1", height: 2},
-    {delay: 211, display: "↑R2G2R1-R2", height: 4},
-    {delay: 224, display: "↑R2G2R1-R3", height: 6},
-    {delay: 237, display: "↑R2G2R1-R4", height: 8},
-    {delay: 251, display: "↑R2G2R1-R5", height: 10},
-    {delay: 264, display: "↑R2G2R1-R6", height: 12},
+      {delay: 184, display: "↑R2G2R1-", height: 0},
+      {delay: 197, display: "↑R2G2R1-R1", height: 2},
+      {delay: 211, display: "↑R2G2R1-R2", height: 4},
+      {delay: 224, display: "↑R2G2R1-R3", height: 6},
+      {delay: 237, display: "↑R2G2R1-R4", height: 8},
+      {delay: 251, display: "↑R2G2R1-R5", height: 10},
+      {delay: 264, display: "↑R2G2R1-R6", height: 12},
 
-    {delay: 196, display: "↑R2F-", height: 0},
-    {delay: 210, display: "↑R2F-R1", height: 2},
-    {delay: 223, display: "↑R2F-R2", height: 4},
-    {delay: 236, display: "↑R2F-R3", height: 6},
-    {delay: 250, display: "↑R2F-R4", height: 8},
-    {delay: 263, display: "↑R2F-R5", height: 10},
-    {delay: 276, display: "↑R2F-R6", height: 12},
+      {delay: 196, display: "↑R2F-", height: 0},
+      {delay: 210, display: "↑R2F-R1", height: 2},
+      {delay: 223, display: "↑R2F-R2", height: 4},
+      {delay: 236, display: "↑R2F-R3", height: 6},
+      {delay: 250, display: "↑R2F-R4", height: 8},
+      {delay: 263, display: "↑R2F-R5", height: 10},
+      {delay: 276, display: "↑R2F-R6", height: 12},
 
-    {delay: 192, display: "↑R4-", height: 0},
-    {delay: 206, display: "↑R4-R1", height: 2},
-    {delay: 219, display: "↑R4-R2", height: 4},
-    {delay: 232, display: "↑R4-R3", height: 6},
-    {delay: 246, display: "↑R4-R4", height: 8},
-    {delay: 259, display: "↑R4-R5", height: 10},
-    {delay: 272, display: "↑R4-R6", height: 12},
+      {delay: 192, display: "↑R4-", height: 0},
+      {delay: 206, display: "↑R4-R1", height: 2},
+      {delay: 219, display: "↑R4-R2", height: 4},
+      {delay: 232, display: "↑R4-R3", height: 6},
+      {delay: 246, display: "↑R4-R4", height: 8},
+      {delay: 259, display: "↑R4-R5", height: 10},
+      {delay: 272, display: "↑R4-R6", height: 12},
 
-    {delay: 235, display: "↑R5-", height: 0},
-    {delay: 248, display: "↑R5-R1", height: 2},
-    {delay: 261, display: "↑R5-R2", height: 4},
-    {delay: 275, display: "↑R5-R3", height: 6},
-    {delay: 288, display: "↑R5-R4", height: 8},
-    {delay: 301, display: "↑R5-R5", height: 10},
-    {delay: 315, display: "↑R5-R6", height: 12},
+      {delay: 235, display: "↑R5-", height: 0},
+      {delay: 248, display: "↑R5-R1", height: 2},
+      {delay: 261, display: "↑R5-R2", height: 4},
+      {delay: 275, display: "↑R5-R3", height: 6},
+      {delay: 288, display: "↑R5-R4", height: 8},
+      {delay: 301, display: "↑R5-R5", height: 10},
+      {delay: 315, display: "↑R5-R6", height: 12},
 
-    {delay: 197, display: "↑G2R1G3R1-", height: 0},
-    {delay: 211, display: "↑G2R1G3R1-R1", height: 2},
-    {delay: 224, display: "↑G2R1G3R1-R2", height: 4},
-    {delay: 237, display: "↑G2R1G3R1-R3", height: 6},
-    {delay: 251, display: "↑G2R1G3R1-R4", height: 8},
-    {delay: 264, display: "↑G2R1G3R1-R5", height: 10},
-    {delay: 277, display: "↑G2R1G3R1-R6", height: 12},
+      {delay: 197, display: "↑G2R1G3R1-", height: 0},
+      {delay: 211, display: "↑G2R1G3R1-R1", height: 2},
+      {delay: 224, display: "↑G2R1G3R1-R2", height: 4},
+      {delay: 237, display: "↑G2R1G3R1-R3", height: 6},
+      {delay: 251, display: "↑G2R1G3R1-R4", height: 8},
+      {delay: 264, display: "↑G2R1G3R1-R5", height: 10},
+      {delay: 277, display: "↑G2R1G3R1-R6", height: 12},
 
-    {delay: 197, display: "↑G3R1G2R1-", height: 0},
-    {delay: 210, display: "↑G3R1G2R1-R1", height: 2},
-    {delay: 223, display: "↑G3R1G2R1-R2", height: 4},
-    {delay: 237, display: "↑G3R1G2R1-R3", height: 6},
-    {delay: 250, display: "↑G3R1G2R1-R4", height: 8},
-    {delay: 263, display: "↑G3R1G2R1-R5", height: 10},
-    {delay: 277, display: "↑G3R1G2R1-R6", height: 12},
+      {delay: 197, display: "↑G3R1G2R1-", height: 0},
+      {delay: 210, display: "↑G3R1G2R1-R1", height: 2},
+      {delay: 223, display: "↑G3R1G2R1-R2", height: 4},
+      {delay: 237, display: "↑G3R1G2R1-R3", height: 6},
+      {delay: 250, display: "↑G3R1G2R1-R4", height: 8},
+      {delay: 263, display: "↑G3R1G2R1-R5", height: 10},
+      {delay: 277, display: "↑G3R1G2R1-R6", height: 12},
 
-    {delay: 239, display: "↑R3F-", height: 0},
-    {delay: 252, display: "↑R3F-R1", height: 2},
-    {delay: 265, display: "↑R3F-R2", height: 4},
-    {delay: 279, display: "↑R3F-R3", height: 6},
-    {delay: 292, display: "↑R3F-R4", height: 8},
-    {delay: 305, display: "↑R3F-R5", height: 10},
-    {delay: 319, display: "↑R3F-R6", height: 12},
+      {delay: 239, display: "↑R3F-", height: 0},
+      {delay: 252, display: "↑R3F-R1", height: 2},
+      {delay: 265, display: "↑R3F-R2", height: 4},
+      {delay: 279, display: "↑R3F-R3", height: 6},
+      {delay: 292, display: "↑R3F-R4", height: 8},
+      {delay: 305, display: "↑R3F-R5", height: 10},
+      {delay: 319, display: "↑R3F-R6", height: 12},
 
-    {delay: 188, display: "↑G2R1F-", height: 0},
-    {delay: 202, display: "↑G2R1F-R1", height: 2},
-    {delay: 215, display: "↑G2R1F-R2", height: 4},
-    {delay: 228, display: "↑G2R1F-R3", height: 6},
-    {delay: 242, display: "↑G2R1F-R4", height: 8},
-    {delay: 255, display: "↑G2R1F-R5", height: 10},
-    {delay: 268, display: "↑G2R1F-R6", height: 12},
+      {delay: 188, display: "↑G2R1F-", height: 0},
+      {delay: 202, display: "↑G2R1F-R1", height: 2},
+      {delay: 215, display: "↑G2R1F-R2", height: 4},
+      {delay: 228, display: "↑G2R1F-R3", height: 6},
+      {delay: 242, display: "↑G2R1F-R4", height: 8},
+      {delay: 255, display: "↑G2R1F-R5", height: 10},
+      {delay: 268, display: "↑G2R1F-R6", height: 12},
 
-    {delay: 210, display: "↑G3R1F-", height: 0},
-    {delay: 223, display: "↑G3R1F-R1", height: 2},
-    {delay: 236, display: "↑G3R1F-R2", height: 4},
-    {delay: 250, display: "↑G3R1F-R3", height: 6},
-    {delay: 263, display: "↑G3R1F-R4", height: 8},
-    {delay: 276, display: "↑G3R1F-R5", height: 10},
-    {delay: 290, display: "↑G3R1F-R6", height: 12},
+      {delay: 210, display: "↑G3R1F-", height: 0},
+      {delay: 223, display: "↑G3R1F-R1", height: 2},
+      {delay: 236, display: "↑G3R1F-R2", height: 4},
+      {delay: 250, display: "↑G3R1F-R3", height: 6},
+      {delay: 263, display: "↑G3R1F-R4", height: 8},
+      {delay: 276, display: "↑G3R1F-R5", height: 10},
+      {delay: 290, display: "↑G3R1F-R6", height: 12},
 
-    {delay: 202, display: "↑G1R2G2R1-", height: 0},
-    {delay: 215, display: "↑G1R2G2R1-R1", height: 2},
-    {delay: 228, display: "↑G1R2G2R1-R2", height: 4},
-    {delay: 242, display: "↑G1R2G2R1-R3", height: 6},
-    {delay: 255, display: "↑G1R2G2R1-R4", height: 8},
-    {delay: 268, display: "↑G1R2G2R1-R5", height: 10},
-    {delay: 282, display: "↑G1R2G2R1-R6", height: 12},
+      {delay: 202, display: "↑G1R2G2R1-", height: 0},
+      {delay: 215, display: "↑G1R2G2R1-R1", height: 2},
+      {delay: 228, display: "↑G1R2G2R1-R2", height: 4},
+      {delay: 242, display: "↑G1R2G2R1-R3", height: 6},
+      {delay: 255, display: "↑G1R2G2R1-R4", height: 8},
+      {delay: 268, display: "↑G1R2G2R1-R5", height: 10},
+      {delay: 282, display: "↑G1R2G2R1-R6", height: 12},
 
-    {delay: 202, display: "↑G2R1G1R2-", height: 0},
-    {delay: 216, display: "↑G2R1G1R2-R1", height: 2},
-    {delay: 229, display: "↑G2R1G1R2-R2", height: 4},
-    {delay: 242, display: "↑G2R1G1R2-R3", height: 6},
-    {delay: 256, display: "↑G2R1G1R2-R4", height: 8},
-    {delay: 269, display: "↑G2R1G1R2-R5", height: 10},
-    {delay: 282, display: "↑G2R1G1R2-R6", height: 12},
+      {delay: 202, display: "↑G2R1G1R2-", height: 0},
+      {delay: 216, display: "↑G2R1G1R2-R1", height: 2},
+      {delay: 229, display: "↑G2R1G1R2-R2", height: 4},
+      {delay: 242, display: "↑G2R1G1R2-R3", height: 6},
+      {delay: 256, display: "↑G2R1G1R2-R4", height: 8},
+      {delay: 269, display: "↑G2R1G1R2-R5", height: 10},
+      {delay: 282, display: "↑G2R1G1R2-R6", height: 12},
 
-    {delay: 205, display: "↑G3R3-", height: 0},
-    {delay: 218, display: "↑G3R3-R1", height: 2},
-    {delay: 231, display: "↑G3R3-R2", height: 4},
-    {delay: 245, display: "↑G3R3-R3", height: 6},
-    {delay: 258, display: "↑G3R3-R4", height: 8},
-    {delay: 271, display: "↑G3R3-R5", height: 10},
-    {delay: 285, display: "↑G3R3-R6", height: 12},
+      {delay: 205, display: "↑G3R3-", height: 0},
+      {delay: 218, display: "↑G3R3-R1", height: 2},
+      {delay: 231, display: "↑G3R3-R2", height: 4},
+      {delay: 245, display: "↑G3R3-R3", height: 6},
+      {delay: 258, display: "↑G3R3-R4", height: 8},
+      {delay: 271, display: "↑G3R3-R5", height: 10},
+      {delay: 285, display: "↑G3R3-R6", height: 12},
 
-    {delay: 205, display: "↑R1G3R2-", height: 0},
-    {delay: 218, display: "↑R1G3R2-R1", height: 2},
-    {delay: 232, display: "↑R1G3R2-R2", height: 4},
-    {delay: 245, display: "↑R1G3R2-R3", height: 6},
-    {delay: 258, display: "↑R1G3R2-R4", height: 8},
-    {delay: 272, display: "↑R1G3R2-R5", height: 10},
-    {delay: 285, display: "↑R1G3R2-R6", height: 12},
+      {delay: 205, display: "↑R1G3R2-", height: 0},
+      {delay: 218, display: "↑R1G3R2-R1", height: 2},
+      {delay: 232, display: "↑R1G3R2-R2", height: 4},
+      {delay: 245, display: "↑R1G3R2-R3", height: 6},
+      {delay: 258, display: "↑R1G3R2-R4", height: 8},
+      {delay: 272, display: "↑R1G3R2-R5", height: 10},
+      {delay: 285, display: "↑R1G3R2-R6", height: 12},
 
-    {delay: 205, display: "↑R2G3R1-", height: 0},
-    {delay: 219, display: "↑R2G3R1-R1", height: 2},
-    {delay: 232, display: "↑R2G3R1-R2", height: 4},
-    {delay: 245, display: "↑R2G3R1-R3", height: 6},
-    {delay: 259, display: "↑R2G3R1-R4", height: 8},
-    {delay: 272, display: "↑R2G3R1-R5", height: 10},
-    {delay: 285, display: "↑R2G3R1-R6", height: 12},
+      {delay: 205, display: "↑R2G3R1-", height: 0},
+      {delay: 219, display: "↑R2G3R1-R1", height: 2},
+      {delay: 232, display: "↑R2G3R1-R2", height: 4},
+      {delay: 245, display: "↑R2G3R1-R3", height: 6},
+      {delay: 259, display: "↑R2G3R1-R4", height: 8},
+      {delay: 272, display: "↑R2G3R1-R5", height: 10},
+      {delay: 285, display: "↑R2G3R1-R6", height: 12},
 
-    {delay: 210, display: "↑R1G1R3-", height: 0},
-    {delay: 223, display: "↑R1G1R3-R1", height: 2},
-    {delay: 237, display: "↑R1G1R3-R2", height: 4},
-    {delay: 250, display: "↑R1G1R3-R3", height: 6},
-    {delay: 263, display: "↑R1G1R3-R4", height: 8},
-    {delay: 277, display: "↑R1G1R3-R5", height: 10},
-    {delay: 290, display: "↑R1G1R3-R6", height: 12},
+      {delay: 210, display: "↑R1G1R3-", height: 0},
+      {delay: 223, display: "↑R1G1R3-R1", height: 2},
+      {delay: 237, display: "↑R1G1R3-R2", height: 4},
+      {delay: 250, display: "↑R1G1R3-R3", height: 6},
+      {delay: 263, display: "↑R1G1R3-R4", height: 8},
+      {delay: 277, display: "↑R1G1R3-R5", height: 10},
+      {delay: 290, display: "↑R1G1R3-R6", height: 12},
 
-    {delay: 209, display: "↑R2G1R2-", height: 0},
-    {delay: 223, display: "↑R2G1R2-R1", height: 2},
-    {delay: 236, display: "↑R2G1R2-R2", height: 4},
-    {delay: 249, display: "↑R2G1R2-R3", height: 6},
-    {delay: 263, display: "↑R2G1R2-R4", height: 8},
-    {delay: 276, display: "↑R2G1R2-R5", height: 10},
-    {delay: 289, display: "↑R2G1R2-R6", height: 12},
+      {delay: 209, display: "↑R2G1R2-", height: 0},
+      {delay: 223, display: "↑R2G1R2-R1", height: 2},
+      {delay: 236, display: "↑R2G1R2-R2", height: 4},
+      {delay: 249, display: "↑R2G1R2-R3", height: 6},
+      {delay: 263, display: "↑R2G1R2-R4", height: 8},
+      {delay: 276, display: "↑R2G1R2-R5", height: 10},
+      {delay: 289, display: "↑R2G1R2-R6", height: 12},
 
-    {delay: 214, display: "↑G1R2F-", height: 0},
-    {delay: 227, display: "↑G1R2F-R1", height: 2},
-    {delay: 240, display: "↑G1R2F-R2", height: 4},
-    {delay: 254, display: "↑G1R2F-R3", height: 6},
-    {delay: 267, display: "↑G1R2F-R4", height: 8},
-    {delay: 280, display: "↑G1R2F-R5", height: 10},
-    {delay: 294, display: "↑G1R2F-R6", height: 12},
+      {delay: 214, display: "↑G1R2F-", height: 0},
+      {delay: 227, display: "↑G1R2F-R1", height: 2},
+      {delay: 240, display: "↑G1R2F-R2", height: 4},
+      {delay: 254, display: "↑G1R2F-R3", height: 6},
+      {delay: 267, display: "↑G1R2F-R4", height: 8},
+      {delay: 280, display: "↑G1R2F-R5", height: 10},
+      {delay: 294, display: "↑G1R2F-R6", height: 12},
 
-    {delay: 230, display: "↑G2R2F-", height: 0},
-    {delay: 244, display: "↑G2R2F-R1", height: 2},
-    {delay: 257, display: "↑G2R2F-R2", height: 4},
-    {delay: 270, display: "↑G2R2F-R3", height: 6},
-    {delay: 284, display: "↑G2R2F-R4", height: 8},
-    {delay: 297, display: "↑G2R2F-R5", height: 10},
-    {delay: 310, display: "↑G2R2F-R6", height: 12},
+      {delay: 230, display: "↑G2R2F-", height: 0},
+      {delay: 244, display: "↑G2R2F-R1", height: 2},
+      {delay: 257, display: "↑G2R2F-R2", height: 4},
+      {delay: 270, display: "↑G2R2F-R3", height: 6},
+      {delay: 284, display: "↑G2R2F-R4", height: 8},
+      {delay: 297, display: "↑G2R2F-R5", height: 10},
+      {delay: 310, display: "↑G2R2F-R6", height: 12},
 
-    {delay: 232, display: "↑R1G2R1F-", height: 0},
-    {delay: 245, display: "↑R1G2R1F-R1", height: 2},
-    {delay: 258, display: "↑R1G2R1F-R2", height: 4},
-    {delay: 272, display: "↑R1G2R1F-R3", height: 6},
-    {delay: 285, display: "↑R1G2R1F-R4", height: 8},
-    {delay: 298, display: "↑R1G2R1F-R5", height: 10},
-    {delay: 312, display: "↑R1G2R1F-R6", height: 12}
-  ];
+      {delay: 232, display: "↑R1G2R1F-", height: 0},
+      {delay: 245, display: "↑R1G2R1F-R1", height: 2},
+      {delay: 258, display: "↑R1G2R1F-R2", height: 4},
+      {delay: 272, display: "↑R1G2R1F-R3", height: 6},
+      {delay: 285, display: "↑R1G2R1F-R4", height: 8},
+      {delay: 298, display: "↑R1G2R1F-R5", height: 10},
+      {delay: 312, display: "↑R1G2R1F-R6", height: 12}
+    ];
 
-  var gapList = [
-    {delay: 0, display: "", height: 0},
+    var gapList = [
+      {delay: 0, display: "", height: 0},
 
-    {delay: 19, display: "G1R1", height: 3},
-    {delay: 32, display: "G1R2", height: 5},
-    {delay: 45, display: "G1R3", height: 7},
-    {delay: 59, display: "G1R4", height: 9},
-    {delay: 72, display: "G1R5", height: 11},
+      {delay: 19, display: "G1R1", height: 3},
+      {delay: 32, display: "G1R2", height: 5},
+      {delay: 45, display: "G1R3", height: 7},
+      {delay: 59, display: "G1R4", height: 9},
+      {delay: 72, display: "G1R5", height: 11},
 
-    {delay: 22, display: "G2R1", height: 4},
-    {delay: 36, display: "G2R2", height: 6},
-    {delay: 49, display: "G2R3", height: 8},
-    {delay: 62, display: "G2R4", height: 10},
-    {delay: 76, display: "G2R5", height: 12},
+      {delay: 22, display: "G2R1", height: 4},
+      {delay: 36, display: "G2R2", height: 6},
+      {delay: 49, display: "G2R3", height: 8},
+      {delay: 62, display: "G2R4", height: 10},
+      {delay: 76, display: "G2R5", height: 12},
 
-    {delay: 25, display: "G3R1", height: 5},
-    {delay: 38, display: "G3R2", height: 7},
-    {delay: 51, display: "G3R3", height: 9},
-    {delay: 65, display: "G3R4", height: 11},
+      {delay: 25, display: "G3R1", height: 5},
+      {delay: 38, display: "G3R2", height: 7},
+      {delay: 51, display: "G3R3", height: 9},
+      {delay: 65, display: "G3R4", height: 11},
 
-    {delay: 26, display: "G4R1", height: 6},
-    {delay: 40, display: "G4R2", height: 8},
-    {delay: 53, display: "G4R3", height: 10},
-    {delay: 66, display: "G4R4", height: 12},
+      {delay: 26, display: "G4R1", height: 6},
+      {delay: 40, display: "G4R2", height: 8},
+      {delay: 53, display: "G4R3", height: 10},
+      {delay: 66, display: "G4R4", height: 12},
 
-    {delay: 28, display: "G5R1", height: 7},
-    {delay: 41, display: "G5R2", height: 9},
-    {delay: 54, display: "G5R3", height: 11},
+      {delay: 28, display: "G5R1", height: 7},
+      {delay: 41, display: "G5R2", height: 9},
+      {delay: 54, display: "G5R3", height: 11},
 
-    {delay: 28, display: "G6R1", height: 8},
-    {delay: 42, display: "G6R2", height: 10},
-    {delay: 55, display: "G6R3", height: 12},
+      {delay: 28, display: "G6R1", height: 8},
+      {delay: 42, display: "G6R2", height: 10},
+      {delay: 55, display: "G6R3", height: 12},
 
-    {delay: 30, display: "G7R1", height: 9},
-    {delay: 43, display: "G7R2", height: 11},
-    {delay: 56, display: "G7R3", height: 13},
+      {delay: 30, display: "G7R1", height: 9},
+      {delay: 43, display: "G7R2", height: 11},
+      {delay: 56, display: "G7R3", height: 13},
 
-    {delay: 29, display: "G8R1", height: 10},
-    {delay: 42, display: "G8R2", height: 12},
-    {delay: 56, display: "G8R3", height: 14}
-  ];
-</script>
+      {delay: 29, display: "G8R1", height: 10},
+      {delay: 42, display: "G8R2", height: 12},
+      {delay: 56, display: "G8R3", height: 14}
+    ];
+  </script>
 </body>
 </html>
