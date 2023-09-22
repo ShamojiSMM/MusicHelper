@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -37,12 +38,12 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 23/09/19)</font>
+  <font size="2">(最終更新日: 23/09/22)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
   <br><br>
-  <div style="border: 1px solid #000000; background-color: #f1f1f1;">
+  <div style="border: 1px solid #000000; background-color: #f1f1f1; width: 300px;">
     <ol>
       <li><a href="#bpmAndNoteLength">BPMと符長</a></li>
       <li><a href="#railLoopGenerator">レールループ生成</a></li>
@@ -303,11 +304,23 @@
     <option>縦スクロール</option>
     <option>横スクロール</option>
   </select>
+
+  <select style="display: none;" id="selectLoadingSpeedInput" onchange="funLoadingSpeedInput(this.selectedIndex)">
+    <option>カスタム</option>
+    <option selected="true">平均遅度</option>
+    <option>遅度周期</option>
+  </select>
   <br>
-  <div style="display: none;" id="divLoadingSpeed">
-    <font size="3"><b>スクロール遅度[f/b]:</b></font>
-    <input type="number" id="inputLoadingSpeed" oninput="funLoadingSpeed(this.value)">
+  <div style="display: none;" id="divLoadingSpeedAverage">
+    <font size="3"><b>平均スクロール遅度[f/b]:</b></font>
+    <input type="number" id="inputLoadingSpeedAverage" oninput="funLoadingSpeedAverage(this.value)">
     <font size="2">上向き, 右向きを正とする(自由落下 = -4)。</font>
+  </div>
+
+  <div style="display: none;" id="divLoadingSpeedCycle">
+    <font size="3"><b>スクロール遅度周期[f/b]:</b></font>
+    <input type="text" id="inputLoadingSpeedCycle" style="height: 35px; width: 200px;" oninput="funLoadingSpeedCycle(this.value)">
+    <font size="2">値をコンマ区切りで入力(例: 6, 7, 6, 7, 6)。</font>
   </div>
   
   <font size="3"><b>着線パターン:</b></font>
@@ -406,7 +419,7 @@
   <select id="selectInstrument">
     <option>サイン波</option>
     <option>三角波</option>
-    <option>三角波</option>
+    <option>矩形波</option>
     <option>ノコギリ波</option>
   </select>
   <br><br>
@@ -481,21 +494,48 @@
     }
 
     function funLoading(selectedIndex) {
+      divLoadingSpeedCycle.style.display = "none";
+
       switch (selectedIndex) {
         case 0:
         case 1:
-          divLoadingSpeed.style.display = "none";
+          divLoadingSpeedAverage.style.display = "none";
+          selectLoadingSpeedInput.style.display = "none";
+
           tableWiring.rows[5].style.display = "none";
           break;
 
         case 2:
-          divLoadingSpeed.style.display = "block";
+          divLoadingSpeedAverage.style.display = "block";
+          selectLoadingSpeedInput.style.display = "none";
+
           tableWiring.rows[5].style.display = "none";
           break;
         
         case 3:
-          divLoadingSpeed.style.display = "block";
+          divLoadingSpeedAverage.style.display = "block";
+          selectLoadingSpeedInput.style.display = "inline-block";
+          selectLoadingSpeedInput.selectedIndex = 1;
+
           tableWiring.rows[5].style.display = "table-row";
+      }
+    }
+
+    function funLoadingSpeedInput(selectedIndex) {
+      switch (selectedIndex) {
+        case 0:
+          divLoadingSpeedAverage.style.display = "none";
+          divLoadingSpeedCycle.style.display = "none";
+          break;
+
+        case 1: 
+          divLoadingSpeedCycle.style.display = "none";
+          divLoadingSpeedAverage.style.display = "block";
+          break;
+
+        case 2:
+          divLoadingSpeedAverage.style.display = "none";
+          divLoadingSpeedCycle.style.display = "block";
       }
     }
 
@@ -537,7 +577,7 @@
       }
     }
 
-    function funLoadingSpeed(loadingSpeedValue) {
+    function funLoadingSpeedAverage(loadingSpeedValue) {
       if (selectLoading.selectedIndex == 3) {
         if (loadingSpeedValue != "") {
           for (var loadingSpeedColumn = 2; loadingSpeedColumn <= 100; loadingSpeedColumn ++) {
@@ -552,13 +592,24 @@
       }
     }
 
+    function funLoadingSpeedCycle(loadingSpeeds) {
+      if (selectLoading.selectedIndex == 3) {
+        var loadingSpeedValues = loadingSpeeds.split(",").map(speed => parseFloat(speed.trim(), 10));
+
+        for (var loadingSpeedsColumn = 2; loadingSpeedsColumn <= 100; loadingSpeedsColumn ++) {
+          tableWiring.rows[5].cells[loadingSpeedsColumn].textContent = (loadingSpeedValues[(loadingSpeedsColumn - 2) % loadingSpeedValues.length]).toFixed(2);
+        }
+      }
+    }
+
     function funSleep(f) {
       return new Promise(resolve => setTimeout(resolve, f * 50 / 3));
     } 
 
+    var instruments = ["sine", "triangle", "square", "sawtooth"];
+
     function funPlay() {
       var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      var instruments = ["sine", "triangle", "square", "sawtooth"];
       
       if (selectInputType.selectedIndex == 0) {
         (async () => {
@@ -639,7 +690,7 @@
           break;
 
         case 2:
-          yLoadingSpeed = inputLoadingSpeed.value;
+          yLoadingSpeed = inputLoadingSpeedAverage.value;
       }
 
       for (var tableColumn = 2; tableColumn <= 100; tableColumn ++) {
