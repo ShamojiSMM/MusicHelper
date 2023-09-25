@@ -46,6 +46,7 @@
   <div style="border: 1px solid #000000; background-color: #f1f1f1; width: 300px;">
     <ol>
       <li><a href="#bpmAndNoteLength">BPMと符長</a></li>
+      <li><a href="#measureLength">小節計算</a></li>
       <li><a href="#railLoopGenerator">レールループ生成</a></li>
       <li><a href="#railLoopShape">レールループ周期確認</a></li>
       <li><a href="#tableCulculator">表計算</a></li>
@@ -129,6 +130,35 @@
       resultBeatLength.textContent = (3600 / bpmValue).toFixed(2);
     }
 
+  </script>
+
+  <hr id="measureLength">
+  <font size="5"><b>小節計算</b></font>
+  <font size="3">小節や曲の長さを計算します。</font>
+  <br><br>
+
+  <font size="3"><b>4分符長[f]:</b></font>
+  <input type="number" id="inputMeasureBeatLength" oninput="funMeasureLength()">
+
+  <font size="3"><b>拍子:</b></font>
+  <input type="number" style="width: 35px;" id="inputSignature0" oninput="funMeasureLength()" value="4">
+  /
+  <input type="number" style="width: 35px;" id="inputSignature1" oninput="funMeasureLength()" value="4">
+  <br>
+  <font size="3"><b>小節数:</b></font>
+  <input type="number" id="inputMeasureNumber" oninput="funMeasureLength()">
+  <br><br>
+  <font size="3"><b>長さ[f]:</b></font>
+  <span id="resultMeasureLength"></span>
+
+  <script>
+    function funMeasureLength() {
+      if (inputMeasureBeatLength.value != "" && inputSignature0.value != "" && inputSignature0.value != "" && inputMeasureNumber.value != "") {
+        resultMeasureLength.textContent = (inputMeasureNumber.value * (inputSignature0.value * ((4 * inputMeasureBeatLength.value) / inputSignature1.value))).toFixed(2);
+      } else {
+        resultMeasureLength.textContent = "";
+      }
+    }
   </script>
   
   <hr id="railLoopGenerator">
