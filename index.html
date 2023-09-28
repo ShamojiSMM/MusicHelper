@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -38,7 +37,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 23/09/22)</font>
+  <font size="2">(最終更新日: 23/09/28)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -398,7 +397,14 @@
     <option style="color: #5d78ff;">LowC 低ド</option>
   </select>
   <button onclick="funPlay()">鳴らす</button>
-  <font size="2">初めは正常に鳴らないかも。</font>
+  
+  <font size="3"><b>音色:</b></font>
+  <select id="selectInstrument">
+    <option>サイン波</option>
+    <option>三角波</option>
+    <option>矩形波</option>
+    <option>ノコギリ波</option>
+  </select>
 
   <div style="overflow-x: scroll;">
     <table id="tableWiring" border="1" style="width: 6000px; border-collapse: collapse; table-layout: fixed;">
@@ -438,21 +444,16 @@
     </table>
   </div>
 
-  <button onclick="funTable()">更新</button>
   <font size="3"><b>遅延入力方法:</b></font>
   <select id="selectInputType" onchange="funInputType(this.selectedIndex)">
     <option>それぞれの符長</option>
     <option>累計遅延</option>
   </select>
 
-  <font size="3"><b>音色:</b></font>
-  <select id="selectInstrument">
-    <option>サイン波</option>
-    <option>三角波</option>
-    <option>矩形波</option>
-    <option>ノコギリ波</option>
-  </select>
-  <br><br>
+  <font size="2"><span id="spanInputType">n分符には, 4+8や16+16のように入力可(付点4分, 8分)。</span></font>
+  <br>
+  <button onclick="funTable()">更新</button>
+  <br>
   <button onclick="funTest()">検証</button>
   <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font>
   <br>
@@ -498,9 +499,13 @@
         tableWiring.rows[2].style.display = "table-row";
         tableWiring.rows[3].cells[0].textContent = "符長[f]";
 
+        spanInputType.style.display = "inline-block";
+
       } else {
         tableWiring.rows[2].style.display = "none";
         tableWiring.rows[3].cells[0].textContent = "累計遅延[f]";
+
+        spanInputType.style.display = "none";
       }
     }
 
@@ -510,8 +515,13 @@
 
       if (selectInputType.selectedIndex == 0) {
         for (var beatColumn = 1; beatColumn <= 100; beatColumn ++) {
-          if (tableWiring.rows[2].cells[beatColumn].textContent != "") {
-            tableWiring.rows[3].cells[beatColumn].textContent = (inputTableBeat.value * 4 / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(2);
+          if (!isNaN(tableWiring.rows[2].cells[beatColumn].textContent)) {
+            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(2)) ? ((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(2) : "";
+
+          } else {
+            var sumNotes = ((tableWiring.rows[2].cells[beatColumn].textContent).split("+").map(Number)).map(note => (parseFloat(inputTableBeat.value) * 4) / note).reduce((a, b) => a + b, 0);
+
+            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(sumNotes) ? sumNotes.toFixed(2) : "";
           }
         }
       }
@@ -519,7 +529,14 @@
 
     function funNote() {
       if (selectInputType.selectedIndex == 0) {
-        tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2) : "";
+        if (!isNaN(tableWiring.rows[2].cells[event.target.cellIndex].textContent)) {
+          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2) : "";
+
+        } else {
+          var sumNotes = ((event.target.textContent).split("+").map(Number)).map(note => (parseFloat(inputTableBeat.value) * 4) / note).reduce((a, b) => a + b, 0);
+
+          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(sumNotes) ? sumNotes.toFixed(2) : "";
+        }
       }
     }
 
@@ -1003,7 +1020,8 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  (ギャップ)遅延データやスクロール遅度データなどに誤りがあった場合教えてください。
+  とってもデバッグ不足。<br>
+  データや機能に誤りがあった場合教えてください。
   <br><br>
   羽なしや水中verもやってみたいけどデータ集めるのが面倒...<br>
   だれかやってくださいw
