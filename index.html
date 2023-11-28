@@ -37,7 +37,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 23/09/28)</font>
+  <font size="2">(最終更新日: 23/11/28)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -154,6 +154,7 @@
     function funMeasureLength() {
       if (inputMeasureBeatLength.value != "" && inputSignature0.value != "" && inputSignature0.value != "" && inputMeasureNumber.value != "") {
         resultMeasureLength.textContent = (inputMeasureNumber.value * (inputSignature0.value * ((4 * inputMeasureBeatLength.value) / inputSignature1.value))).toFixed(2);
+      
       } else {
         resultMeasureLength.textContent = "";
       }
@@ -185,6 +186,7 @@
     function funCycleType(cycleType) {
       if (cycleType == 1) {
         spanCycleText.style.display = "none";
+      
       } else {
         spanCycleText.style.display = "inline-block";
       }
@@ -457,6 +459,13 @@
   <button onclick="funTest()">検証</button>
   <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font>
   <br>
+  <font size="2">個数: [
+    ◎: <span id="testResult0"></span>
+    ○: <span id="testResult1"></span>
+    △: <span id="testResult2"></span>
+    ×: <span id="testResult3"></span>
+    ]</font>
+  <br>
   <input type="checkbox" id="checkTestTerminal">
   <font size="2">終端遅度を使用(8b以上あける)。</font><br>
   <font size="2">代入ボタンで↓に結果を代入・表示します。</font>
@@ -510,7 +519,6 @@
     }
 
     function funTableBeat(tableBeatValue) {
-
       resultTableBpm.textContent = (3600 / tableBeatValue).toFixed(2);
 
       if (selectInputType.selectedIndex == 0) {
@@ -751,12 +759,14 @@
     }    
 
     function funTest() {
+      var testResults = [0, 0, 0, 0];
+
       for (var testColumn = 1; testColumn <= 100; testColumn ++) {
         var target = parseInt(tableWiring.rows[7].cells[testColumn].textContent);
         var height = (checkTestTerminal.checked ? 15 : parseInt(tableWiring.rows[8].cells[testColumn].textContent) - 1);
         var resultSame = [], resultNear = [], resultNearNear = [];
 
-        if (!isNaN(tableWiring.rows[7].cells[testColumn].textContent + tableWiring.rows[8].cells[testColumn].textContent)) {
+        if (!isNaN(target) && !isNaN(height) && target + height != "") {
           for (var i = 0; i < startingList.length; i ++) {
             var starting = startingList[i];
 
@@ -799,20 +809,28 @@
 
           if (resultSame.length > 0) {
             tableWiring.rows[9].cells[testColumn].textContent = "◎";
+            testResults[0] += 1;
 
           } else if (resultNear.length > 0) {
             tableWiring.rows[9].cells[testColumn].textContent = "○";
+            testResults[1] += 1;
 
           } else if (resultNearNear.length > 0) {
             tableWiring.rows[9].cells[testColumn].textContent = "△";
+            testResults[2] += 1;
 
           } else {
             tableWiring.rows[9].cells[testColumn].textContent = "×";
+            testResults[3] += 1;
           }
-
+         
         } else {
-          tableWiring.rows[9].cells[testColumn].textContent = "×";
+          tableWiring.rows[9].cells[testColumn].textContent = "";
         }
+      }
+
+      for (var i = 0; i <= 3; i ++) {
+        document.getElementById("testResult" + i).textContent = testResults[i];
       }
     }
 
@@ -1020,11 +1038,11 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  とってもデバッグ不足。<br>
+  コーディング技術不足。<br>
   データや機能に誤りがあった場合教えてください。
   <br><br>
-  羽なしや水中verもやってみたいけどデータ集めるのが面倒...<br>
-  だれかやってくださいw
+  SMM3に期待。
+  <br>
   </font>
   <br><br>
 
@@ -1049,7 +1067,7 @@
   <b>・着線</b> ... 
   レール音符が落下などして, 集音レールに乗ること。<br>
   <b>・(自由)落下集音</b> ... 
-  マリオが自由落下し, 一定の遅度で集音すること。この時レール音符は, マリオと落下遅度が同じため水平に一列に並ぶ。<br>
+  マリオが自由落下し, 一定の遅度で集音すること。この時レール音符は, マリオと落下遅度が等しいため水平に一列に並ぶ。<br>
   <b>・座標</b> ... 
   ここでは右向きをx, 上向きをyとする。<br>
 
