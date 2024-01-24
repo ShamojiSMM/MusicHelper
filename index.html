@@ -322,13 +322,14 @@
           } else {
             resultCycle.textContent = "Not Found";
           }
+          break;
 
         case 3:
           imageCycle.style.display = "none";
 
           for (var s = 0; s <= cycleLength / 84; s ++) {
             for (var d = 0; d <= cycleLength / 120; d ++) {
-              for (var c = 0; c <= cycleLength / 140; c ++) {
+              for (var c = 0; c <= cycleLength / 142; c ++) {
                 for (var u = 0; u <= s / 2; u ++) {
                   if (s * 84 + d * 120 + c * 142 + u * 2 == cycleLength) {
                     resultCycles.push(` (${s}, ${d}, ${c}, ${u}) `);
@@ -344,7 +345,6 @@
           } else {
             resultCycle.textContent = "Not Found";
           }
-          break;
       }
     }
   </script>
