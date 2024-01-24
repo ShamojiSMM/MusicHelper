@@ -489,18 +489,7 @@
     <option>矩形波</option>
     <option>ノコギリ波</option>
   </select>
-  <br>
-  <input type="checkbox" id="checkTableRhythm" onchange="funTableRhythm()">
-  <font size="2">リズム打ち</font>
-
-  <div id="divTableRhythm" style="display: none;">
-    <font size="3"><b>間隔[f]:</b></font>
-    <input type="number" id="inputTableRhythm">
   
-    <font size="3"><b>オフセット[f]:</b></font>
-    <input type="number" id="inputTableRhythmOffset">
-  </div>
-
   <div style="overflow-x: scroll;">
     <table id="tableWiring" border="1" style="width: 6000px; border-collapse: collapse; table-layout: fixed;">
       <tr bgcolor="#ffffe0">
@@ -750,10 +739,6 @@
       }
     }
 
-    function funTableRhythm() {
-      divTableRhythm.style.display = checkTableRhythm.checked ? "inline-block" : "none";
-    }
-
     function funSleep(f) {
       return new Promise(resolve => setTimeout(resolve, f * 50 / 3));
     } 
@@ -762,26 +747,6 @@
 
     function funPlay() {
       var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-      async function playDrum() {
-        var oscillator = audioContext.createOscillator();
-        oscillator.type = "sine";
-
-        oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-        oscillator.connect(audioContext.destination);
-
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-
-        if (true) {
-          await sleep(inputTableRhythm.value);
-          playDrum();
-        }
-      }
-
-      if (checkTableRhythm && inputTableRhythm.value != 0) {
-        setInterval(playDrum, inputTableRhythmOffset.value * 50 / 3);
-      }
       
       if (selectInputType.selectedIndex == 0) {
         (async () => {
