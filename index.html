@@ -93,7 +93,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 24/01/25)</font>
+  <font size="2">(最終更新日: 24/01/26)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -175,15 +175,15 @@
     var splits = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, (4 / 3), (4 / 6), (4 / 12)];
 
     function funBeatLength(beatLengthValue) {
-      resultBpm.textContent = (3600 / beatLengthValue).toFixed(2);
+      resultBpm.textContent = (3600 / beatLengthValue).toFixed(3);
 
       for (var tableBeatsRow = 1; tableBeatsRow < tableBeats.rows.length; tableBeatsRow ++) {
-        tableBeats.rows[tableBeatsRow].cells[3].textContent = (beatLengthValue * splits[tableBeatsRow - 1]).toFixed(2);
+        tableBeats.rows[tableBeatsRow].cells[3].textContent = (beatLengthValue * splits[tableBeatsRow - 1]).toFixed(3);
       }
     }
 
     function funBpm(bpmValue) {
-      resultBeatLength.textContent = (3600 / bpmValue).toFixed(2);
+      resultBeatLength.textContent = (3600 / bpmValue).toFixed(3);
     }
 
   </script>
@@ -210,7 +210,7 @@
   <script>
     function funMeasureLength() {
       if (inputMeasureBeatLength.value != "" && inputSignature0.value != "" && inputSignature0.value != "" && inputMeasureNumber.value != "") {
-        resultMeasureLength.textContent = (inputMeasureNumber.value * (inputSignature0.value * ((4 * inputMeasureBeatLength.value) / inputSignature1.value))).toFixed(2);
+        resultMeasureLength.textContent = (inputMeasureNumber.value * (inputSignature0.value * ((4 * inputMeasureBeatLength.value) / inputSignature1.value))).toFixed(3);
       
       } else {
         resultMeasureLength.textContent = "";
@@ -601,17 +601,17 @@
     }
 
     function funTableBeat(tableBeatValue) {
-      resultTableBpm.textContent = (3600 / tableBeatValue).toFixed(2);
+      resultTableBpm.textContent = (3600 / tableBeatValue).toFixed(3);
 
       if (selectInputType.selectedIndex == 0) {
         for (var beatColumn = 1; beatColumn <= 100; beatColumn ++) {
           if (!isNaN(tableWiring.rows[2].cells[beatColumn].textContent)) {
-            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(2)) ? ((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(2) : "";
+            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(3)) ? ((parseFloat(inputTableBeat.value) * 4) / tableWiring.rows[2].cells[beatColumn].textContent).toFixed(3) : "";
 
           } else {
             var sumNotes = ((tableWiring.rows[2].cells[beatColumn].textContent).split("+").map(Number)).map(note => (parseFloat(inputTableBeat.value) * 4) / note).reduce((a, b) => a + b, 0);
 
-            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(sumNotes) ? sumNotes.toFixed(2) : "";
+            tableWiring.rows[3].cells[beatColumn].textContent = isFinite(sumNotes) ? sumNotes.toFixed(3) : "";
           }
         }
       }
@@ -620,12 +620,12 @@
     function funNote() {
       if (selectInputType.selectedIndex == 0) {
         if (!isNaN(tableWiring.rows[2].cells[event.target.cellIndex].textContent)) {
-          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(2) : "";
+          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3) : "";
 
         } else {
           var sumNotes = ((event.target.textContent).split("+").map(Number)).map(note => (parseFloat(inputTableBeat.value) * 4) / note).reduce((a, b) => a + b, 0);
 
-          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(sumNotes) ? sumNotes.toFixed(2) : "";
+          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(sumNotes) ? sumNotes.toFixed(3) : "";
         }
       }
     }
@@ -715,7 +715,7 @@
       if (selectLoading.selectedIndex == 3) {
         if (loadingSpeedValue != "") {
           for (var loadingSpeedColumn = 2; loadingSpeedColumn <= 100; loadingSpeedColumn ++) {
-            tableWiring.rows[5].cells[loadingSpeedColumn].textContent = parseFloat(loadingSpeedValue).toFixed(2);
+            tableWiring.rows[5].cells[loadingSpeedColumn].textContent = parseFloat(loadingSpeedValue).toFixed(3);
           }
 
         } else {
@@ -731,7 +731,7 @@
         var loadingSpeedValues = loadingSpeeds.split(",").map(speed => parseFloat(speed.trim(), 10));
 
         for (var loadingSpeedsColumn = 2; loadingSpeedsColumn <= 100; loadingSpeedsColumn ++) {
-          tableWiring.rows[5].cells[loadingSpeedsColumn].textContent = (loadingSpeedValues[(loadingSpeedsColumn - 2) % loadingSpeedValues.length]).toFixed(2);
+          tableWiring.rows[5].cells[loadingSpeedsColumn].textContent = (loadingSpeedValues[(loadingSpeedsColumn - 2) % loadingSpeedValues.length]).toFixed(3);
         }
       }
     }
@@ -1026,9 +1026,9 @@
       spanHeight.style.display = (checkTerminal.checked ? "none" : "inline-block");
     }
 
-    resultSame = [], resultNear = [], resultNearNear = [];
-
     function funTarget() {
+      resultSame = [], resultNear = [], resultNearNear = [];
+
       var target = parseInt(inputTarget.value);
       var height = (checkTerminal.checked ? 15 : parseInt(inputHeight.value) - 1);
 
