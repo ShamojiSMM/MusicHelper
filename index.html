@@ -93,7 +93,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 24/01/26)</font>
+  <font size="2">(最終更新日: 24/01/27)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -806,9 +806,9 @@
 
     var instruments = ["sine", "triangle", "square", "sawtooth"];
 
-    function funPlay() {
-      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function funPlay() {      
       if (selectInputType.selectedIndex == 0) {
         (async () => {
           for (var playColumn = 1; playColumn <= 100; playColumn ++) {
