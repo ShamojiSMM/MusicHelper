@@ -22,6 +22,8 @@
     input[type="checkbox"] {
       height: 20px;
       width: 20px;
+      position:relative;
+      top: 5px;
     }
 
     select {
@@ -93,7 +95,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 24/01/27)</font>
+  <font size="2">(最終更新日: 24/01/28)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -534,7 +536,7 @@
     <option>累計遅延</option>
   </select>
 
-  <font size="2"><span id="spanInputType">n分符には, 4+8や16+16のように入力可(付点4分, 8分)。</span></font>
+  <font size="2"><span id="spanInputType">n分符には, 4+8, 16+16, 2-32のように入力可(付点4分, 8分, 4分+8分+16分+32分)。</span></font>
   <br>
   <button onclick="funTable()">更新</button>
   <br>
@@ -623,9 +625,17 @@
           tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3) : "";
 
         } else {
-          var sumNotes = ((event.target.textContent).split("+").map(Number)).map(note => (parseFloat(inputTableBeat.value) * 4) / note).reduce((a, b) => a + b, 0);
+          var parts = event.target.textContent.split(/([+-])/);
+          var calNotes = 0;
 
-          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(sumNotes) ? sumNotes.toFixed(3) : "";
+          for (var i = 0; i < parts.length; i += 2) {
+            var sign = i > 0 ? parts[i - 1] : "";
+
+            var note = (inputTableBeat.value * 4 / parseFloat(parts[i]));
+            calNotes += parseFloat(sign + note);
+          }
+
+          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(calNotes) ? calNotes.toFixed(3) : "";
         }
       }
     }
@@ -808,7 +818,7 @@
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    function funPlay() {      
+    function funPlay() {
       if (selectInputType.selectedIndex == 0) {
         (async () => {
           for (var playColumn = 1; playColumn <= 100; playColumn ++) {
