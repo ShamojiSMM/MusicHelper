@@ -1061,7 +1061,7 @@
 
                 if (distance >= 0) {
                   var totalDelay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (checkTerminal.checked ? 0 : (distance <= 6 ? accelerations[distance] : 0));
-                  var targetResult = {delay: totalDelay, height: starting.height + gap0.height + gap1.height + gap2.height, up: starting.up, display: starting.display + gap0.display + gap1.display + gap2.display};
+                  var targetResult = {delay: totalDelay, height: starting.height + gap0.height + gap1.height + gap2.height, up: starting.up, display: `${starting.display}${gap0.display}${gap1.display}${gap2.display}`};
 
                   switch (totalDelay) {
                     case target:
@@ -1125,9 +1125,9 @@
         newResultNearNear.push(` (${result.delay}/${result.height}/${result.up}/${result.display}) `);
       });
 
-      document.getElementById("resultSame").textContent = Array.from(new Set(newResultSame));
-      document.getElementById("resultNear").textContent = Array.from(new Set(newResultNear));
-      document.getElementById("resultNearNear").textContent = Array.from(new Set(newResultNearNear));
+      document.getElementById("resultSame").innerHTML = Array.from(new Set(newResultSame));
+      document.getElementById("resultNear").innerHTML = Array.from(new Set(newResultNear));
+      document.getElementById("resultNearNear").innerHTML = Array.from(new Set(newResultNearNear));
     }
   </script>
 
