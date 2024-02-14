@@ -288,13 +288,13 @@
           if (addStraights >= 0) {
             resultCycle.innerHTML = `<b>直線追加[本]:</b> ${addStraights}`;
             imageCycle.style.display = "block";
-            imageCycle.src = `images/base${cycleLength % 42}.jpg`;
+            imageCycle.src = `images/tracks/base${cycleLength % 42}.jpg`;
 
           } else {
             if ([90, 96].includes(cycleLength)) {
               resultCycle.textContent = "";
               imageCycle.style.display = "block";
-              imageCycle.src = `images/other${cycleLength}.jpg`;
+              imageCycle.src = `images/tracks/other${cycleLength}.jpg`;
 
             } else {
               resultCycle.textContent = "Not Found";
