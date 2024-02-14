@@ -575,15 +575,16 @@
         generateRow2.contentEditable = true;
         generateRow2.addEventListener("input", funNote);
 
-        tableWiring.rows[1].insertCell(generateColumn).contentEditable = true;
-        tableWiring.rows[3].insertCell(generateColumn).contentEditable = true;
-        tableWiring.rows[4].insertCell(generateColumn).contentEditable = true;
-        tableWiring.rows[5].insertCell(generateColumn).contentEditable = true;
-        tableWiring.rows[6].insertCell(generateColumn).contentEditable = true;
+        for (var i = 1; i <= 9; i ++) {
+          if (i == 2) continue;
 
-        tableWiring.rows[7].insertCell(generateColumn);
-        tableWiring.rows[8].insertCell(generateColumn);
-        tableWiring.rows[9].insertCell(generateColumn);
+          if (i <= 6) {
+            tableWiring.rows[i].insertCell(generateColumn).contentEditable = true;
+          
+          } else {
+            tableWiring.rows[i].insertCell(generateColumn);
+          }
+        }
       }
     }
 
