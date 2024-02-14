@@ -486,7 +486,7 @@
   
   <font size="3"><b>音色:</b></font>
   <select id="selectInstrument">
-    <option>サイン波</option>
+    <option>正弦波</option>
     <option>三角波</option>
     <option>矩形波</option>
     <option>ノコギリ波</option>
@@ -692,23 +692,23 @@
 
       switch (selectedIndex) {
         case 1:
-          firstCorrection = 9;
+          firstCorrection = 8;
           correctionPattern = [11, 11, 10];
           break;
         
         case 2:
           firstCorrection = 11;
-          correctionPattern = [10, 11, 11];
+          correctionPattern = [11, 10, 11];
           break;
 
         case 3:
-          firstCorrection = 10
-          correctionPattern = [11, 11, 10];
+          firstCorrection = 11;
+          correctionPattern = [10, 11, 11];
           break;
 
         case 4:
-          firstCorrection = 11;
-          correctionPattern = [11, 10, 11];
+          firstCorrection = 10;
+          correctionPattern = [11, 11, 10];
       }
 
       for (var landingColumn = 2; landingColumn <= 100; landingColumn ++) {
@@ -817,6 +817,21 @@
     var instruments = ["sine", "triangle", "square", "sawtooth"];
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function funPlaySound(column) {
+      var oscillator = audioContext.createOscillator();
+      var gainNode = audioContext.createGain();
+
+      oscillator.type = instruments[selectInstrument.selectedIndex];
+      oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableWiring.rows[6].cells[column].textContent)) / 12)), audioContext.currentTime);
+      oscillator.connect(gainNode);      
+
+      gainNode.gain.value = 0.2;     
+      gainNode.connect(audioContext.destination);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
 
     function funPlay() {
       if (selectInputType.selectedIndex == 0) {
@@ -832,14 +847,7 @@
             }
     
             if (!isNaN(tableWiring.rows[6].cells[playColumn].textContent)) {
-              var oscillator = audioContext.createOscillator();
-    
-              oscillator.type = instruments[selectInstrument.selectedIndex];
-              oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableWiring.rows[6].cells[playColumn].textContent)) / 12)), audioContext.currentTime);
-              oscillator.connect(audioContext.destination);
-    
-              oscillator.start();
-              oscillator.stop(audioContext.currentTime + 0.1);
+              funPlaySound(playColumn);
             }
     
             if (playColumn >= 2) {
@@ -870,14 +878,7 @@
               }
               tableWiring.rows[0].cells[playCell].style.backgroundColor = "#98fb98";
 
-              var oscillator = audioContext.createOscillator();
-    
-              oscillator.type = instruments[selectInstrument.selectedIndex];
-              oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableWiring.rows[6].cells[playCell].textContent)) / 12)), audioContext.currentTime);
-              oscillator.connect(audioContext.destination);
-                          
-              oscillator.start();
-              oscillator.stop(audioContext.currentTime + 0.1);
+              funPlaySound(playColumn);
 
             }, parseFloat(tableWiring.rows[3].cells[playCell].textContent) * 50 / 3);
           }
@@ -1137,8 +1138,7 @@
   <img src="images/info/gaps.jpg" height="140">
   <img src="images/info/height.jpg" height="140">
   <br>
-  <img src="images/info/landing0.jpg" height="140">
-  <img src="images/info/landing1.jpg" height="200">
+  <img src="images/info/landing.jpg" height="180">
 
   <hr id="scrollSpeedTable">
   <font size="5"><b>スクロール遅度表</b></font>
@@ -1296,7 +1296,8 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  音符ブロックと接触して音が鳴るオブジェクト(例えばクリボー)を音源って呼んでるけどよくよく考えなくても音源は音符ブロックの方。
+  集音配置生成の精度上がりました(はず)。<br>
+  なんせ計測なんてする人が少ないので割と大変。
   <br><br>
   データや機能などの誤り, ここに無いグローバル音源配置やスクロール方法, おトクな情報など教えてくれたら嬉しいです。  
   <br><br>
