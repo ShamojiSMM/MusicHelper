@@ -947,7 +947,7 @@
         totalNoteDelay = selectInputType.selectedIndex == 0 ? (totalNoteDelay + (tableColumn != 1 ? parseFloat(tableWiring.rows[3].cells[tableColumn - 1].textContent) : 0)) : parseFloat(tableWiring.rows[3].cells[tableColumn].textContent);
         totalXDelay += parseFloat(tableWiring.rows[4].cells[tableColumn].textContent) + (selectLoading.selectedIndex == 3 ? parseFloat(tableWiring.rows[5].cells[tableColumn].textContent) : 0);
 
-        tableWiring.rows[7].cells[tableColumn].textContent = parseInt(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (yLoadingSpeed + 4)));
+        tableWiring.rows[7].cells[tableColumn].textContent = Math.round(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (yLoadingSpeed + 4)));
 
         tableWiring.rows[8].cells[tableColumn].textContent = parseInt(tableWiring.rows[8].cells[1].textContent) + parseInt(tableWiring.rows[6].cells[tableColumn].textContent);
       }
