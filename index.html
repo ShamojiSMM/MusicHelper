@@ -93,9 +93,9 @@
 </head>
 
 <body>
-  <h1>レール演奏補助ツール - SMM2</h1>
-  <font size="3">レール演奏に関するいろんな機能があります。</font><br>
-  <font size="2">(最終更新日: 2024/02/14)</font>
+  <h1>テスト</h1>
+  <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
+  <font size="2">(最終更新日: 2024/02/17)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -490,6 +490,8 @@
     <option>三角波</option>
     <option>矩形波</option>
     <option>ノコギリ波</option>
+    <option>ピアノ</option>
+    <option>トランペット</option>
   </select>
   
   <div style="overflow-x: scroll;">
@@ -818,20 +820,58 @@
     var instruments = ["sine", "triangle", "square", "sawtooth"];
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
+        
+    var soundData = [];
+
+    for (var i = 0; i <= 1; i ++) {
+      (function(i) {
+        var xml = new XMLHttpRequest();
+        xml.responseType = "arraybuffer";
+        xml.open("GET", `sounds/sound${i}.mp3`, true);
+      
+        xml.onload = function() {
+          audioContext.decodeAudioData(
+            xml.response, 
+            function(data) {
+              soundData[i] = data;
+            }
+          );
+        };
+      
+        xml.send();
+      })(i);
+    }
+
+
     function funPlaySound(column) {
-      var oscillator = audioContext.createOscillator();
-      var gainNode = audioContext.createGain();
+      if (selectInstrument.selectedIndex <= 3) {
+        var oscillator = audioContext.createOscillator();
+        var gainNode = audioContext.createGain();
 
-      oscillator.type = instruments[selectInstrument.selectedIndex];
-      oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableWiring.rows[6].cells[column].textContent)) / 12)), audioContext.currentTime);
-      oscillator.connect(gainNode);      
+        oscillator.type = instruments[selectInstrument.selectedIndex];
+        oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableWiring.rows[6].cells[column].textContent)) / 12)), audioContext.currentTime);
+        oscillator.connect(gainNode);      
 
-      gainNode.gain.value = 0.2;     
-      gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 0.2;     
+        gainNode.connect(audioContext.destination);
 
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.1);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+      
+      } else {
+        var bufferSource = audioContext.createBufferSource();
+        var gainNode = audioContext.createGain();
+
+        bufferSource.buffer = soundData[selectInstrument.selectedIndex - 4];
+        bufferSource.playbackRate.value = 2 ** ((18 - selectScale.selectedIndex + parseInt(tableWiring.rows[6].cells[column].textContent)) / 12);
+
+        bufferSource.connect(gainNode);
+
+        gainNode.gain.value = 0.4;
+        gainNode.connect(audioContext.destination);
+
+        bufferSource.start(0);
+      }
     }
 
     function funPlay() {
@@ -1297,13 +1337,11 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  集音配置生成の精度上がりました(はず)。<br>
-  なんせ計測なんてする人が少ないので割と大変。
+  CORSポリシーにだいぶ苦しめられました。<br>
+  htmlでローカルファイル参照はできるのにJavaScriptだとできない。GitHubにアップロードしたらできるけど, いちいちアップロードしないといけないのは面倒。<br>
+  サーバの勉強もしないとねぇ。
   <br><br>
-  データや機能などの誤り, ここに無いグローバル音源配置やスクロール方法, おトクな情報など教えてくれたら嬉しいです。  
-  <br><br>
-  今年こそSMM3来るかなぁ。
-  <br>
+  データ, 機能, その他もろもろの誤りや改善案があれば教えてくれると嬉しいです。
   </font>
   <br><br>
 
