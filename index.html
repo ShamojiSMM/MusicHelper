@@ -492,6 +492,8 @@
     <option>ノコギリ波</option>
     <option>ピアノ</option>
     <option>トランペット</option>
+    <option>フルート</option>
+    <option>ヴァイオリン</option>
   </select>
   
   <div style="overflow-x: scroll;">
@@ -823,7 +825,7 @@
         
     var soundData = [];
 
-    for (var i = 0; i <= 1; i ++) {
+    for (var i = 0; i < selectInstrument.options.length - 4; i ++) {
       (function(i) {
         var xml = new XMLHttpRequest();
         xml.responseType = "arraybuffer";
