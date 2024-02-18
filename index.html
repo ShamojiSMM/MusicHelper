@@ -95,7 +95,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
-  <font size="2">(最終更新日: 2024/02/17)</font>
+  <font size="2">(最終更新日: 2024/02/18)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -482,7 +482,7 @@
     <option>LowC# 低ド#</option>
     <option style="color: #5d78ff;">LowC 低ド</option>
   </select>
-  <button onclick="funPlay()">鳴らす</button>
+  <button onclick="funPlay()">演奏</button>
   
   <font size="3"><b>音色:</b></font>
   <select id="selectInstrument">
@@ -495,6 +495,8 @@
     <option>フルート</option>
     <option>ヴァイオリン</option>
   </select>
+
+  <button onclick="funStopPlay()">演奏停止</button>
   
   <div style="overflow-x: scroll;">
     <table id="tableWiring" border="1" style="width: 6000px; border-collapse: collapse; table-layout: fixed;">
@@ -876,10 +878,16 @@
       }
     }
 
+    var stopFlag = false;
+
     function funPlay() {
+      stopFlag = false;
+
       if (selectInputType.selectedIndex == 0) {
         (async () => {
           for (var playColumn = 1; playColumn <= 100; playColumn ++) {
+            if (stopFlag) return;
+
             if (tableWiring.rows[3].cells[playColumn].textContent + tableWiring.rows[6].cells[playColumn].textContent == "" || playColumn >= 100) {
               for (var playLightColumn of tableWiring.rows[0].cells) {
                 if (playLightColumn.cellIndex >= 1) {
@@ -910,6 +918,8 @@
         }
 
         for (var playColumn = 1; playColumn <= 100; playColumn ++) {
+          if (stopFlag) return;
+
           if (!isNaN(parseFloat(tableWiring.rows[3].cells[playColumn].textContent) + parseInt(tableWiring.rows[6].cells[playColumn].textContent)) && tableWiring.rows[3].cells[playColumn].textContent != "" && tableWiring.rows[6].cells[playColumn].textContent != "") {
             const playCell = playColumn;
 
@@ -925,6 +935,16 @@
 
             }, parseFloat(tableWiring.rows[3].cells[playCell].textContent) * 50 / 3);
           }
+        }
+      }
+    }
+
+    function funStopPlay() {
+      stopFlag = true;
+
+      for (var playResetColumn of tableWiring.rows[0].cells) {
+        if (playResetColumn.cellIndex >= 1) {
+          playResetColumn.style.backgroundColor = "#ffffe0";
         }
       }
     }
