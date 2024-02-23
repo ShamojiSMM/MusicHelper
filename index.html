@@ -22,7 +22,7 @@
     input[type="checkbox"] {
       height: 20px;
       width: 20px;
-      position:relative;
+      position: relative;
       top: 5px;
     }
 
@@ -32,6 +32,18 @@
 
     button {
       height: 35px;
+    }
+
+    #canvasWiring {
+      border: 2px solid #8f8f8f;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+
+    .divWiringGenerator {
+      display: inline-block;
+      vertical-align: top;
+      margin-left: 15px;
     }
 
     .divSet {
@@ -95,7 +107,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
-  <font size="2">(最終更新日: 2024/02/18)</font>
+  <font size="2">(最終更新日: 2024/02/23)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -1065,35 +1077,37 @@
   <font size="5"><b>縦集音配置生成</b></font>
   <font size="3">縦レールによる集音(ぜんまいメソッド)の配置を探します。</font>
   <br><br>
+  <canvas id="canvasWiring" width="32px" height="320px"></canvas>
+  <div class="divWiringGenerator">
+    <font size="3"><b>狙いの値[f]:</b></font>
+    <input type="number" id="inputTarget">
 
-  <font size="3"><b>狙いの値[f]:</b></font>
-  <input type="number" id="inputTarget">
+    <span id="spanHeight">
+      <font size="3"><b>着線レールとの距離[b]:</b></font>
+      <input type="number" id="inputHeight">
+    </span>
 
-  <span id="spanHeight">
-    <font size="3"><b>着線レールとの距離[b]:</b></font>
-    <input type="number" id="inputHeight">
-  </span>
+    <button onclick="funTarget()">探す</button><br>
+    <input type="checkbox" id="checkTerminal" onclick="funTerminal()">
+    <font size="2">終端遅度を使用(8b以上あける)。<br></font>
+    <select id="selectSort" onchange="funSort()">
+      <option>↓長さ 短い順</option>
+      <option>↓長さ 長い順</option>
+      <option>↑長さ 短い順</option>
+      <option>↑長さ 長い順</option>
+    </select>
+    <font size="2">( 遅延 / ↓長さ / ↑長さ / 表記 )。</font>
+    <br><br>
 
-  <button onclick="funTarget()">探す</button><br>
-  <input type="checkbox" id="checkTerminal" onclick="funTerminal()">
-  <font size="2">終端遅度を使用(8b以上あける)。<br></font>
-  <select id="selectSort" onchange="funSort()">
-    <option>↓長さ 短い順</option>
-    <option>↓長さ 長い順</option>
-    <option>↑長さ 短い順</option>
-    <option>↑長さ 長い順</option>
-  </select>
-  <font size="2">( 遅延 / ↓長さ / ↑長さ / 表記 )。</font>
-  <br><br>
+    <font size="3"><b>一致:</b></font><br>
+    <div id="divSame"></div><br>
 
-  <font size="3"><b>一致:</b></font><br>
-  <span id="resultSame"></span><br>
+    <font size="3"><b>誤差:</b></font><br>
+    <div id="divNear"></div><br>
 
-  <font size="3"><b>誤差:</b></font><br>
-  <span id="resultNear"></span><br>
-
-  <font size="3"><b>もっと誤差:</b></font><br>
-  <span id="resultNearNear"></span> 
+    <font size="3"><b>もっと誤差:</b></font><br>
+    <div id="divNearNear"></div>
+  </div>
 
   <script>
     function funTerminal() {
@@ -1187,9 +1201,101 @@
         newResultNearNear.push(` (${result.delay}/${result.height}/${result.up}/${result.display}) `);
       });
 
-      document.getElementById("resultSame").innerHTML = Array.from(new Set(newResultSame));
-      document.getElementById("resultNear").innerHTML = Array.from(new Set(newResultNear));
-      document.getElementById("resultNearNear").innerHTML = Array.from(new Set(newResultNearNear));
+      newResultSame = Array.from(new Set(newResultSame));
+      newResultNear = Array.from(new Set(newResultNear));
+      newResultNearNear = Array.from(new Set(newResultNearNear));
+
+
+      [divSame, divNear, divNearNear].forEach((div, i) => {
+        while (div.firstChild) {
+          div.removeChild(div.firstChild);
+        }
+
+        [newResultSame, newResultNear, newResultNearNear][i].forEach(result => {
+          var span = document.createElement("span");
+          span.textContent = `${result},`;
+
+          span.addEventListener("click", function(event) {
+            var str = event.target.textContent.match(/[↑↓][^)]+\)/)[0].replace(")", "");
+          
+            var direction = str[0];
+            var optsList = [];
+            var parts = [];
+            var partsIndex = ["noteU", "noteD", "space", "openU", "openD", "close", "connection", "middle"];
+
+            str.slice(1).split("-").map(str => optsList.push(str.match(/[A-Z]\d*/g) || []));
+
+            if (direction == "↑") {
+              optsList[0].forEach((option, i) => {
+                switch (option[0]) {
+                  case "R":
+                    if (i == 0) {
+                      if (option[1] == 0) {
+                        parts.unshift(5);
+                      
+                      } else {
+                        parts.unshift(6);
+                        [...Array(option[1] - 1)].map(() => parts.unshift(6, 7));
+                        parts.unshift((i < optsList[0].length - 1 ? 3 : 5), 7);
+                      }
+                    
+                    } else {
+                      parts.unshift(4);
+                      [...Array(option[1] - 1)].map(() => parts.unshift(6, 7));
+                      parts.unshift((i < optsList[0].length - 1 ? 3 : 5), 7);
+                    }
+                    break;
+                  
+                  case "G":
+                    if (i == 0) parts.unshift(3);
+                    [...Array(option[1] - 1)].map(() => parts.unshift(2));
+                    break;
+                  
+                  case "F":
+                    if (i == 0) parts.unshift(3);
+                }
+              });
+            
+              parts.push(0);
+            
+            } else {
+              parts.unshift(3);
+              parts.push(1);
+            }
+
+            if (optsList[1] == "") parts.push(4);
+
+            optsList[1].forEach((option, i) => {
+              if (option[0] == "R") {
+                parts.push(i == 0 ? 6 : 3);
+                [...Array(option[1] - 1)].map(() => parts.push(7, 6));
+                parts.push(7, 4);
+              
+              } else {
+                if (i == 0) parts.push(4);
+                [...Array(option[1] - 1)].map(() => parts.push(2));
+              }
+            });
+
+            var context = canvasWiring.getContext("2d");
+
+            context.clearRect(0, 0, 32, 1000);
+            canvasWiring.height = 32 * parts.length;
+
+            parts.forEach((part, i) => {
+              var image = new Image();
+              image.src = `images/railParts/${partsIndex[`${part}`[0]]}.png`;
+
+              image.onload = () => {
+                context.imageSmoothingEnabled = false;
+                context.drawImage(image, 0, 32 * i, 32, 32);
+              }
+            });
+          });
+
+          div.appendChild(span);
+        });
+      });
     }
   </script>
 
@@ -1359,9 +1465,10 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  CORSポリシーにだいぶ苦しめられました。<br>
-  htmlでローカルファイル参照はできるのにJavaScriptだとできない。GitHubにアップロードしたらできるけど, いちいちアップロードしないといけないのは面倒。<br>
-  サーバの勉強もしないとねぇ。
+  最近はもっぱらマリメしないですねぇ。3はやく。<br>
+  こんなツールを使う人は相当限られてると思いますが、<br>
+  というか私以外に使ってるのかな？<br>
+  3でレール演奏の活気が戻ることを願います。
   <br><br>
   データ, 機能, その他もろもろの誤りや改善案があれば教えてくれると嬉しいです。
   </font>
