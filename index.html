@@ -107,7 +107,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
-  <font size="2">(最終更新日: 2024/02/23)</font>
+  <font size="2">(最終更新日: 2024/02/24)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -883,10 +883,11 @@
 
         bufferSource.connect(gainNode);
 
-        gainNode.gain.value = 0.3;
+        gainNode.gain.value = 0.4;
         gainNode.connect(audioContext.destination);
 
         bufferSource.start(0);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
       }
     }
 
