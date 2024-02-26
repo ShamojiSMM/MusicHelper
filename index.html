@@ -107,7 +107,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
-  <font size="2">(最終更新日: 2024/02/24)</font>
+  <font size="2">(最終更新日: 2024/02/26)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -540,7 +540,7 @@
         <th bgcolor="#ffc0cb">高さ[b]</th><td style="border: 2px solid #303030;" contenteditable="true" oninput="funTable()"></td>
       </tr>
       <tr bgcolor="#ffffff">
-        <th bgcolor="#dcdcdc">配置</th><td></td>
+        <th bgcolor="#dcdcdc">配置可</th><td></td>
       </tr>
       <tr>
         <th bgcolor="#dcdcdc">代入</th>
@@ -554,12 +554,12 @@
     <option>累計遅延</option>
   </select>
 
-  <font size="2"><span id="spanInputType">n分符には, 4+8, 16+16, 2-32のように入力可(付点4分, 8分, 4分+8分+16分+32分)。</span></font>
+  <font size="2"><span id="spanInputType">n分符には, 4., 16+16, 2.-32, 2.. のように入力可(付点4分, 8分, 付点2分-32分, 複付点2分)。</span></font>
   <br>
   <button onclick="funTable()">更新</button>
   <br>
   <button onclick="funTest()">検証</button>
-  <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)</font>
+  <font size="2">結果が配置可能かどうかを検証。(◎一致, ○誤差, △もっと誤差, ×不可)。</font>
   <br>
   <font size="2">個数: [
     ◎: <span id="testResult0"></span>
@@ -569,8 +569,11 @@
     ]</font>
   <br>
   <input type="checkbox" id="checkTestTerminal">
-  <font size="2">終端遅度を使用(8b以上あける)。</font><br>
-  <font size="2">代入ボタンで↓に結果を代入・表示します。</font>
+  <font size="2">終端速度を使用(8b以上あける)。</font>
+  <br><br>
+  <font size="2">代入ボタンで↓に結果を代入・表示します。</font><br>
+  <input type="checkbox" id="checkTableButtonImage" checked="true">
+  <font size="2">ボタン押下時に画像表示(一致の左端の配置)。</font>
 
   <script>
     for (var generateColumn = 1; generateColumn <= 100; generateColumn ++) {
@@ -639,24 +642,25 @@
     }
 
     function funNote() {
-      if (selectInputType.selectedIndex == 0) {
-        if (!isNaN(tableWiring.rows[2].cells[event.target.cellIndex].textContent)) {
-          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3)) ? ((parseFloat(inputTableBeat.value) * 4) / event.target.textContent).toFixed(3) : "";
+      if (selectInputType.selectedIndex == 1) return;
 
-        } else {
-          var parts = event.target.textContent.split(/([+-])/);
-          var calNotes = 0;
+      var parts = event.target.textContent.match(/[+-]*\d+\.*/g);
 
-          for (var i = 0; i < parts.length; i += 2) {
-            var sign = i > 0 ? parts[i - 1] : "";
-
-            var note = (inputTableBeat.value * 4 / parseFloat(parts[i]));
-            calNotes += parseFloat(sign + note);
-          }
-
-          tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(calNotes) ? calNotes.toFixed(3) : "";
-        }
+      if (event.target.textContent == "" || !parts) {
+        tableWiring.rows[3].cells[event.target.cellIndex].textContent = "";
+        return;
       }
+
+      var calNotes = 0;
+          
+      parts.forEach(part => {
+        var note = inputTableBeat.value * 4 / part.replace(/[+-.]/g, "");
+        note = 2 * note - note * (2 ** -(part.match(/\./g) || []).length);
+    
+        calNotes += (part.startsWith("-") ? -1 : 1) * note;
+      });
+
+        tableWiring.rows[3].cells[event.target.cellIndex].textContent = isFinite(calNotes) ? calNotes.toFixed(3) : "";
     }
 
     function funLoading(selectedIndex) {
@@ -887,7 +891,7 @@
         gainNode.connect(audioContext.destination);
 
         bufferSource.start(0);
-        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
       }
     }
 
@@ -980,7 +984,7 @@
         totalNoteDelay = selectInputType.selectedIndex == 0 ? (totalNoteDelay + (tableColumn != 1 ? parseFloat(tableWiring.rows[3].cells[tableColumn - 1].textContent) : 0)) : parseFloat(tableWiring.rows[3].cells[tableColumn].textContent);
         totalXDelay += parseFloat(tableWiring.rows[4].cells[tableColumn].textContent) + (selectLoading.selectedIndex == 3 ? parseFloat(tableWiring.rows[5].cells[tableColumn].textContent) : 0);
 
-        tableWiring.rows[7].cells[tableColumn].textContent = Math.round(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (yLoadingSpeed + 4)));
+        tableWiring.rows[7].cells[tableColumn].textContent = parseInt(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (yLoadingSpeed + 4)));
 
         tableWiring.rows[8].cells[tableColumn].textContent = parseInt(tableWiring.rows[8].cells[1].textContent) + parseInt(tableWiring.rows[6].cells[tableColumn].textContent);
       }
@@ -1067,6 +1071,12 @@
       inputHeight.value = tableWiring.rows[8].cells[button.target.id].textContent;
       funTarget();
 
+      if (checkTableButtonImage.checked) {
+        setTimeout(() => {
+          divSame.children[0].click();
+        }, 200);
+      }
+
       for (tableButtonColumn = 1; tableButtonColumn <= 100; tableButtonColumn ++) {
         document.getElementById(tableButtonColumn).style.backgroundColor = "";
       }
@@ -1090,7 +1100,7 @@
 
     <button onclick="funTarget()">探す</button><br>
     <input type="checkbox" id="checkTerminal" onclick="funTerminal()">
-    <font size="2">終端遅度を使用(8b以上あける)。<br></font>
+    <font size="2">終端速度を使用(8b以上あける)。<br></font>
     <select id="selectSort" onchange="funSort()">
       <option>↓長さ 短い順</option>
       <option>↓長さ 長い順</option>
@@ -1224,7 +1234,7 @@
             var parts = [];
             var partsIndex = ["noteU", "noteD", "space", "openU", "openD", "close", "connection", "middle"];
 
-            str.slice(1).split("-").map(str => optsList.push(str.match(/[A-Z]\d*/g) || []));
+            str.slice(1).split("-").map(str => optsList.push(str.match(/[RGF]\d*/g) || []));
 
             if (direction == "↑") {
               optsList[0].forEach((option, i) => {
@@ -1590,7 +1600,7 @@
   <br><br><br>
 
   <font size="3"><a href="https://twitter.com/Shamoji_SMM">作った人</a></font><br>
-  <font size="2">(C)opyRight 2023 無し</font>
+  <font size="2">(C)opyRight (2023 ~ currentTime) 無し</font>
 
   <script>
     var accelerations = [11, 8, 5, 3, 2, 1, 1];
