@@ -107,7 +107,7 @@
 <body>
   <h1>レール演奏補助ツール - SMM2</h1>
   <font size="3">レール演奏で使えそうな機能の寄せ集め。</font><br>
-  <font size="2">(最終更新日: 2024/02/26)</font>
+  <font size="2">(最終更新日: 2024/03/05)</font>
 
   <hr>
   <font size="5"><b>目次</b></font>
@@ -984,7 +984,7 @@
         totalNoteDelay = selectInputType.selectedIndex == 0 ? (totalNoteDelay + (tableColumn != 1 ? parseFloat(tableWiring.rows[3].cells[tableColumn - 1].textContent) : 0)) : parseFloat(tableWiring.rows[3].cells[tableColumn].textContent);
         totalXDelay += parseFloat(tableWiring.rows[4].cells[tableColumn].textContent) + (selectLoading.selectedIndex == 3 ? parseFloat(tableWiring.rows[5].cells[tableColumn].textContent) : 0);
 
-        tableWiring.rows[7].cells[tableColumn].textContent = parseInt(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (yLoadingSpeed + 4)));
+        tableWiring.rows[7].cells[tableColumn].textContent = parseInt(parseInt(tableWiring.rows[7].cells[1].textContent) + totalNoteDelay - totalXDelay - ((selectLoading.selectedIndex != 1 ? parseInt(tableWiring.rows[6].cells[tableColumn].textContent) : 0) * (parseFloat(yLoadingSpeed) + 4)));
 
         tableWiring.rows[8].cells[tableColumn].textContent = parseInt(tableWiring.rows[8].cells[1].textContent) + parseInt(tableWiring.rows[6].cells[tableColumn].textContent);
       }
@@ -1476,10 +1476,10 @@
   <hr id="diary">
   <font size="5"><b>雑記</b></font>
   <br><br><font size="2">
-  最近はもっぱらマリメしないですねぇ。3はやく。<br>
-  こんなツールを使う人は相当限られてると思いますが、<br>
-  というか私以外に使ってるのかな？<br>
-  3でレール演奏の活気が戻ることを願います。
+  フルートとヴァイオリンの音を収録したけどどう聴いてもそんな音じゃない。なんで？<br>
+  集音の精度向上したつもりだけどまだズレが気になります。<br>
+  データのミスなのか着線時の処理のせいなのか計算ミスなのか...<br>
+  あとそろそろネタが尽きてきました。
   <br><br>
   データ, 機能, その他もろもろの誤りや改善案があれば教えてくれると嬉しいです。
   </font>
