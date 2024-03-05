@@ -572,8 +572,6 @@
   <font size="2">終端速度を使用(8b以上あける)。</font>
   <br><br>
   <font size="2">代入ボタンで↓に結果を代入・表示します。</font><br>
-  <input type="checkbox" id="checkTableButtonImage" checked="true">
-  <font size="2">ボタン押下時に画像表示(一致の左端の配置)。</font>
 
   <script>
     for (var generateColumn = 1; generateColumn <= 100; generateColumn ++) {
@@ -1071,12 +1069,6 @@
       inputHeight.value = tableWiring.rows[8].cells[button.target.id].textContent;
       funTarget();
 
-      if (checkTableButtonImage.checked) {
-        setTimeout(() => {
-          divSame.children[0].click();
-        }, 200);
-      }
-
       for (tableButtonColumn = 1; tableButtonColumn <= 100; tableButtonColumn ++) {
         document.getElementById(tableButtonColumn).style.backgroundColor = "";
       }
@@ -1107,7 +1099,9 @@
       <option>↑長さ 短い順</option>
       <option>↑長さ 長い順</option>
     </select>
-    <font size="2">( 遅延 / ↓長さ / ↑長さ / 表記 )。クリックで画像出ます。</font>
+    <font size="2">( 遅延 / ↓長さ / ↑長さ / 表記 )。クリックで画像出ます。</font><br>
+    <input type="checkbox" id="checkWiringImage" checked="true">
+    <font size="2">実行時に画像表示(一致の左端の配置)。</font>
     <br><br>
 
     <font size="3"><b>一致:</b></font><br>
@@ -1307,7 +1301,12 @@
           div.appendChild(span);
         });
       });
+
+      if (checkWiringImage.checked) {
+        divSame.children[0].click(); 
+      }
     }
+    
   </script>
 
   <hr id="imageGallery">
