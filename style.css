@@ -1,0 +1,289 @@
+@charset "UTF-8";
+
+body {
+  font-family: "Fira Sans", Arial, Helvetica, sans-serif;
+  white-space: nowrap;
+}
+
+p {
+  display: inline;
+}
+
+.p3 {
+  font-size: 1em;
+}
+
+.p2 {
+  font-size: 0.8em;
+}
+
+.gray {
+  color: #656565;
+}
+
+.en {
+  display: none;
+  line-height: 1.5;
+}
+
+hr {
+  margin-top: 1rem;
+}
+
+h2 {
+  margin-top: 0px;
+  margin-right: 0.8rem;
+  display: inline-block;
+}
+
+h3  {
+  margin-top: 0px;
+  margin-right: 0.8rem;
+  display: inline-block;  
+}
+
+a {
+  text-decoration: none;
+}
+
+.contents {
+  border: 1px solid #000000;
+  border-radius: 0.5rem;
+  background-color: #f3f3f3;
+  width: 20rem;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+input[type="number"] {
+  height: 1.7rem;
+  width: 3.6rem;
+  margin-right: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+input[type="text"] {
+  margin-bottom: 0.4rem;
+}
+
+input[type="checkbox"] {
+  height: 1.3rem;
+  width: 1.3rem;
+  position: relative;
+  top: 0.35rem;
+}
+
+input[type="file"] {
+  border: 1px solid #c6c6c6;
+  border-radius: 0.375rem;
+  margin-bottom: 0.4rem;
+  margin-right: 0.8rem;
+}
+
+select {
+  height: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+#selectTableInput {
+  margin-bottom: 0rem;
+}
+
+button:not(td button) {
+  height: 2rem;
+  margin-bottom: 0.4rem;
+  margin-right: 0.8rem;
+}
+
+.result {
+  font-size: 1em;
+}
+
+#tableBeats {
+  border-collapse: collapse;
+  width: 24rem;
+}
+
+#tableBeats *:not(span) {
+  border: 1px solid #9a9a9a;
+}
+
+#tableBeats tr {
+  text-align: center;
+}
+
+#tableBeats tr:nth-child(1) {
+  background-color: #cfffff;
+}
+
+#tableBeats tr:nth-child(6) {
+  background-color: #baffc9;
+}
+
+#tableBeats tr:nth-child(10),
+#tableBeats tr:nth-child(11),
+#tableBeats tr:nth-child(12) {
+  background-color: #ffffe0;
+}
+
+#inputSignature0, #inputSignature1 {
+  width: 2rem;
+  margin-right: 0rem;
+}
+
+#divSpecial, #imageloop {
+  display: none;
+}
+
+#selectScale option:nth-child(4) {
+  color: #ff8045;
+}
+
+#selectScale option:nth-child(16) {
+  color: #1eb700;
+}
+
+#selectScale option:nth-child(28) {
+  color: #5d78ff;
+}
+
+.tableWirings {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tableWirings *:not(span) {
+  border: 1px solid #8c8c8c;
+  overflow: hidden;
+}
+
+.th {
+  background-color: #dcdcdc;
+  width: 7.5rem;
+}
+
+.index {
+  background-color: #ffffe0;
+}
+
+.normal {
+  background-color: #ffffff;
+}
+
+.input {
+  background-color: #fffff7;
+}
+
+table .blue {
+  background-color: #f0ffff;
+}
+
+table .red {
+  background-color: #fff2e9;
+}
+
+#selectLoadingSpeedInput, 
+#divLoadingSpeedAverage, 
+#divLoadingSpeedCycle {
+  display: none;
+}
+
+.divScroll {
+  overflow-x: scroll;
+  margin-top: 0.8rem;
+}
+
+#canvasWiring {
+  border: 2px solid #8f8f8f;
+  border-radius: 0.35rem;
+  margin-left: 0.8rem;
+}
+
+.divWiringGenerator {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 0.9rem;
+}
+
+.divSet {
+  border: 2px solid #1e1e17;
+  background-color: #fffff8;
+  white-space: normal;
+  font-size: 0.79em;
+  margin: 0.4rem;
+  margin-top: 0.8rem;
+  margin-bottom: 1.6rem;
+  border-radius: 1rem;
+  display: flex;
+}
+
+.divItems {
+  display: flex;
+  flex-direction: column;
+  margin: 7px;
+}
+
+.imgSet {
+  height: 7rem;
+  display: block;
+  margin: 0.04rem;
+  border-radius: 0.3rem;
+}
+
+.spanData {
+  border-bottom: 1px solid #cb4e00;
+  width: fit-content;
+}
+
+.divSkin {
+  margin-top: 0.7rem;
+  border-bottom: 1px solid #1b690b;
+  width: fit-content;
+}
+
+.imgSkin {
+  height: 1.8rem;
+  margin-right: 0.55rem;
+  border-radius: 0.4rem;
+  border: 1.5px solid #176900;
+}
+
+.imgEnm {
+  height: 1.2rem;
+  display: inline-block;
+  border-radius: 0.3rem;
+  border: 0.1px solid #ffffff;
+}
+
+ul {
+  padding-left: 0.8rem;
+  margin-top: 0px;
+}
+
+.tableSpeeds {
+  border-collapse: collapse;
+}
+
+.tableSpeeds *:not(span) {
+  border: 1px solid #000000;
+}
+
+.lightGray {
+  background-color: #f1f1f1;
+}
+
+.lightGreen {
+  background-color: #e4ffea;
+}
+
+.paragraph {
+  margin-left: 0.8rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.vertical {
+  writing-mode: vertical-lr;
+}
