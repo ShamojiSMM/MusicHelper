@@ -32,6 +32,10 @@ function isNum(...values) {
   return true;
 }
 
+function toInt(value) {
+
+}
+
 var magnifications = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, (4 / 3), (4 / 6), (4 / 12)];
 
 function funBeatValue(beatValue) {
@@ -598,68 +602,49 @@ for (var i = 1; i <= tableWiringLength; i ++) {
   buttonCell.appendChild(button);
 }
 
-tableInput.addEventListener("keydown", e => {
-  if (e.ctrlKey) {
-    var row = document.activeElement.parentNode.rowIndex;
-    var cell = document.activeElement.cellIndex;
+document.querySelectorAll(".tableWirings td").forEach(table => {
+  table.addEventListener("blur", event => event.target.scrollLeft = 0);
+});
 
-    switch (e.key) {
-      case "ArrowRight":
-        tableInput.rows[row].cells[cell + 1].focus();
-        break;
-      
-      case "ArrowLeft":
-        tableInput.rows[row].cells[cell - 1].focus();
-        break;
+var arrows = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
 
-      case "ArrowUp":
-        tableInput.rows[row - 1].cells[cell].focus();
-        break;
-      
-      case "ArrowDown":
-        tableInput.rows[row + 1].cells[cell].focus();
-    }
+tableInput.addEventListener("keydown", event => {
+  if (event.ctrlKey) {
+    var row = event.target.parentNode.rowIndex;
+    var cell = event.target.cellIndex;
+
+    var shifts = [[0, 1], [0, -1], [-1, 0], [1, 0]][arrows.indexOf(event.key)];
+    if (!shifts) return;
+
+    var destination = tableInput.rows[row + shifts[0]].cells[cell + shifts[1]];
+    destination.focus();
   }
 });
 
-tableWiring.addEventListener("keydown", e => {
-  if (e.ctrlKey) {
-    var row = document.activeElement.parentNode.rowIndex;
-    var cell = document.activeElement.cellIndex;
+tableWiring.addEventListener("keydown", event => {
+  if (!event.ctrlKey) return;
 
-    switch (e.key) {
-      case "ArrowRight":
-        tableWiring.rows[row].cells[cell + 1].focus();
-        break;
-      
-      case "ArrowLeft":
-        tableWiring.rows[row].cells[cell - 1].focus();
-        break;
-
-      case "ArrowUp":
-        tableWiring.rows[row - (selectLoading.selectedIndex == 3 ? 1 : (row == 5 ? 2 : 1))].cells[cell].focus();
-        break;
-      
-      case "ArrowDown":
-      tableWiring.rows[row + (selectLoading.selectedIndex == 3 ? 1 : (row == 3 ? 2 : 1))].cells[cell].focus();
-    }
-  }
+  var row = event.target.parentNode.rowIndex;
+  var cell = event.target.cellIndex;
+  
+  var shifts = [[0, 1], [0, -1], [-(selectLoading.selectedIndex == 3 ? 1 : (row == 5 ? 2 : 1)), 0], [(selectLoading.selectedIndex == 3 ? 1 : (row == 3 ? 2 : 1)), 0]][arrows.indexOf(event.key)];
+  if (!shifts) return;
+  
+  var destination = tableWiring.rows[row + shifts[0]].cells[cell + shifts[1]];
+  destination.focus();
 });
 
-tableSort.addEventListener("keydown", e => {
-  if (e.ctrlKey) {
-    var row = document.activeElement.parentNode.rowIndex;
-    var cell = document.activeElement.cellIndex;
-
-    switch (e.key) {
-      case "ArrowRight":
-        tableSort.rows[row].cells[cell + 1].focus();
-        break;
-      
-      case "ArrowLeft":
-        tableSort.rows[row].cells[cell - 1].focus();
-    }
-  }
+tableSort.addEventListener("keydown", event => {
+  if (!event.ctrlKey) return;
+  
+  var row = event.target.parentNode.rowIndex;
+  var cell = event.target.cellIndex;
+  
+  var shift = [1, -1][arrows.indexOf(event.key)];
+  if (!shift) return;
+  
+  var destination = tableSort.rows[row].cells[cell + shift];
+  destination.focus();
 });
 
 function funTableBeat(tableBeatValue) {
@@ -720,7 +705,7 @@ function funNote(cellIndex) {
       calNotes += (part.startsWith("-") ? -1 : 1) * note;
     });
   
-    tableInput.rows[3].cells[target.cellIndex].textContent = isFinite(calNotes) ? calNotes.toFixed(3) : "";
+    tableInput.rows[3].cells[target.cellIndex].textContent = isFinite(calNotes) ? calNotes : "";
   }
 }
 
@@ -899,7 +884,7 @@ function funLoadingSpeedAverage(loadingSpeed) {
   if (selectLoading.selectedIndex - languageIndex == 6) {
     if (loadingSpeed != "") {
       for (var i = 2; i <= tableWiringLength; i ++) {
-        tableWiring.rows[4].cells[i].textContent = parseFloat(loadingSpeed).toFixed(3);
+        tableWiring.rows[4].cells[i].textContent = parseFloat(loadingSpeed);
       }
 
     } else {
@@ -922,7 +907,7 @@ function funLoadingSpeedCycle(loadingSpeeds) {
   var loadingSpeeds = loadingSpeeds.split(",").map(speed => parseFloat(speed));
   
   for (var i = 2; i <= tableWiringLength; i ++) {
-    tableWiring.rows[4].cells[i].textContent = (loadingSpeeds[(i - 2) % loadingSpeeds.length]).toFixed(3);
+    tableWiring.rows[4].cells[i].textContent = (loadingSpeeds[(i - 2) % loadingSpeeds.length]);
   }
 }
 
@@ -934,7 +919,7 @@ function funAllocation() {
     var height = tableInput.rows[4].cells[i].textContent;
 
     if (isNum(delay, height)) {
-      tableWiring.rows[2].cells[i].textContent = totalDelay.toFixed(3);
+      tableWiring.rows[2].cells[i].textContent = totalDelay;
       tableWiring.rows[5].cells[i].textContent = parseInt(height);
 
       totalDelay += parseFloat(delay);
@@ -1015,55 +1000,47 @@ function funWiringSort() {
     if (!isNum(delay, xDelay, xScrollDelay, height, baseDelay, baseHeight)) break;
 
     totalXDelay += (parseFloat(xDelay) + parseFloat(xScrollDelay));
-    wirings.push({index: i, delay: parseFloat(baseDelay) + parseFloat(delay) - parseInt(height) * (yScrollDelay + 4), xDelay: totalXDelay, down: baseHeight + height});
+    wirings.push({index: i, delay: parseFloat(baseDelay) + parseFloat(delay) - parseInt(height) * (yScrollDelay + 4), xDelay: totalXDelay, height: baseHeight + height});
   }
 
   var evals = [];
 
   for (var i = 0; i < wirings.length; i ++) {
-    if (evals[i] == null) evals[i] = isWirable(wirings[i].delay - wirings[i].xDelay, wirings[i].down);        
+    evals[i] = evals[i] ?? isWirable(wirings[i].delay - wirings[i].xDelay, wirings[i].height);        
     if (evals[i] == 0) continue;
+
+    var backI = wirings.length - 1 - i;
+    var shifts = [];
+
+    if (i >= 1) shifts.push(-1);
+    if (backI >= 1) shifts.push(1);
+    if (i >= 2) shifts.push(-2);
+    if (backI >= 2) shifts.push(2);
+
+    var movedEvals = [];
+    var evalSums = [];
+
+    shifts.forEach(shift => {
+      if (shift > 0) evals[i + shift] = evals[i + shift] ?? isWirable(wirings[i + shift].delay - wirings[i + shift].xDelay, wirings[i + shift].height);
     
-    if (i == 0 || i == wirings.length - 1) {
-      var shift = i == 0 ? 1 : -1;
-      if (shift == 1) evals[i + 1] = isWirable(wirings[i + 1].delay - wirings[i + 1].xDelay, wirings[i + 1].down);
+      var current = isWirable(wirings[i].delay - wirings[i + shift].xDelay, wirings[i].height);
+      var destination = isWirable(wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].height);
+    
+      movedEvals.push({shift, current, destination});
+      evalSums.push(current + destination);
+    });
 
-      var current = isWirable(wirings[i].delay - wirings[i + shift].xDelay, wirings[i].down);
-      var destination = isWirable(wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].down);
+    var movedEval = movedEvals[evalSums.indexOf(Math.min(...evalSums))];
+    var shift = movedEval.shift;
+    var current = movedEval.current;
+    var destination = movedEval.destination;
 
-      if (current + destination < evals[i] + evals[i + shift])  {
-        [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
-        [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
-
-        evals[i] = current;
-        evals[i + shift] = destination;
-      }
+    if (current + destination < evals[i] + evals[i + shift]) {
+      [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
+      [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
       
-    } else {
-      evals[i + 1] = isWirable(wirings[i + 1].delay - wirings[i + 1].xDelay, wirings[i + 1].down);
-
-      var movedEvals = [];
-
-      [-1, 1].forEach(shift => {
-        var current = isWirable(wirings[i].delay - wirings[i + shift].xDelay, wirings[i].down);
-        var destination = isWirable(wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].down);
-        
-        movedEvals.push([current, destination]);
-      });
-
-      var smaller = movedEvals[0][0] + movedEvals[0][1] > movedEvals[1][0] + movedEvals[1][1] ? 1 : 0;
-      var shift = smaller == 0 ? -1 : 1;
-      
-      var current = movedEvals[smaller][0];
-      var destination = movedEvals[smaller][1];
-      
-      if (current + destination < evals[i] + evals[i + shift]) {
-        [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
-        [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
-        
-        evals[i] = current;
-        evals[i + shift] = destination;
-      }
+      evals[i] = current;
+      evals[i + shift] = destination;
     }
   }
 
@@ -1074,7 +1051,7 @@ function funWiringSort() {
     th.style.backgroundColor = i == movedInd ? "#ffffe0" : "#ffedc4";
 
     tableSort.rows[2].cells[i].textContent = parseInt(wirings[i - 1].delay - wirings[i - 1].xDelay);
-    tableSort.rows[3].cells[i].textContent = wirings[i - 1].down;
+    tableSort.rows[3].cells[i].textContent = wirings[i - 1].height;
     tableSort.rows[4].cells[i].textContent = ["◎", "○", "△", "×"][evals[i - 1]];
   }
 
@@ -1107,6 +1084,8 @@ function funTableButton() {
 
 document.addEventListener("keydown", e => {
   if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+
     if (selectedButton == 0) return;
     
     var shift = e.key == "ArrowLeft" ? -1 : 1;
@@ -1280,7 +1259,13 @@ function funSort() {
   });
 
   if (checkWiringImage.checked) {
-    if (divSame.firstChild) divSame.firstChild.click();
+    if (divSame.firstChild) {
+      divSame.firstChild.click();
+    
+    } else {
+      canvasWiring.getContext("2d").clearRect(0, 0, 32, 1000);
+      canvasWiring.height = 320;
+    }
   }
 }
 
@@ -1744,7 +1729,11 @@ var gapList = [
 
   {delay: 29, disp: "G8R1", down: 10},
   {delay: 42, disp: "G8R2", down: 12},
-  {delay: 56, disp: "G8R3", down: 14}
+  {delay: 56, disp: "G8R3", down: 14},
+
+  {delay: 29, disp: "G9R1", down: 11},
+  {delay: 42, disp: "G9R2", down: 13},
+  {delay: 56, disp: "G9R3", down: 15}
 ];
 
 var commonEnms = ["チョロプー", "ガボン", "ボムへい", "メカクッパ", "ミサイルメカクッパ(赤メカクッパ)", "ビームメカクッパ(青メカクッパ)", "クッパJr.", "ハナチャン", "ハンマーブロス", "メガブロス", "サンボ", "カメック", "プー", "トゲメット", "緑ノコノコ", "赤ノコノコ", "カロン", "メット", "トゲメット", "カロンこうら", "メットこうら", "トゲメットこうら", "杭なしワンワン", "ブラックパックン", "POWブロック", "Pスイッチ", "縦ジャンプ台(縦バネ)", "横ジャンプ台(横バネ)", "砲台", "キラー砲台", "ドッスン", "クッパ", "ブンブン", "ラリー", "イギー", "ウェンディ", "レミー", "ロイ", "モートン", "ルドウィッグ", "ワンワンの杭"];
