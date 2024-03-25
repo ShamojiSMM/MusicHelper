@@ -152,11 +152,17 @@ button:not(td button) {
 .tableWirings {
   border-collapse: collapse;
   table-layout: fixed;
+  overflow-x: scroll;
 }
 
 .tableWirings *:not(span) {
   border: 1px solid #8c8c8c;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tableWirings *:hover, .tableWirings *:focus {
+  text-overflow: clip;
 }
 
 .th {
