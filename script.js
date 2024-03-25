@@ -1039,8 +1039,8 @@ function funWiringSort() {
       [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
       [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
       
-      evals[i] = current;
-      evals[i + shift] = destination;
+      evals[i] = destination;
+      evals[i + shift] = current;
     }
   }
 
