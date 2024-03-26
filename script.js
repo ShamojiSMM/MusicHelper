@@ -32,10 +32,6 @@ function isNum(...values) {
   return true;
 }
 
-function toInt(value) {
-
-}
-
 var magnifications = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, (4 / 3), (4 / 6), (4 / 12)];
 
 function funBeatValue(beatValue) {
@@ -1012,10 +1008,10 @@ function funWiringSort() {
     var backI = wirings.length - 1 - i;
     var shifts = [];
 
-    if (i >= 1) shifts.push(-1);
-    if (backI >= 1) shifts.push(1);
-    if (i >= 2) shifts.push(-2);
-    if (backI >= 2) shifts.push(2);
+    for (var num = 1; num <= 2; num ++) {
+      if (i >= num) shifts.push(-num);
+      if (backI >= num) shifts.push(num);
+    };
 
     var movedEvals = [];
     var evalSums = [];
@@ -1084,8 +1080,6 @@ function funTableButton() {
 
 document.addEventListener("keydown", e => {
   if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
-    e.preventDefault();
-
     if (selectedButton == 0) return;
     
     var shift = e.key == "ArrowLeft" ? -1 : 1;
