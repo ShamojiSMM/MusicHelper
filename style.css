@@ -197,8 +197,15 @@ table .red {
 }
 
 .divScroll {
+  position: relative;
   overflow-x: scroll;
   margin-top: 0.8rem;
+}
+
+#divOverview {
+  margin-top: 0.4rem;
+  margin-left: 0.4rem;
+  display: none;
 }
 
 #canvasWiring {
