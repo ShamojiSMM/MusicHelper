@@ -168,6 +168,8 @@ function funCycle() {
   spanCycle.textContent = coefficients[0] * straight + coefficients[1] * diagonal + coefficients[2] * curved + coefficients[3] * correction;
 }
 
+var tableWiringLength = 150;
+
 var _atob = function(string) {
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
   var b64re = /^(?:[A-Za-z\d+\/]{4})*?(?:[A-Za-z\d+\/]{2}(?:==)?|[A-Za-z\d+\/]{3}=?)?$/;
@@ -546,8 +548,6 @@ MidiParser.parse(inputSmf, (midiData) => {
 
   funTimeUnit(timeUnit);
 });
-
-var tableWiringLength = 100;
 
 document.querySelectorAll(".tableWirings").forEach(table => {
   table.style.width = `${tableWiringLength * 4}rem`;
@@ -999,6 +999,11 @@ function funWiringSort() {
     wirings.push({index: i, delay: parseFloat(baseDelay) + parseFloat(delay) - parseInt(height) * (yScrollDelay + 4), xDelay: totalXDelay, height: baseHeight + height});
   }
 
+  if (!wirings.length) {
+    funRemoveOverview();
+    return;
+  }
+
   var evals = [];
 
   for (var i = 0; i < wirings.length; i ++) {
@@ -1054,6 +1059,10 @@ function funWiringSort() {
   var evalsCount = [0, 0, 0, 0];
   evals.forEach(e => evalsCount[e] ++);
   spanEvaluations.textContent = `◎: ${evalsCount[0]}, ○: ${evalsCount[1]}, △: ${evalsCount[2]}, ×: ${evalsCount[3]}`;
+
+  if (canvasOverview.height > 0) {
+    funOverview();
+  }
 }
 
 var selectedButton = 0;
@@ -1085,6 +1094,77 @@ document.addEventListener("keydown", e => {
     var shift = e.key == "ArrowLeft" ? -1 : 1;
     tableSort.rows[5].cells[selectedButton + shift].firstChild.click();
   }
+});
+
+function funOverview() {
+  var heights = [];
+
+  for (var i = 1; i <= tableWiringLength; i ++) {
+    var height = tableSort.rows[3].cells[i].textContent;
+
+    if (!isNum(height)) break;
+    heights.push(height);
+  }
+
+  if (!heights.length) return;
+  divOverview.style.display = "block";
+
+  var maxHeight = Math.max(...heights);
+  var tileX = heights.length;
+  var tileY = maxHeight - Math.min(...heights) + 3;
+
+  canvasOverview.width = 16 * tileX;
+  canvasOverview.height = 16 * tileY;
+
+  var distances = heights.map(height => maxHeight - height);
+  var context = canvasOverview.getContext("2d");
+
+  var space = new Image();
+  space.src = `images/railParts/space.png`;
+
+  space.onload = () => {
+    context.globalAlpha = 0.6;
+
+    for (var x = 0; x < tileX; x ++) {
+      for (var y = 0; y < tileY; y ++) {
+        context.drawImage(space, 16 * x, 16 * y, 16, 16);
+      }
+    }
+
+    context.globalAlpha = 1;
+  }
+
+  var parts = [];
+
+  for (var i = 0; i <= 2; i ++) {
+    parts[i] = new Image();
+    parts[i].src = `images/railParts/${["openU", "note", "openD"][i]}.png`;
+  };
+
+  parts[2].onload = () => {
+    distances.forEach((distance, x) => {
+      for (var i = 0; i <= 2; i ++) {
+        context.drawImage(parts[i], 16 * x, 16 * (distance + i), 16, 16);
+      }
+    });
+
+    context.imageSmoothingEnabled = false;
+  }
+}
+
+function funRemoveOverview() {
+  canvasOverview.height = 0;
+  divOverview.style.display = "none";
+}
+
+canvasOverview.addEventListener("click", event => {
+  var x = event.clientX - event.target.getBoundingClientRect().left;
+
+  if (x < 0) x = 0;
+  if (x > canvasOverview.width) x = canvasOverview.width;
+
+  var column = parseInt(x / 16) + 1;
+  tableSort.rows[5].cells[column].firstChild.click();
 });
 
 function funTarget() {
@@ -1242,10 +1322,11 @@ function funSort() {
           image.src = `images/railParts/${partsIndex[`${part}`[0]]}.png`;
 
           image.onload = () => {
-            context.imageSmoothingEnabled = false;
             context.drawImage(image, 0, 32 * i, 32, 32);
           }
         });
+
+        context.imageSmoothingEnabled = false;
       });
 
       div.appendChild(span);
