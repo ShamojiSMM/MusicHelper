@@ -3,6 +3,7 @@
 body {
   font-family: "Fira Sans", Arial, Helvetica, sans-serif;
   white-space: nowrap;
+  
 }
 
 p {
@@ -28,6 +29,7 @@ p {
 
 hr {
   margin-top: 1rem;
+  
 }
 
 h2 {
