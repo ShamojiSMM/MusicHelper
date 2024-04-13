@@ -168,7 +168,7 @@ function funCycle() {
   spanCycle.textContent = coefficients[0] * straight + coefficients[1] * diagonal + coefficients[2] * curved + coefficients[3] * correction;
 }
 
-var tableWiringLength = 150;
+var tableWiringLength = 100;
 
 var _atob = function(string) {
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -480,7 +480,7 @@ else {
 }
 
 MidiParser.parse(inputSmf, (midiData) => {
-  if (!midiData)  {
+  if (!midiData) {
     alert(["SMFが無効かもです。", "Invalid SMF."][languageIndex]);
     return;
   }
@@ -490,43 +490,38 @@ MidiParser.parse(inputSmf, (midiData) => {
     return;
   }
 
-  var noteTracks = [];
   var timeUnit = midiData.timeUnit;
 
-  midiData.tracks.forEach(track => {
-    var notes = [];
+  var track = midiData.tracks[selectTrack.selectedIndex]; 
+  var notes = [];
 
-    for (var event of track.events) {
-      var type = event.type;
-      var data = event.data;
+  for (var event of track.events) {
+    var type = event.type;
+    var data = event.data;
 
-      if (type == 255 && event.metaType == 1) {
-        if (data == "MMstart") {
-          notes = [];
-          continue;
-        }
-        
-        if (data == "MMend") break;
-      }
-
-      if (notes.length) notes[notes.length - 1].time += event.deltaTime;
-      if (type == 9 && data[1] > 0) {
-        notes.push({time: 0, key: data[0]});
+    if (type == 255 && event.metaType == 1) {
+      if (data == "MMstart") {
+        notes = [];
         continue;
-      }    
+      }
+      
+      if (data == "MMend") break;
     }
 
-    if (notes.length) notes[notes.length - 1].time = timeUnit;
-    noteTracks.push(notes);
-  });
-
-  var selectedTrack = noteTracks[selectTrack.selectedIndex];  
-  if (selectedTrack[0] == null || !selectedTrack[0].hasOwnProperty("key")) {
+    if (notes.length) notes[notes.length - 1].time += event.deltaTime;
+    if (type == 9 && data[1] > 0) {
+      notes.push({time: 0, key: data[0]});
+      continue;
+    }    
+  }
+ 
+  if (!notes.length) {
     alert(["そのトラックにはなんもありません。", "That track is empty."][languageIndex]);
     return;
   }
 
-  var baseKey = selectedTrack[0].key;
+  notes[notes.length - 1].time = timeUnit;
+  var baseKey = notes[0].key;
 
   selectTableInput.selectedIndex = languageIndex;
   inputTimeUnit.value = timeUnit;
@@ -539,7 +534,7 @@ MidiParser.parse(inputSmf, (midiData) => {
     }
   });
 
-  selectedTrack.forEach((event, i) => {
+  notes.forEach((event, i) => {
     if (i >= tableWiringLength) return;
 
     tableInput.rows[2].cells[i + 1].textContent = event.time;
@@ -758,20 +753,28 @@ function funPlaySound(column) {
 
 var stopFlag = false;
 
+function funResetPlay() {
+  for (var j = 1; j <= tableWiringLength; j ++) {
+    tableInput.rows[0].cells[j].style.backgroundColor = "#ffffe0";
+  }
+} 
+
 function funPlay() {
   stopFlag = false;
   
   var loop = () => {
     if (stopFlag) return;
 
+    if (i > tableWiringLength) {
+      funResetPlay();
+      return;
+    }
+
     var delay = tableInput.rows[3].cells[i].textContent;
     var height = tableInput.rows[4].cells[i].textContent;
 
-    if (!isNum(delay, height) || i >= tableWiringLength) {
-      for (var j = 1; j <= tableWiringLength; j ++) {
-        tableInput.rows[0].cells[j].style.backgroundColor = "#ffffe0";
-      }
-
+    if (!isNum(delay, height)) {
+      funResetPlay();
       return;
     }
 
@@ -779,7 +782,7 @@ function funPlay() {
     if (i >= 2) tableInput.rows[0].cells[i - 1].style.backgroundColor = "#ffffe0";
     tableInput.rows[0].cells[i].style.backgroundColor = "#98fb98";
     i ++;
-    
+
     setTimeout(loop, delay * 50 / 3);
   }
 
@@ -790,9 +793,7 @@ function funPlay() {
 function funStopPlay() {
   stopFlag = true;
 
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    tableInput.rows[0].cells[i].style.backgroundColor = "#ffffe0";
-  }
+  funResetPlay();
 }
 
 function funLoading(selectedIndex) {
