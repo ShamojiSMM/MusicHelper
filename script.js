@@ -969,6 +969,8 @@ function isWirable(target, height) {
   return 3;
 }
 
+var sortableRange = 3;
+
 function funWiringSort() {
   var totalXDelay = 0;
   var wirings = [];
@@ -1014,7 +1016,7 @@ function funWiringSort() {
     var backI = wirings.length - 1 - i;
     var shifts = [];
 
-    for (var num = 1; num <= 2; num ++) {
+    for (var num = 1; num <= sortableRange; num ++) {
       if (i >= num) shifts.push(-num);
       if (backI >= num) shifts.push(num);
     };
@@ -1408,6 +1410,10 @@ window.onload = function() {
       imgSkin.title = enmList[skins[skin]];
     }
   }
+}
+
+function funContraptions() {
+  divSetsParent.style.display = divSetsParent.style.display == "none" ? "block" : "none";
 }
 
 var accelerations = [11, 8, 5, 3, 2, 1, 1];
