@@ -991,7 +991,7 @@ function funWiringSort() {
         yScrollDelay = paeseFloat(inputLoadingSpeedAverage.value);
     }
 
-    var height = selectLoading.selectedIndex - languageIndex == 2 ? 0 : parseInt(tableWiring.rows[5].cells[i].textContent);
+    var height = parseInt(tableWiring.rows[5].cells[i].textContent);
 
     var baseDelay = inputBaseDelay.value;
     var baseHeight = parseInt(inputBaseHeight.value) - parseInt(tableWiring.rows[5].cells[1].textContent);
