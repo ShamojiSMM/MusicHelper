@@ -969,7 +969,7 @@ function isWirable(target, height) {
   return 3;
 }
 
-var sortableRange = 3;
+var sortableRange = 4;
 
 function funWiringSort() {
   var totalXDelay = 0;
@@ -1209,47 +1209,42 @@ function funTarget() {
 }
 
 function funSort() {
-  switch ((selectSort.selectedIndex - languageIndex) / 2) {
-    case 0:
-      resultsSame.sort((m, n) => m.down - n.down);
-      resultsNear.sort((m, n) => m.down - n.down);
-      resultsFar.sort((m, n) => m.down - n.down);
-      break;
+  var sorting = (selectSort.selectedIndex - languageIndex) / 2;
+  var direction = sorting <= 1 ? 0 : 1;
+  var order = sorting % 2 == 0 ? 1 : -1;
 
-    case 1:
-      resultsSame.sort((m, n) => n.down - m.down);
-      resultsNear.sort((m, n) => n.down - m.down);
-      resultsFar.sort((m, n) => n.down - m.down);
-      break;
+  var resultsList = [resultsSame, resultsNear, resultsFar];
 
-    case 2:
-      resultsSame.sort((m, n) => m.up - n.up);
-      resultsNear.sort((m, n) => m.up - n.up);
-      resultsFar.sort((m, n) => m.up - n.up);
-      break;
+  [resultsSame, resultsNear, resultsFar] = resultsList.map(results => {
+    return results.sort((a, b) => {
+      var [a0, a1] = [[a.up, a.down], [a.up, a.down]][direction];
+      var [b0, b1] = [[b.up, b.down], [b.up, b.down]][direction];
 
-    case 3:
-      resultsSame.sort((m, n) => n.up - m.up);
-      resultsNear.sort((m, n) => n.up - m.up);
-      resultsFar.sort((m, n) => n.up - m.up);
-  }
+      if (a0 > b0) return order;
+      if (a0 < b0) return -order;
+    
+      if (a1 > b1) return order;
+      if (a1 < b1) return -order;
+    
+      return 0;
+    });
+  });
 
-  var newresultsSame = [], newresultsNear = [], newresultsFar = [];
+  var newResultsSame = [], newResultsNear = [], newResultsFar = [];
+  var newResultsList = [newResultsSame, newResultsNear, newResultsFar];
 
-  resultsSame.forEach(result => newresultsSame.push(` (${result.delay}/${result.down}/${result.up}/${result.disp}) `));
-  resultsNear.forEach(result => newresultsNear.push(` (${result.delay}/${result.down}/${result.up}/${result.disp}) `));
-  resultsFar.forEach(result => newresultsFar.push(` (${result.delay}/${result.down}/${result.up}/${result.disp}) `));
+  [resultsSame, resultsNear, resultsFar].forEach((results, i) => {
+    results.forEach(result => {
+      newResultsList[i].push(` (${result.delay}/${result.up}/${result.down}/${result.disp})`);
+    });
 
-  newresultsSame = Array.from(new Set(newresultsSame));
-  newresultsNear = Array.from(new Set(newresultsNear));
-  newresultsFar = Array.from(new Set(newresultsFar));
+    newResultsList[i] = Array.from(new Set(newResultsList[i]));
+  });
 
   [divSame, divNear, divFar].forEach((div, i) => {
-    while (div.firstChild) {
-      div.removeChild(div.firstChild);
-    }
+    while (div.firstChild) div.removeChild(div.firstChild);
 
-    [newresultsSame, newresultsNear, newresultsFar][i].forEach(result => {
+    [newResultsSame, newResultsNear, newResultsFar][i].forEach(result => {
       var span = document.createElement("span");
       span.textContent = `${result},`;
 
@@ -1311,7 +1306,7 @@ function funSort() {
           
           } else {
             if (i == 0) parts.push(4);
-            [...Array(option[1] - 1)].map(() => parts.push(2));
+            [...Array(option.substring(1) - 1)].map(() => parts.push(2));
           }
         });
 
@@ -1815,7 +1810,9 @@ var gapList = [
 
   {delay: 29, disp: "G9R1", down: 11},
   {delay: 42, disp: "G9R2", down: 13},
-  {delay: 56, disp: "G9R3", down: 15}
+  {delay: 56, disp: "G9R3", down: 15},
+
+  {delay: 29, disp: "G10R1", down: 12}
 ];
 
 var commonEnms = ["チョロプー", "ガボン", "ボムへい", "メカクッパ", "ミサイルメカクッパ(赤メカクッパ)", "ビームメカクッパ(青メカクッパ)", "クッパJr.", "ハナチャン", "ハンマーブロス", "メガブロス", "サンボ", "カメック", "プー", "トゲメット", "緑ノコノコ", "赤ノコノコ", "カロン", "メット", "トゲメット", "カロンこうら", "メットこうら", "トゲメットこうら", "杭なしワンワン", "ブラックパックン", "POWブロック", "Pスイッチ", "縦ジャンプ台(縦バネ)", "横ジャンプ台(横バネ)", "砲台", "キラー砲台", "ドッスン", "クッパ", "ブンブン", "ラリー", "イギー", "ウェンディ", "レミー", "ロイ", "モートン", "ルドウィッグ", "ワンワンの杭"];
