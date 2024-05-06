@@ -443,7 +443,7 @@
     <option class="ja">三角波</option>
     <option class="en">Triangle Wave</option>
 
-    <option class="ja">矩形波</option>
+    <option class="ja" selected>矩形波</option>
     <option class="en">Square Wave</option>
     
     <option class="ja">ノコギリ波</option>
@@ -454,12 +454,6 @@
     
     <option class="ja">トランペット</option>
     <option class="en">Trampet</option>
-
-    <option class="ja">スティールパン</option>
-    <option class="en">Steelpan</option>
-
-    <option class="ja">ヴァイオリン</option>
-    <option class="en">Violin</option>
   </select>
 
   <button onclick="funStopPlay()">
@@ -728,22 +722,22 @@
     </button><br>
 
     <select id="selectSort" onchange="funSort()">
-      <option class="ja">↓長さ 短い順</option>
-      <option class="en">↓Length, Asc-Order</option>
-
-      <option class="ja">↓長さ 長い順</option>
-      <option class="en">↓Length, Des-Order</option>
-
       <option class="ja" selected>↑長さ 短い順</option>
       <option class="en">↑Length, Asc-Order</option>
 
       <option class="ja">↑長さ 長い順</option>
       <option class="en">↑Length, Des-Order</option>
+
+      <option class="ja">↓長さ 短い順</option>
+      <option class="en">↓Length, Asc-Order</option>
+
+      <option class="ja">↓長さ 長い順</option>
+      <option class="en">↓Length, Des-Order</option>
     </select>
     
     <p class="p2">
-      <span class="ja">( 遅延 / ↓長さ / ↑長さ / 表記 )。クリックで画像出ます。</span>
-      <span class="en">( Delay / ↓Length / ↑Length / Wiring ). Click to view image.</span><br>
+      <span class="ja">( 遅延 / ↑長さ / ↓長さ / 表記 )。クリックで画像出ます。</span>
+      <span class="en">( Delay / ↑Length / ↓Length / Wiring ). Click to view image.</span><br>
 
     <label>
       <input type="checkbox" id="checkWiringImage" checked>
