@@ -495,6 +495,11 @@ MidiParser.parse(inputSmf, (midiData) => {
   var track = midiData.tracks[selectTrack.selectedIndex]; 
   var notes = [];
 
+  if (!track) {
+    alert(["トラックがありません。", "There is no such track."][languageIndex]);
+    return;    
+  }
+
   for (var event of track.events) {
     var type = event.type;
     var data = event.data;
@@ -1237,9 +1242,11 @@ function funSort() {
     results.forEach(result => {
       newResultsList[i].push(` (${result.delay}/${result.up}/${result.down}/${result.disp})`);
     });
-
-    newResultsList[i] = Array.from(new Set(newResultsList[i]));
   });
+
+  newResultsSame = Array.from(new Set(newResultsSame));
+  newResultsNear = Array.from(new Set(newResultsNear));
+  newResultsFar = Array.from(new Set(newResultsFar));
 
   [divSame, divNear, divFar].forEach((div, i) => {
     while (div.firstChild) div.removeChild(div.firstChild);
