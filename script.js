@@ -154,6 +154,42 @@ function funLoop() {
       }
 
       spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
+      break;
+
+    case 8:
+      divSpecial.style.display = "none";
+
+      for (var s = 0; s <= loopValue / 42; s ++) {
+        for (var d = 0; d <= loopValue / 60; d ++) {
+          for (var c = 0; c <= loopValue / 71; c ++) {
+            for (var u = 0; u <= s / 2; u ++) {
+              if (s * 42 + d * 60 + c * 71 + u == loopValue && s % 2 == 0 && loopValue >= 144) {
+                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
+              }
+            }
+          }
+        }
+      }
+
+      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
+      break;
+
+    case 6:
+      divSpecial.style.display = "none";
+
+      for (var s = 0; s <= loopValue / 84; s ++) {
+        for (var d = 0; d <= loopValue / 120; d ++) {
+          for (var c = 0; c <= loopValue / 142; c ++) {
+            for (var u = 0; u <= s / 2; u ++) {
+              if (s * 84 + d * 120 + c * 142 + u * 2 == loopValue) {
+                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
+              }
+            }
+          }
+        }
+      }
+
+      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
   }
 }
 
@@ -533,11 +569,11 @@ MidiParser.parse(inputSmf, (midiData) => {
 
   funStopPlay();
 
-  [2, 3].forEach(i => {
+  for (var i = 2; i <= 4; i ++) {
     for (var j = 1; j <= tableWiringLength; j ++) {
       tableInput.rows[i].cells[j].textContent = "";
     }
-  });
+  }
 
   notes.forEach((event, i) => {
     if (i >= tableWiringLength) return;
@@ -931,7 +967,7 @@ function funAllocation() {
 
 function isWirable(target, height) {
   var near = 0, far = 0;
-  target = parseInt(target);
+  target = Math.round(target);
 
   for (var i = 0; i < startingList.length; i ++) {
     var starting = startingList[i];
@@ -1059,7 +1095,7 @@ function funWiringSort() {
     th.textContent = movedInd;
     th.style.backgroundColor = i == movedInd ? "#ffffe0" : "#ffedc4";
 
-    tableSort.rows[2].cells[i].textContent = parseInt(wirings[i - 1].delay - wirings[i - 1].xDelay);
+    tableSort.rows[2].cells[i].textContent = Math.round(wirings[i - 1].delay - wirings[i - 1].xDelay);
     tableSort.rows[3].cells[i].textContent = wirings[i - 1].height;
     tableSort.rows[4].cells[i].textContent = ["◎", "○", "△", "×"][evals[i - 1]];
   }
