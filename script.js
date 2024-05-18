@@ -204,7 +204,7 @@ function funCycle() {
   spanCycle.textContent = coefficients[0] * straight + coefficients[1] * diagonal + coefficients[2] * curved + coefficients[3] * correction;
 }
 
-var tableWiringLength = 200;
+var tableWiringLength = 100;
 
 var _atob = function(string) {
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
