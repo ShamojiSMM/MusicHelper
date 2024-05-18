@@ -204,7 +204,7 @@ function funCycle() {
   spanCycle.textContent = coefficients[0] * straight + coefficients[1] * diagonal + coefficients[2] * curved + coefficients[3] * correction;
 }
 
-var tableWiringLength = 100;
+var tableWiringLength = 200;
 
 var _atob = function(string) {
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -585,6 +585,20 @@ MidiParser.parse(inputSmf, (midiData) => {
   funTimeUnit(timeUnit);
 });
 
+var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+for (var i = 27; i >= 0; i --) {
+  var option = document.createElement("option");
+  
+  var octave = 1;
+  if (i >= 12) octave = i >= 24 ? 3 : 2;
+
+  option.text = `${octave}-${keys[i % 12]}`;
+  selectScale.appendChild(option);
+}
+
+selectScale.selectedIndex = 15;
+
 document.querySelectorAll(".tableWirings").forEach(table => {
   table.style.width = `${tableWiringLength * 4}rem`;
 });
@@ -798,7 +812,9 @@ function funResetPlay() {
   for (var j = 1; j <= tableWiringLength; j ++) {
     tableInput.rows[0].cells[j].style.backgroundColor = "#ffffe0";
   }
-} 
+}
+
+var timeoutId;
 
 function funPlay() {
   stopFlag = false;
@@ -824,7 +840,7 @@ function funPlay() {
     tableInput.rows[0].cells[i].style.backgroundColor = "#98fb98";
     i ++;
 
-    setTimeout(loop, delay * 50 / 3);
+    timeoutId = setTimeout(loop, delay * 50 / 3);
   }
 
   var i = 1;
@@ -835,6 +851,7 @@ function funStopPlay() {
   stopFlag = true;
 
   funResetPlay();
+  clearTimeout(timeoutId);
 }
 
 function funLoading(selectedIndex) {
@@ -953,6 +970,9 @@ function funAllocation() {
   var totalDelay = 0;
 
   for (var i = 1; i <= tableWiringLength; i ++) {
+    tableWiring.rows[2].cells[i].textContent = "";
+    tableWiring.rows[5].cells[i].textContent = "";
+
     var delay = tableInput.rows[3].cells[i].textContent;
     var height = tableInput.rows[4].cells[i].textContent;
 
@@ -1089,6 +1109,10 @@ function funWiringSort() {
     }
   }
 
+  for (var i = 2; i <= 4; i ++) {
+    for (var j = 1; j <= tableWiringLength; j ++) tableSort.rows[i].cells[j].textContent = "";
+  }
+
   for (var i = 1; i <= wirings.length; i ++) {
     var th = tableSort.rows[0].cells[i];
     var movedInd = wirings[i - 1].index;
@@ -1199,15 +1223,34 @@ function funOverview() {
 function funRemoveOverview() {
   canvasOverview.height = 0;
   divOverview.style.display = "none";
+
+  spanOverview.textContent = "";
 }
 
-canvasOverview.addEventListener("click", event => {
+function funColumnOverviw(event) {
   var x = event.clientX - event.target.getBoundingClientRect().left;
 
   if (x < 0) x = 0;
   if (x > canvasOverview.width) x = canvasOverview.width;
 
-  var column = parseInt(x / 16) + 1;
+  return parseInt(x / 16) + 1;
+}
+
+canvasOverview.addEventListener("click", event => {
+  var column = funColumnOverviw(event);
+
+  var delay = tableSort.rows[2].cells[column].textContent;
+  var height = tableSort.rows[3].cells[column].textContent;
+  var key = selectScale.options[selectScale.selectedIndex - (height - parseInt(inputBaseHeight.value))].text;
+
+  var title = `
+    ${["列", "Column"][languageIndex]}: ${column}, 
+    ${["音階", "Key"][languageIndex]}: ${key}, 
+    ${["遅延", "Delay"][languageIndex]}: ${delay}, 
+    ${["高さ", "Height"][languageIndex]}: ${height}
+  `;
+
+  spanOverview.textContent = title;
   tableSort.rows[5].cells[column].firstChild.click();
 });
 
@@ -1276,7 +1319,7 @@ function funSort() {
 
   [resultsSame, resultsNear, resultsFar].forEach((results, i) => {
     results.forEach(result => {
-      newResultsList[i].push(` (${result.delay}/${result.up}/${result.down}/${result.disp})`);
+      newResultsList[i].push(` (${result.delay}/${parseInt(result.up)}/${result.down}/${result.disp})`);
     });
   });
 
@@ -1465,13 +1508,13 @@ var startingList = [
   {delay: 67, disp: "↓-R5", down: 10, up: 0},
   {delay: 80, disp: "↓-R6", down: 12, up: 0},
 
-  {delay: 21, disp: "↑R0-", down: 0, up: 0},
-  {delay: 34, disp: "↑R0-R1", down: 2, up: 0},
-  {delay: 48, disp: "↑R0-R2", down: 4, up: 0},
-  {delay: 61, disp: "↑R0-R3", down: 6, up: 0},
-  {delay: 74, disp: "↑R0-R4", down: 8, up: 0},
-  {delay: 88, disp: "↑R0-R5", down: 10, up: 0},
-  {delay: 101, disp: "↑R0-R6", down: 12, up: 0},
+  {delay: 21, disp: "↑R0-", down: 0, up: 0.1},
+  {delay: 34, disp: "↑R0-R1", down: 2, up: 0.1},
+  {delay: 48, disp: "↑R0-R2", down: 4, up: 0.1},
+  {delay: 61, disp: "↑R0-R3", down: 6, up: 0.1},
+  {delay: 74, disp: "↑R0-R4", down: 8, up: 0.1},
+  {delay: 88, disp: "↑R0-R5", down: 10, up: 0.1},
+  {delay: 101, disp: "↑R0-R6", down: 12, up: 0.1},
 
   {delay: 64, disp: "↑R1-", down: 0, up: 2},
   {delay: 78, disp: "↑R1-R1", down: 2, up: 2},
@@ -1505,13 +1548,13 @@ var startingList = [
   {delay: 173, disp: "↑R2-R5", down: 10, up: 4},
   {delay: 187, disp: "↑R2-R6", down: 12, up: 4},
 
-  {delay: 111, disp: "↑F-", down: 0, up: 0},
-  {delay: 124, disp: "↑F-R1", down: 2, up: 0},
-  {delay: 137, disp: "↑F-R2", down: 4, up: 0},
-  {delay: 151, disp: "↑F-R3", down: 6, up: 0},
-  {delay: 164, disp: "↑F-R4", down: 8, up: 0},
-  {delay: 177, disp: "↑F-R5", down: 10, up: 0},
-  {delay: 191, disp: "↑F-R6", down: 12, up: 0},
+  {delay: 111, disp: "↑F-", down: 0, up: 0.2},
+  {delay: 124, disp: "↑F-R1", down: 2, up: 0.2},
+  {delay: 137, disp: "↑F-R2", down: 4, up: 0.2},
+  {delay: 151, disp: "↑F-R3", down: 6, up: 0.2},
+  {delay: 164, disp: "↑F-R4", down: 8, up: 0.2},
+  {delay: 177, disp: "↑F-R5", down: 10, up: 0.2},
+  {delay: 191, disp: "↑F-R6", down: 12, up: 0.2},
 
   {delay: 120, disp: "↑G3R1-", down: 0, up: 5},
   {delay: 133, disp: "↑G3R1-R1", down: 2, up: 5},
