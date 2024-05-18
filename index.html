@@ -22,7 +22,7 @@
     <span class="ja">レール演奏で使えそうな機能の寄せ集め。</span>
     <span class="en">A mishmash of functions for Track Music!</span>
   </p><br>
-  <p class="p3 gray">(Last Update: 2024/May/12)</p><br><br>
+  <p class="p3 gray">(Last Update: 2024/May/18)</p><br><br>
 
   <p class="p3 bold">Language(Beta):</p>
   <select id="selectLanguage" onchange="funLanguage(this.selectedIndex)">
@@ -417,18 +417,7 @@
     <span class="ja">基準音階:</span>
     <span class="en">Base Key:</span>
   </p>
-  <select id="selectScale">
-    <option>D#</option><option>D</option><option>C#</option>
-    <option>C</option><option>B</option><option>A#</option>
-    <option>A</option><option>G#</option><option>G</option>
-    <option>F#</option><option>F</option><option>E</option>
-    <option>D#</option><option>D</option><option>C#</option>
-    <option selected>C</option>
-    <option>B</option><option>A#</option><option>A</option>
-    <option>G#</option><option>G</option><option>F#</option>
-    <option>F</option><option>E</option><option>D#</option>
-    <option>D</option><option>C#</option><option>C</option>
- </select>
+  <select id="selectScale"></select>
 
   <button onclick="funPlay()">
     <span class="ja">演奏</span>
@@ -569,8 +558,8 @@
   </select><br>
 
   <button onclick="funAllocation()">
-    <span class="ja">上の表を下に代入</span>
-    <span class="en">Transfer the Values</span>
+    <span class="ja">ここまで計算</span>
+    <span class="en">Calculation the Values</span>
   </button><br>
 
   <div class="divScroll">
@@ -689,7 +678,9 @@
   <button onclick="funRemoveOverview()">
     <span class="ja">非表示</span>
     <span class="en">Hide</span>
-  </button><br>
+  </button>
+
+  <span id="spanOverview" class="result"></span><br>
 
   <div class="divScroll" id="divOverview">
     <canvas id="canvasOverview" height="0"></canvas>
@@ -787,7 +778,7 @@
   <img src="images/info/height.png" height="140"><br><br>
   
   <p class="p3">
-    <span class="ja">着線パターン</span>
+    <span class="ja">着線パターン。</span>
     <span class="en">Landing Patterns.</span>
   </p><br>
   <img src="images/info/landing.png" height="180">
@@ -797,10 +788,6 @@
     <span class="ja">スクロール遅度表</span>
     <span class="en">Scroll Speeds Table</span>
   </h2>
-  <p class="p3"><a href="https://www.youtube.com/watch?v=3VlLrf_5KvA">
-    <span class="ja">一部参考</span>
-    <span class="en">Reference</span>
-  </a></p><br>
 
   <p class="p2">
     <span class="ja">数値の単位は[f/b], 1b進むのにかかる時間。</span>
@@ -1003,9 +990,10 @@
   <div class="sentence">
     <span class="p2">
       <a href="https://forms.gle/k3EpNYdrkMjCmfjt7">レール演奏補助ツール 意見箱</a><br>
-      ↑ 意見箱を作りました。何かあればここに記入してください(メールアドレスは収集しません)。<br><br>
+      ↑ 意見箱を作りました。何かあればここに記入してください(メールアドレスは収集しません)。<br>
+      もしくはDMでも。<br><br>
 
-      データ, 機能, その他もろもろの誤りや改善案があれば意見箱で教えてくれると嬉しいです。
+      データ, 機能, その他もろもろの誤りや改善案があれば教えてくれると嬉しいです。
     </span><br><br>
   
     <h3>用語と単位集</h3><br><div class="p2">
