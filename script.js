@@ -1049,7 +1049,7 @@ function funWiringSort() {
         break;
       
       case 2:
-        yScrollDelay = paeseFloat(inputLoadingSpeedAverage.value);
+        yScrollDelay = parseFloat(inputLoadingSpeedAverage.value);
     }
 
     var height = parseInt(tableWiring.rows[5].cells[i].textContent);
