@@ -1,1166 +1,288 @@
 <!DOCTYPE html>
 <html lang="ja">
-  
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.8">
-  
-  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
-  <link rel="stylesheet" href="style.css" type="text/css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Track Music Conductor</title>
+  <link rel="icon" href="images/favicon.ico">
+
+  <link rel="stylesheet" href="style.css" type="text/css">
+  <script src="midiParser.js" defer></script>
+  <script src="data.js" defer></script>
+  <script src="script.js" defer></script>
+
+  <title>レール演奏補助ツール</title>
 
   <meta name="google-site-verification" content="FF-jl08IpYvT8gR51LfziGsiz1AkfHZpXcCUrOLdWMQ">
 </head>
 
 <body>
-  <h1>
-    <span class="ja">レール演奏補助ツール</span>
-    <span class="en">Track Music Conductor</span>
-  </h1>
+  <main>
+    <header>
+      <h1>
+        レール演奏補助ツール
+        <a href="https://x.com/Shamoji_SMM" target="_blank">
+          <img src="images/xIcon.jpg" title="made by @Shamoji_SMM">
+        </a>
+      </h1>
 
-  <p class="p3">
-    <span class="ja">レール演奏で使えそうな機能の寄せ集め。</span>
-    <span class="en">A mishmash of functions for Track Music!</span>
-  </p><br>
-  <p class="p3 gray">(Last Update: 2025/Mar/13)</p><br><br>
+      <div>
+        <p class="pText">現在改装中です。集音生成機能のみ。</p>
+        <p class="pDescription gray">Last Update: 2025/Feb/17</p>
+      </div>
+    </header>
 
-  <p class="p3 bold">Language(Beta):</p>
-  <select id="selectLanguage" onchange="funLanguage(this.selectedIndex)">
-    <option>日本語</option>
-    <option>English</option>
-  </select>
+    <hr>
+    <section>
+      <h2>集音生成</h2>
+      <p class="pSubH">羽あり地上/水中、羽なし地上の縦断線式集音。</p><br>
 
-  <hr>
-  <h2>
-    <span class="ja">目次</span>
-    <span class="en">Contents</span>
-  </h2>
-  <div class="contents">
-    <ol>
-      <li><a href="#bpmAndNoteValue">
-        <span class="ja">BPMと符長</span>
-        <span class="en">BPM and Note Length</span>        
-      </a></li>
-      <li><a href="#barValue">
-        <span class="ja">小節計算</span>
-        <span class="en">Bar Calculation</span>       
-      </a></li>
-      <li><a href="#railLoopGenerator">
-        <span class="ja">レールループ生成</span>
-        <span class="en">Loop-Track Generation</span>       
-      </a></li>
-      <li><a href="#railLoopCycle">
-        <span class="ja">レールループ周期計算</span>
-        <span class="en">Loop-Track Calculation</span>       
-      </a></li>
-      <li><a href="#tableCulculator">
-        <span class="ja">表計算</span>
-        <span class="en">Spread Sheet to Collect Notes</span>     
-      </a></li>
-      <li><a href="#wiringGenerator">
-        <span class="ja">縦断線式集音配線生成</span>
-        <span class="en">Collection-Track Generation</span>       
-      </a></li>
-      <li><a href="#imageGallery">
-        <span class="ja">画像</span>
-        <span class="en">Images</span>       
-      </a></li>
-      <li><a href="#scrollSpeedTable">
-        <span class="ja">スクロール遅度表</span>
-        <span class="en">Scroll Speeds Table</span>
-      </a></li>
-      <li><a href="#grobalGrounds">
-        <span class="ja">グローバル音源配置集</span>
-        <span class="en">Global Contraptions</span>       
-      </a></li>
-      <li><a href="#diary">
-        <span class="ja">雑記 / 参考文献・資料・おすすめ</span>
-        <span class="en">Afterword / References</span>       
-      </a></li>
-    </ol>
-  </div>
+      <label class="labelInput">
+        集音タイプ:
+        <select id="selectType">
+          <option value="wing-ground" selected>羽あり, 地上</option>
+          <option value="noWing-ground">羽なし, 地上</option>
+          <option value="wing-water">羽あり, 水中</option>
+          <option value="noWing-water">羽なし, 水中</option>
+        </select>
+      </label><br>
 
-  <hr id="bpmAndNoteValue">
-  <h2>
-    <span class="ja">BPMと符長</span>
-    <span class="en">BPM and Note Length</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">音符の長さとBPMを計算。</span>
-    <span class="en">Calculate note length and BPM.</span>
-  </p><br>
+      <label class="labelInput">
+        MIDIファイル:
+        <input id="inputSmf" type="file" accept=".midi, .mid, .smf">
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">4分符長[f]:</span>
-    <span class="en">Quarter Note Length [f]:</span>
-  </p>
-  <input type="number" oninput="funBeatValue(this.value)">
+      <label class="labelInput">
+        トラック:
+        <select id="selectTrack"></select>
+      </label><br>
 
-  <p class="p3 bold">BPM:</p>
-  <span id="spanBpm" class="result"></span>
-  <br>
+      <label class="labelInput spaceBottom">
+        <button id="buttonLoadSmf">読み込み</button>
+      </label><br>
 
-  <table id="tableBeats">
-    <tr>
-      <th>
-        <span class="ja">分符</span>
-        <span class="en">Note</span>
-      </th>
-      <th>
-        <span class="ja">拍</span>
-        <span class="en">Beat</span>
-      </th>
-      <th>
-        <span class="ja">記号</span>
-        <span class="en">Symbol</span>
-      </th>
-      <th>
-        <span class="ja">長さ[f]</span>  
-        <span class="en">Length [f]</span>
-      </th>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">1</span>
-        <span class="en">Whole</span>
-      </td>
-      <td>4.000</td><td>𝅝</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">付点2</span>
-        <span class="en">Dotted Harf</span>
-      </td>
-      <td>3.000</td><td>𝅗𝅥.</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">2</span>
-        <span class="en">Harf</span>
-      </td>
-      <td>2.000</td><td>𝅗𝅥</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">付点4</span>
-        <span class="en">Dotted Quarter</span>
-      </td>
-      <td>1.500</td><td>𝅘𝅥.</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">4</span>
-        <span class="en">Quarter</span>
-      </td>
-      <td>1.000</td><td>𝅘𝅥</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">付点8</span>
-        <span class="en">Dotted Eighth</span>
-      </td>
-      <td>0.750</td><td>𝅘𝅥𝅮.</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">8</span>
-        <span class="en">Eighth</span>
-      </td>
-      <td>0.500</td><td>𝅘𝅥𝅮</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">16</span>
-        <span class="en">Sixteenth</span>
-      </td>
-      <td>0.250</td><td>𝅘𝅥𝅯</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">3</span>
-        <span class="en">Triple Harf</span>
-      </td>
-      <td>1.333</td>
-      <td>𝅗𝅥𝅗𝅥𝅗𝅥</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">6</span>
-        <span class="en">Triple Quarter</span>
-      </td>
-      <td>0.666</td><td>𝅘𝅥𝅘𝅥𝅘𝅥</td><td></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="ja">12</span>
-        <span class="en">Triple Eighth</span>
-      </td>
-      <td>0.333</td><td>𝅘𝅥𝅮𝅘𝅥𝅮𝅘𝅥𝅮</td><td></td>
-    </tr>   
-  </table>
+      <label class="labelInput">
+        4分音価:
+        <input id="inputTickUnit" type="number" value="480" step="1" min="1">
+      </label><br>
 
-  <br>
-  <p class="p3 bold">BPM:</p>
-  <input type="number" oninput="funBpm(this.value)">
+      <label class="labelInput spaceRight">
+        4分符長[f]:
+        <input id="inputBeatValue" type="number" step="any">
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">4分符長[f]:</span>
-    <span class="en">Quarter Note Length [f]:</span>
-  </p>
-  <span id="spanBeatValue" class="result"></span>
+      <p class="pResult">
+        BPM:
+        <span id="spanBpm"></span>
+      </p><br>
 
-  <hr id="barValue">
-  <h2>
-    <span class="ja">小節計算</span>
-    <span class="en">Bar Calculation</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">小節や曲の長さを計算。</span>
-    <span class="en">Calculate the length of bars or music.</span>
-  </p><br>
+      <label class="labelInput">
+        基準音:
+        <select id="selectBaseKey"></select>
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">4分符長[f]:</span>  
-    <span class="en">Quarter Note Length [f]:</span>
-  </p>
-  <input type="number" id="inputBarBeatValue" oninput="funBarValue()">
+      <label class="labelInput spaceRight">
+        <button id="buttonPlay">演奏</button>
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">拍子:</span>  
-    <span class="en">Rhythm:</span>
-  </p>
-  <input type="number" id="inputSignature0" oninput="funBarValue()" value="4">
-  <p class="p3 bold">/</p>
-  <input type="number" id="inputSignature1" oninput="funBarValue()" value="4"><br>
-  
-  <p class="p3 bold">
-    <span class="ja">小節数:</span>  
-    <span class="en">Number of Bars:</span>
-  </p>
-  <input type="number" id="inputBarNumber" oninput="funBarValue()"><br><br>
-  
-  <p class="p3 bold">
-    <span class="ja">長さ[f]:</span>  
-    <span class="en">Length [f]:</span>
-  </p>
-  <span id="spanBarValue" class="result"></span>
+      <label class="labelInput">
+        音色:
+        <select id="selectInstrument">
+          <option>正弦波</option>
+          <option>三角波</option>
+          <option selected>矩形波</option>
+          <option>ノコギリ波</option>
+        </select>
+      </label>
 
-  <hr id="railLoopGenerator">
-  <h2>
-    <span class="ja">レールループ生成</span>
-    <span class="en">Loop-Track Generation</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">任意の周期のレールループを作成。</span>
-    <span class="en">Generate loop-tracks of any period.</span>
-  </p><br>
+      <label class="labelInput">
+        <button id="buttonStopPlay">演奏停止</button>
+      </label>
 
-  <select id="selectLoopType" onchange="funLoopType(this.selectedIndex)">
-    <option class="ja">羽あり往復</option>
-    <option class="en">Winged, Reciprocating</option>
-    
-    <option class="ja">羽あり特殊</option>
-    <option class="en">Winged, Special</option>
+      <div class="divScroll">
+        <table id="table0">
+          <tr><th>番号</th></tr>
+          <tr><th>メモ</th></tr>
+          <tr><th title="">
+            <label class="labelInput">
+              <select id="selectNoteInput">
+                <option selected title="音の長さ。4分符2つ分の長さなら、(4分音価) * 2 となる。">音価</option>
+                <option title="(2)=2分音符, (8.)=付点8分音符, (4..+8-16)=複付点4分音符+8分音符-16分音符=2分音符">n分符</option>
+              </select>
+            </label>
+          </th></tr>
+          <tr><th title="音の長さ。">符長[f]</th></tr>
+          <tr><th title="基準音からの音程の差(半音単位)。">音高[b]</th></tr>
+        </table>
+      </div>
 
-    <option class="ja">羽あり周回</option>
-    <option class="en">Winged, Circulating</option>
+      <label class="labelInput">
+        <button id="buttonCalcTable0">ここまで計算</button>
+      </label><br>
 
-    <option class="ja">羽なし往復</option>
-    <option class="en">Non-Winged, Reciprocating</option>
+      <label class="labelInput">
+        読み込みタイプ:
+        <select id="selectLoading">
+          <option selected>開始画面(全て同時)</option>
+          <option>自由落下</option>
+          <option>縦スクロール</option>
+          <option>横スクロール</option>
+        </select>
+      </label>
 
-    <option class="ja">羽なし周回</option>
-    <option class="en">Non-Winged, Circulating</option>
-  </select>
-  
-  <p class="p3 bold">
-    <span class="ja">周期[f]:</span>
-    <span class="en">Period [f]:</span>
-  </p>
-  <input type="number" id="inputLoop">
-  <button onclick="funLoop()">
-    <span class="ja">生成</span>
-    <span class="en">Generate</span>
-  </button>
-  
-  <p id="pLoopsText" class="p2">
-    <span class="ja">(直線, 斜線, 曲線, うるう) の本数。</span>
-    <span class="en">Number of (Straight, Diagonal, Curved, Cu).</span>
-  </p><br><br>
+      <label class="labelInput invisible">
+        <select id="selectLoadingInput">
+          <option>カスタム</option>
+          <option selected>平均遅度</option>
+          <option>遅度循環</option>
+        </select>
+      </label><br>
 
-  <span id="spanLoops" class="result"></span>
-  
-  <div id="divSpecial">
-    <p id="pSpecialText" class="p3 bold">
-      <span class="ja">直線追加[本]:</span>
-      <span class="en">Adding Straight:</span>
-    </p>
-    <span id="spanSpecial" class="result"></span><br>
-  
-    <img id="imageLoop">
-  </div>
+      <label class="labelInput invisible">
+        平均スクロール遅度[f/b]:
+        <input id="inputScrollSlownessAve" type="number" step="any">
+      </label>
 
-  <hr id="railLoopCycle">
-  <h2>
-    <span class="ja">レールループ周期計算</span>
-    <span class="en">Loop-Track Calculation</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">レールの本数から周期を計算。</span>
-    <span class="en">Calculate the period from tracks.</span>
-  </p><br>
+      <label class="labelInput invisible">
+        スクロール遅度循環[f/b]:
+        <input id="inputScrollSlownessCycle" type="text" placeholder="e.g. 6, 7, 6, 6, 7">
+      </label>
 
-  <select id="selectCycle">
-    <option class="ja">羽あり往復</option>
-    <option class="en">Winged, Reciprocating</option>
+      <label class="labelInput">
+        着線パターン:
+        <select id="selectLanding">
+          <option>カスタム</option>
+        </select>
+      </label>
 
-    <option class="ja">羽あり周回</option>
-    <option class="en">Winged, Circulating</option>
-    
-    <option class="ja">羽なし往復</option>
-    <option class="en">Non-Winged, Reciprocating</option>
+      <div class="divScroll">
+        <table id="table1">
+          <tr><th>番号</th></tr>
+          <tr><th>メモ</th></tr>
+          <tr><th title="基準音が鳴ってからその音が鳴るまでの時間。">時刻[f]</th></tr>
+          <tr><th title="前列と比べたときの、音符ブロックが移動する分の遅延。">列間遅延[f]</th></tr>
+          <tr class="invisible"><th title="前列と比べたときの、スクロールでの遅延。">横ス遅延[f]</th></tr>
+          <tr><th title="基準列の音符ブロックとの高さの差。">y差[b]</th></tr>
+        </table>
+      </div>
 
-    <option class="ja">羽なし周回</option>
-    <option class="en">Non-Winged, Circulating</option>
-  </select>
+      <label class="labelInput spaceRight">
+        基準遅延[f]:
+        <input id="inputBaseDelay" type="number" step="1">
+      </label>
 
-  <p class="p3 bold">:</p>
-  <button onclick="funCycle()">
-    <span class="ja">計算</span>
-    <span class="en">Calculate</span>
-  </button><br>
+      <label class="labelInput">
+        基準高さ[b]:
+        <input id="inputBaseHeight" type="number" step="1" min="0">
+      </label><br>
 
-  <p class="p3 bold">
-    <span class="ja">直線[本]:</span>
-    <span class="en">Straight:</span>
-  </p>
-  <input type="number" id="inputCycleStraight">
+      <label class="labelInput spaceRight">
+        <button id="buttonSortWirings">集音する</button>
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">斜線[本]:</span>
-    <span class="en">Diagonal:</span>
-  </p>
-  <input type="number" id="inputCycleDiagonal">
+      <p class="pResult">
+        <span id="spanEvals"></span>
+      </p>
 
-  <p class="p3 bold">
-    <span class="ja">曲線[本]:</span>
-    <span class="en">Curved:</span>
-  </p>
-  <input type="number" id="inputCycleCurved">
+      <div class="divScroll">
+        <table id="table2">
+          <tr><th>番号</th></tr>
+          <tr><th>メモ</th></tr>
+          <tr><th title="その列に与える遅延。">遅延[f]</th></tr>
+          <tr><th title="集音レールとの距離。">高さ[b]</th></tr>
+          <tr><th title="◎: ±0, ○: ±1, △: ±2, ×: それ超過。">配置可</th></tr>
+          <tr><th title="セルを押すと下側に表示。">表示</th></tr>
+        </table>
+      </div>
 
-  <p class="p3 bold">
-    <span class="ja">うるう[個]:</span>
-    <span class="en">Cu:</span>
-  </p>
-  <input type="number" id="inputCycleCorrection"><br><br>
+      <label class="labelInput spaceRight">
+        <button id="buttonChangeOverview">全体像を表示/非表示</button>
+      </label>
 
-  <p class="p3 bold">
-    <span class="ja">周期[f]:</span>
-    <span class="en">Period [f]:</span>
-  </p>
-  <span id="spanCycle"></span>
+      <p class="pResult">
+        <span id="spanWiringData"></span>
+      </p><br>
 
-  <hr id="tableCulculator">
-  <h2>
-    <span class="ja">表計算</span>
-    <span class="en">Spread Sheet to Collect Notes</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">MIDIインポート可! 自動でいい配線を探してくれます。</span>
-    <span class="en">MIDI importable!</span>
+      <div id="divOverview" class="invisible">
+        <canvas id="canvasOverview"></canvas>
+        <canvas id="canvasOverviewSelect"></canvas>
+      </div>
 
-    <a href="https://www.youtube.com/watch?v=wNRr32pd0Es">
-      <span class="ja">解説動画</span>
-      <span class="en">Video</span>
-    </a>
-  </p><br>
+    </section>
 
-  <p class="p3 bold">
-    <span class="ja">MIDIファイル:</span>
-    <span class="en">MIDI File:</span>
-  </p>
-  <input type="file" accept=".mid, .midi, .smf" id="inputSmf">
+    <hr>
+    <section>
+      <h2>縦断線式集音配線生成</h2>
+      <p class="pSubH">縦レールによる集音(ぜんまいメソッド)の配置を探します。</p><br>
 
-  <p class="p3 bold">
-    <span class="ja">トラック:</span>
-    <span class="en">Track:</span>
-  </p>
-  <select id="selectTrack">
-    <option>1</option><option>2</option><option>3</option><option>4</option>
-    <option>5</option><option>6</option><option>7</option><option>8</option>
-    <option>9</option><option>10</option><option>11</option><option>12</option>
-    <option>13</option><option>14</option><option>15</option><option>16</option>
-  </select><br>
+      <canvas id="canvasWiring" width="32"></canvas>
 
-  <button id="buttonLoadSmf">
-    <span class="ja">読み込み</span>
-    <span class="en">Import</span>
-  </button><br><br>
+      <div id="divWiring">
+        <label class="labelInput spaceRight">
+          遅延[f]:
+          <input id="inputWiringDelay" type="number" step="1">
+        </label>
 
-  <div id="divTimeUnit">
-    <p class="p3 bold">
-      <span class="ja">4分符音価:</span>
-      <span class="en">Quarter Note Value:</span>
-    </p>
-    <input type="number" id="inputTimeUnit" value="480" oninput="funTimeUnit()">    
-  </div>
+        <label class="labelInput">
+          高さ[b]:
+          <input id="inputWiringHeight" type="number" step="1" min="1">
+        </label><br>
 
-  <p class="p3 bold">
-    <span class="ja">4分符長[f]:</span>
-    <span class="en">Quarter Note Length [f]:</span>
-  </p>
-  <input type="number" id="inputTableBeat" oninput="funTableBeat(this.value)">
+        <label class="labelInput spaceRight">
+          タイプ:
+          <select id="selectWiringType"></select>
+        </label>
 
-  <p class="p3 bold">BPM:</p>
-  <span id="spanTableBpm" class="result"></span><br>
+        <label class="labelInput">
+          着線時の形状:
+          <select id="selectWiringLanding"></select>
+        </label><br>
 
-  <p class="p3 bold">
-    <span class="ja">基準音階:</span>
-    <span class="en">Base Key:</span>
-  </p>
-  <select id="selectScale"></select>
+        <label class="labelInput spaceRight">
+          <button id="buttonFindWiring">探す</button>
+        </label>
 
-  <button onclick="funPlay()">
-    <span class="ja">演奏</span>
-    <span class="en">Play</span>
-  </button>
-  
-  <p class="p3 bold">
-    <span class="ja">音色:</span>
-    <span class="en">Instrument:</span>
-  </p>
-  <select id="selectInstrument">
-    <option class="ja">正弦波</option>
-    <option class="en">Sine Wave</option>
-
-    <option class="ja">三角波</option>
-    <option class="en">Triangle Wave</option>
-
-    <option class="ja" selected>矩形波</option>
-    <option class="en">Square Wave</option>
-    
-    <option class="ja">ノコギリ波</option>
-    <option class="en">Sawtooth Wave</option>
-    
-    <option class="ja">ピアノ</option>
-    <option class="en">Piano</option>
-    
-    <option class="ja">トランペット</option>
-    <option class="en">Trampet</option>
-  </select>
-
-  <button onclick="funStopPlay()">
-    <span class="ja">演奏停止</span>
-    <span class="en">Stop</span>
-  </button><br>
-
-  <div class="divScroll">
-    <table id="tableInput" class="tableWirings">
-      <tr class="index">
-        <th class="th">
-          <span class="ja">番号</span>
-          <span class="en">Index</span>
-        </th>
-      </tr>
-      <tr class="normal">
-        <th class="th">
-          <span class="ja">メモ</span>
-          <span class="en">Memo</span>
-        </th>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <select id="selectTableInput" onchange="funTableInput()">
-            <option class="ja">音価</option>
-            <option class="en">Note Value</option>
-            
-            <option class="ja">n分符</option>
-            <option class="en">Nth Note</option>
+        <label class="labelInput">
+          <select id="selectWiringOrder">
+            <option selected>↑長さ 短い順</option>
+            <option>↑長さ 長い順</option>
+            <option>↓長さ 短い順</option>
+            <option>↓長さ 長い順</option>
           </select>
-        </th>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <span class="ja">符長[f]</span>
-          <span class="en">Length [f]</span>
-        </th>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <span class="ja">yズレ[b]</span>
-          <span class="en">Y Offset [b]</span>
-        </th>
-      </tr>
-    </table>
-  </div><br>
+        </label>
 
-  <p class="p3 bold">
-    <span class="ja">読み込みタイプ:</span>
-    <span class="en">Loading Type:</span>
-  </p>
-  <select id="selectLoading" onchange="funLoading(this.selectedIndex)">
-    <option class="ja">開始画面(全て同時)</option>
-    <option class="en">Instant</option>
+        <label class="labelInput">
+          <input id="checkWiringView" type="checkbox" checked>
+          実行時に画像表示
+        </label><br>
 
-    <option class="ja">自由落下</option>
-    <option class="en">Freefall</option>
+        <p class="pResult">
+          一致:<br>
+          <span class="spanWiringResults"></span>
+        </p><br>
 
-    <option class="ja">縦スクロール</option>
-    <option class="en">Vertical Scroll</option>
+        <p class="pResult">
+          誤差:<br>
+          <span class="spanWiringResults"></span>
+        </p><br>
 
-    <option class="ja">横スクロール</option>
-    <option class="en">Horizontal Scroll</option>
-  </select>
+        <p class="pResult">
+          もっと誤差:<br>
+          <span class="spanWiringResults"></span>
+        </p>
+      </div>
+    </section>
 
-  <select id="selectLoadingSpeedInput" onchange="funLoadingSpeedInput(this.selectedIndex)">
-    <option class="ja">カスタム</option>
-    <option class="en">Custom</option>
+    <hr>
+    <section>
+      <h2>画像</h2><br>
 
-    <option class="ja" selected>平均遅度</option>
-    <option class="en">Average Slowness</option>
-    
-    <option class="ja">遅度周期</option>
-    <option class="en">Slowness Cycle</option>
-  </select>
-  <br>
-  <div id="divLoadingSpeedAverage">
-    <p class="p3 bold">
-      <span class="ja">平均スクロール遅度[f/b]:</span>
-      <span class="en">Average Scroll Slowness [f/b]:</span>
-    </p>
-    <input type="number" id="inputLoadingSpeedAverage" oninput="funLoadingSpeedAverage(this.value)">
-    <p class="p2">
-      <span class="ja">上向き, 右向きを正とする(自由落下 = -4)。</span>
-      <span class="en">Upward, rightward is positive (freefall = -4 f/b).</span>
-    </p>
-  </div>
+      <img src="images/info/gaps.png" alt="gaps" height="180">
+      <img src="images/info/height.png" alt="height" height="180"><br>
 
-  <div id="divLoadingSpeedCycle">
-    <p class="p3 bold">
-      <span class="ja">スクロール遅度周期[f/b]:</span>
-      <span class="en">Scroll Slowness Cycle [f/b]:</span>
-    </p>
-    <input type="text" id="inputLoadingSpeedCycle" style="height: 35px; width: 200px;" oninput="funLoadingSpeedCycle(this.value)">
-    <p class="p2">
-      <span class="ja">値をコンマ区切りで入力(例: 6, 7, 6, 7, 6)。</span>
-      <span class="en">Input values separated by commas (e.g. 6, 7, 6, 7, 6).</span>
-    </p>
-  </div>
-  
-  <p class="p3 bold">
-    <span class="ja">着線パターン:</span>
-    <span class="en">Landing Pattern:</span>
-  </p>
-  <select id="selectLanding" onchange="funLanding(this.selectedIndex)">
-    <option class="ja">カスタム</option>
-    <option class="en">Custom</option>
-    <option>1</option><option>2</option>
-    <option>3</option><option>4</option>
-  </select><br>
-
-  <button onclick="funAllocation()">
-    <span class="ja">ここまで計算</span>
-    <span class="en">Calculation the Values</span>
-  </button><br>
-
-  <div class="divScroll">
-    <table id="tableWiring" class="tableWirings">
-      <tr class="index">
-        <th class="th">
-          <span class="ja">番号</span>
-          <span class="en">Index</span>
-        </th>
-      </tr>
-      <tr class="normal">
-        <th class="th">
-          <span class="ja">メモ</span>
-          <span class="en">Memo</span>
-        </th>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <span class="ja">遅延[f]</span>
-          <span class="en">Delay [f]</span>
-        </th>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <span class="ja">xズレ[f]</span>
-          <span class="en">X Offset [f]</span>
-        </th>
-        <td>0</td>
-      </tr>
-      <tr class="input" style="display: none;">
-        <th class="th">
-          <span class="ja">横スク遅度[f]</span>
-          <span class="en">Scroll Delay [f]</span>
-        </th>
-        <td>0</td>
-      </tr>
-      <tr class="input">
-        <th class="th">
-          <span class="ja">yズレ[b]</span>
-          <span class="en">Y Offset [b]</span>
-        </th>
-        <td>0</td>
-      </tr>
-    </table>
-  </div><br>
-
-  <p class="p3 bold">
-    <span class="ja">基準遅延[f]:</span>
-    <span class="en">Base Delay [f]:</span>
-  </p>
-  <input type="number" id="inputBaseDelay">
-
-  <p class="p3 bold">
-    <span class="ja">基準高さ[b]:</span>
-    <span class="en">Base Height [b]:</span>
-  </p>
-  <input type="number" id="inputBaseHeight">
-  <br>
-  <button onclick="funWiringSort()">
-    <span class="ja">並び替えを探す</span>
-    <span class="en">Find a Good Sort</span>
-  </button>
-
-  <p class="p2"><p class="bold">
-    <span class="ja">個数:</span>
-    <span class="en">Quantities:</span>
-  </p>
-  <p class="p2">[<span id="spanEvaluations">◎: ○: △: ×: </span>]</p><br>
-
-  <div class="divScroll">
-    <table id="tableSort" class="tableWirings">
-      <tr class="index">
-        <th class="th">
-          <span class="ja">番号</span>
-          <span class="en">Index</span>
-        </th>
-      </tr>
-      <tr class="normal">
-        <th class="th">
-          <span class="ja">メモ</span>
-          <span class="en">Memo</span>
-        </th>
-      </tr>
-      <tr class="blue">
-        <th class="th">
-          <span class="ja">結果[f]</span>
-          <span class="en">Result [f]</span>
-        </th>
-      </tr>
-      <tr class="red">
-        <th class="th">
-          <span class="ja">高さ[b]</span>
-          <span class="en">Height [b]</span>
-        </th>
-      </tr>
-      <tr class="normal">
-        <th class="th">
-          <span class="ja">配置可</span>
-          <span class="en">Wirable</span>
-        </th>
-      </tr>
-      <tr class="normal">
-        <th class="th">
-          <span class="ja">生成</span>
-          <span class="en">Generate</span>
-        </th>
-      </tr>
-    </table>
-  </div><br>
-
-  <button onclick="funOverview()">
-    <span class="ja">全体像を表示</span>
-    <span class="en">Show the Overview</span>
-  </button>
-
-  <button onclick="funRemoveOverview()">
-    <span class="ja">非表示</span>
-    <span class="en">Hide</span>
-  </button>
-
-  <span id="spanOverview" class="result"></span><br>
-
-  <div class="divScroll" id="divOverview">
-    <canvas id="canvasOverview" height="0"></canvas>
-  </div>
-
-  <hr id="wiringGenerator">
-  <h2>
-    <span class="ja">縦断線式集音配線生成</span>
-    <span class="en">Collection-Track Generation</span>
-  </h2>
-  <p class="p3">
-    <span class="ja">縦レールによる集音(ぜんまいメソッド)の配置を探します。</span>
-    <span class="en">Look for Vertical Collection-Tracks.</span>
-  </p><br>
-
-  <canvas id="canvasWiring" width="32" height="320"></canvas>
-  <div class="divWiringGenerator">
-    <p class="p3 bold">
-      <span class="ja">狙いの値[f]:</span>
-      <span class="en">Target Value [f]:</span>
-    </p>
-    <input type="number" id="inputTarget">
-
-    <p class="p3 bold">
-      <span class="ja">着線レールとの距離[b]:</span>
-      <span class="en">Distance to Delivery Track [b]:</span>
-    </p>
-    <input type="number" id="inputHeight">
-
-    <button onclick="funTarget()">
-      <span class="ja">探す</span>
-      <span class="en">Find</span>
-    </button><br>
-
-    <select id="selectSort" onchange="funSort()">
-      <option class="ja" selected>↑長さ 短い順</option>
-      <option class="en">↑Length, Asc-Order</option>
-
-      <option class="ja">↑長さ 長い順</option>
-      <option class="en">↑Length, Des-Order</option>
-
-      <option class="ja">↓長さ 短い順</option>
-      <option class="en">↓Length, Asc-Order</option>
-
-      <option class="ja">↓長さ 長い順</option>
-      <option class="en">↓Length, Des-Order</option>
-    </select>
-    
-    <p class="p2">
-      <span class="ja">( 遅延 / ↑長さ / ↓長さ / 表記 )。クリックで画像出ます。</span>
-      <span class="en">( Delay / ↑Length / ↓Length / Wiring ). Click to view image.</span><br>
-
-    <label>
-      <input type="checkbox" id="checkWiringImage" checked>
-      <span class="ja">実行時に画像表示(一致の左端の配置)。</span>
-      <span class="en">View Image at Runtime</span>
-    </label></p><br><br>
-
-    <p class="p3 bold">
-      <span class="ja">一致:</span>
-      <span class="en">Match:</span>
-    </p><br>
-    <div id="divSame"></div><br>
-
-    <p class="p3 bold">
-      <span class="ja">誤差:</span>
-      <span class="en">Error:</span>
-    </p><br>
-    <div id="divNear"></div><br>
-
-    <p class="p3 bold">
-      <span class="ja">もっと誤差:</span>
-      <span class="en">More Error:</span>
-    </p><br>
-    <div id="divFar"></div>
-  </div>
-
-  <hr id="imageGallery">
-  <h2>
-    <span class="ja">画像</span>
-    <span class="en">Images</span>
-  </h2><br>
-
-  <p class="p3">
-    <span class="ja">周回型, 往復型, 特殊型 の羽ありループ。</span>
-    <span class="en">Circulating, Reciprocating, Special Loop-Tracks.</span>
-  </p><br>
-  <img src="images/info/loops.png" height="180"><br><br>
-
-  <p class="p3">
-    <span class="ja">G = ギャップ, R = レール, b = マス(ブロック)。</span>
-    <span class="en">G = gap, R = rail(track), b = block(tile).</span>
-  </p><br>
-  <img src="images/info/gaps.png" height="140">
-  <img src="images/info/height.png" height="140"><br><br>
-  
-  <p class="p3">
-    <span class="ja">着線パターン。</span>
-    <span class="en">Landing Patterns.</span>
-  </p><br>
-  <img src="images/info/landing.png" height="180">
-
-  <hr id="scrollSpeedTable">
-  <h2>
-    <span class="ja">スクロール遅度表</span>
-    <span class="en">Scroll Speeds Table</span>
-  </h2>
-
-  <p class="p2">
-    <span class="ja">数値の単位は[f/b], 1b進むのにかかる時間。</span>
-    <span class="en">The unit of numbers is "Slowness [f/b]", the time it takes to move 1 block.</span>
-  </p>
-
-  <table class="tableSpeeds">
-    <tr class="index">
-      <th rowspan="100" class="lightGreen">
-        <span class="ja">横</span>
-        <span class="en vertical">Horizontal</span>
-      </th>
-      <th>
-        <span class="ja">スクロール方法</span>
-        <span class="en">Scroll</span>
-      </th>
-      <th>
-        <span class="ja">平均</span>
-        <span class="en">Average</span>
-      </th>
-      <th>
-        <span class="ja">周期</span>
-        <span class="en">Cycle</span>
-      </th>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">強制(遅), クリボー</span>
-        <span class="en">Auto(slow), Goomba</span>
-      </td>
-      <td>32.000</td><td>32...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">強制(中), コンベア(中)</span>
-        <span class="en">Auto(normal), Conveyor(normal)</span>
-      </td>
-      <td>16.000</td><td>16...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">強制(速), コンベア(速)</span>
-        <span class="en">Auto(fast), Conveyor(fast)</span>
-      </td>
-      <td>8.000</td><td>8...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">青ドクロ, コンベア(中)+歩き, <br>コンベア(速)+クリボー</span>
-        <span class="en">Fast Lava Lift, Conveyor(normal)+Walking, <br>Conveyor(fast)+Goomba</span>
-      </td>
-      <td>6.400</td><td>6, 6, 7, 6, 7...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">走り, ドッスン</span>
-        <span class="en">Running, Thwomp</span>
-      </td>
-      <td>5.333</td><td>5, 5, 6...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">歩き, 羽レールブロック</span>
-        <span class="en">Walking, Winged Block on Track</span>
-      </td>
-      <td>10.666</td><td>10, 11, 11...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">レールブロック</span>
-        <span class="en">Block on Track</span>
-      </td>
-      <td>21.333</td><td>21, 21, 22...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">コンベア(速)+走り</span>
-        <span class="en">Conveyor(fast)+Running</span>
-      </td>
-      <td>3.200</td><td>3, 3, 3, 3, 4...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">コンベア(中)+走り, ドッスン+クラウン</span>
-        <span class="en">Conveyor(normal)+Running, Thwomp+Clown Car</span>
-      </td>
-      <td>4.000</td><td>4...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">コンベア(速)+歩き</span>
-        <span class="en">Conveyor(fast)+Walking</span>
-      </td>
-      <td>4.571</td><td>4, 5, 4, 5, 4, 5, 5...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">コンベア(速)+チョロプー</span>
-        <span class="en">Conveyor(fast)+Monty Mole</span>
-      </td>
-      <td>4.333</td><td>(16, 7, 7, 6, 6, 6, 6, 5, 6, 5, 5, 4, 5, 5), <br>4, 5, 4...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">コンベア(速)+怒ハナチャン</span>
-        <span class="en">Conveyor(fast)+Angry Wiggler</span>
-      </td>
-      <td>5.00</td><td>5...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">コンベア(速)+青トゲメット</span>
-        <span class="en">Conveyor(fast)+Blue Spike Top</span>
-      </td>
-      <td>5.833</td><td>5, 6, 6, 6, 6, 6...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">赤砲台メット</span>
-        <span class="en">Shell(red blaster)</span>
-      </td>
-      <td>3.600</td><td>3, 4, 3, 4, 4...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">コンベア(中)+赤砲台メット</span>
-        <span class="en">Conveyor(normal)+Shell(red blaster)</span>
-      </td>
-      <td>2.937</td><td>2, 3*15...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">コンベア(速)+赤砲台メット</span>
-        <span class="en">Conveyor(fasr)+Shell(red blaster)</span>
-      </td>
-      <td>2.481</td><td>(2, 3)*13, 2...</td>
-    </tr>
-  </table><br>
-
-  <table class="tableSpeeds">
-    <tr class="index">
-      <th rowspan="100" class="lightGreen">
-        <span class="ja">縦</span>
-        <span class="en vertical">Vertical</span>
-      </th>
-      <th>
-        <span class="ja">スクロール方法</span>
-        <span class="en">Scroll</span>
-      </th>
-      <th>
-        <span class="ja">平均</span>
-        <span class="en">Average</span>
-      </th>
-      <th>
-        <span class="ja">周期</span>
-        <span class="en">Cycle</span>
-      </th>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">↓自由落下</span>
-        <span class="en">↓ Freefall</span>
-      </td>
-      <td>4.000</td><td>4...</td>
-    </tr>
-    <tr class="lightGray">
-      <td>
-        <span class="ja">↓デブロス落下</span>
-        <span class="en">↓ Falling Sledge Bro</span>
-      </td>
-      <td>2.000</td><td>2...</td>
-    </tr>
-    <tr class="normal">
-      <td>
-        <span class="ja">↑ブンブン急上昇</span>
-        <span class="en">↑ Rising (Boom)^2</span>
-      </td>
-      <td>5.333</td><td>5, 5, 6...</td>
-    </tr>
-  </table>
-
-  <hr id="grobalGrounds">
-  <h2>グローバル音源配置集</h2>
-  <p class="p3">グローバル音源を集めました。</p><br>
-
-  <p class="p2">羽あり音符の往復型ループ端点で音源と接触して1回だけ音を鳴らすような配置。もしくは単に便利そうな音源。<br>
-  コストは音源エネミーを除いた必要ELAの値。<br>
-  ここでは複数の音源を同時に鳴らすことを"複合"と呼ぶ。</p>
-  <br><br>
-
-  <button onclick="funContraptions()">
-    <span class="ja">表示 / 非表示</span>
-    <span class="en">Display / Hide</span>
-  </button>
-
-  <div id="divSetsParent"></div>
-
-  <hr id="diary">
-  <h2>雑記</h2><br>
-  <div class="sentence">
-    <span class="p2">
-      1年以上ぶりに更新しました。
-      
-      データ, 機能, その他もろもろの誤りや改善案があれば教えてくれると嬉しいです。
-    </span><br><br>
-  
-    <h3>用語と単位集</h3><br><div class="p2">
-
-    <p class="bold">・f, フレーム</p> ...
-    <span class="paragraph">
-      1/60秒, 観測しうるSMM2の時間最小単位。時間という意味で1f = 1cuである。
-      SMM2は60fpsである。
-    </span>
-
-    <p class="bold">・b, ブロック幅</p> ...
-    <span class="paragraph">
-      SMM2の1マス。隣接するブロック間の距離は1bとなる。
-    </span>
-    
-    <p class="bold">・f/b, 遅度</p> ...
-    <span class="paragraph">
-      ある距離を進むのにかかる時間。速度の逆数で表される。
-    </span>
-    
-    <p class="bold">・cu, うるう距離</p> ...
-    <span class="paragraph">
-      <a href="https://www.youtube.com/watch?v=nw-DbxZXqsg">解説</a><br>
-      羽レールブロックは 3/32 [b/f] の速さで移動する。<br>
-      このとき, 途中でレールの端に近づくと, 整数fで表せない(端までの)区間はスキップされるか1fかけて移動される。<br>
-      1fに進む距離をdとすると, 余りの距離 &lt; dn (2/3 &lt; n &lt; 11/15) ならばスキップ, そうでないならば1fかけて移動というのが定説である。<a href="https://twitter.com/fnjxbf0b5/status/1771793463815573956">ソース</a><br>
-      羽レールブロックの場合はすべてスキップされるため, レール1or2本でレールの端があると本来より早くなる。<br>
-      そして, 3本つなげると小数部が消え本来の速さと一致するのだが, 1, 2本までと比べてレール1本当たりにかかる時間が異なるため, この時に何らかの要因でずれが発生し少し遅れると考えられていた。<br>
-      このズレがうるう距離である(あくまでも仮説です)。<br>
-      なお, うるう距離を距離や時間の単位として用いることもあるが, 本ツールでは混同や誤解を避けるため, 「このループの周期はnうるう距離(cu)」のようには使わない。
-    </span>
-    
-    <p class="bold">・G, ギャップ</p> ...
-    <span class="paragraph">
-      縦断線レールなどの距離または遅延。
-    </span>
-        
-    <p class="bold">・R, レール</p> ...
-    <span class="paragraph">
-      レールの本数。ここでは直線レールを指す。
-    </span>
-        
-    <p class="bold">・終端速度</p> ...
-    <span class="paragraph">
-      マリオやレールブロックが自由落下し, 充分に加速しきり一定になった速度。地上では 1/4 [b/f]。
-    </span>
-        
-    <p class="bold">・集音</p> ...
-    <span class="paragraph">
-      レール音符を集めること。また, 集音レールはレール音符を集めるためのレール。
-    </span>
-        
-    <p class="bold">・着線</p> ...
-    <span class="paragraph">
-      レール音符が落下などして, 集音レールに乗ること。
-    </span>
-        
-    <p class="bold">・(自由)落下集音</p> ...
-    <span class="paragraph">
-      マリオが自由落下し, 一定の速度で集音すること。<br>
-      この時レール音符は, マリオと落下速度が等しいため水平に一列に並ぶ。
-    </span>
-        
-    <p class="bold">・グローバル</p> ...
-    <span class="paragraph">
-      マリオが同エリアのどこにいても消失・停止しないようなオブジェクトの状態。<br>
-      それに近いものを準グローバルといったりする。<br>
-      また, オブジェクトをグローバルにすることをグローバル化という。
-    </span>
-      
-    <p class="bold">・GG, グローバルグラウンド</p> ...
-    <span class="paragraph">
-      グローバルである床。それに接しているオブジェクトもまたグローバルになるが, 離れるとグローバルでなくなる。<br>
-      スネークブロックやレール上のオブジェクト(例外あり)などが該当する。
-    </span>
-      
-    <p class="bold">・座標</p> ...
-    <span class="paragraph">
-      ここでは右向きをx, 上向きをyとする。
-    </span>
-        
-    <p class="bold">・座標依存性</p> ...
-    <span class="paragraph">
-      エリアの特定の区間とその他では挙動が異なるという現象が見られ, その現象が起こりうるギミックを座標依存性があるという。<br>
-      例えば, ↑G1R1-はエリアの形状に依らず y=16~64 付近でその他のエリアより1fだけ早くなることが知られている。<br>
-      メカニズムは完全には解明されていないが, 挙動の変化する境目の座標は今のところすべて2^n付近である。<br>
-      これはレール演奏のクォリティに影響を与えるため注意が必要(特にループ周期)。
-    </span>
-      
-    <p class="bold">・縦断線式集音, ぜんまいメソッド</p> ...
-    <span class="paragraph">
-      主にzen-mai*さんらが理論化した集音における手法。<br>
-      縦断線レール及びギャップ区間を通過するのにかかる時間を測定・計算することによって理論的に集音することができる。
-    </span>
-        
-    <p class="bold">・エンティティ, エネミー</p> ...
-    <span class="paragraph">
-      おおむねおんなじ意味。クリボーやキノコ, はたまたレールブロックなど。
-    </span>
-        
-    <p class="bold">・エンティティリミット</p> ...
-    <span class="paragraph">
-      いわゆる配置制限。ELA, B, Cが定義されているが, ここではそこまで深く扱わない。
-    </span>
-        
-    <p class="bold">・ELA</p> ...
-    <span class="paragraph">
-      クリボーやレール音符などのオブジェクトの, 作るモードでの配置制限。100個まで。<br>
-      ブロックの中に入っているオブジェクトはカウントされない。
-    </span>
-        
-    <p class="bold">・ELB</p> ...
-    <span class="paragraph">
-      ELAオブジェクトに加え, 一方通行やスネークブロック, ブロックから出てきたエンティティなどを含め, 遊ぶモードでの制限。これが100以上になるとブロックからELBオブジェクトが生成されなくなる。が, オブジェクトが101個以上存在できないというわけではない。
-    </span>
-        
-    <p class="bold">・音源の複合</p> ...
-    <span class="paragraph">
-      同時に2つ以上の音源を1つの音符で鳴らすこと。要するに音源エネミーを重ねるだけ。
-    </span><br>
-        
-    ここで定めたものは独自のものであり, ゲーム・数学・物理学・音楽上正しくない, また, 他の人に伝わらない可能性があります。
-    </div><br>
-  
-    <h3>役立つかもしれないTips</h3><br>
-    
-    <div class="p2">
-    <p class="bold">・アシストロード</p> ...
-    <span class="paragraph">
-      エネミーの足元にリフトなどの読み込み範囲の大きいオブジェクトを配置したり, エネミーを積み重ねたりすることで読み込み範囲を広げられる。<br>
-      特に, レール音符ブロックの1マス上にスターを設置すると, 読み込み範囲がy方向に大きく広がることが知られている。
-    </span><br>
-    
-    <p class="bold">・周回型レールループを作るための条件</p> ...
-    <span class="paragraph">
-      断線を含まない周回型(閉じた)レールループでは, 以下が成り立つ(ほぼ自明)。<br>
-      (s = 直線の本数, d = 斜線or曲線の本数) 周回型レールループについて, <br>
-      ・任意のループ(s, d)において, (s+2, d), (s, d+2)が存在する。<br>
-      ・sが奇数のとき, いかなるループも作成できない。<br>
-      ・s = 0 のとき, d >= 4, dが偶数 で作成できる。<br>
-      ・s = 2 のとき, d >= 1 で作成できる。<br>
-      ・s >= 4, sが偶数 のとき, dの値に依らず作成できる。
-    </span><br>
-    
-    <p class="bold">・各レールの長さ</p> ...
-    <span class="paragraph">
-      長さ(レール1本を通過するのにかかる時間)[f]は, <br>
-      ・羽あり ... 直線21, 斜線30, 曲線36<br>
-      ・羽なし ... 直線42, 斜線60, 曲線71
-    </span></div>
-  </div>
-
-  <hr>
-  <h2>参考文献・資料・おすすめ</h2>
-  <p class="p3">おいしくいただいております。</p><br>
-
-  <span class="p3">
-  <a href="https://www.youtube.com/watch?v=r1Lp6UY5NIc">ぜんまいメソッド解説</a><br>
-  <a href="https://www.youtube.com/watch?v=IE5-31xXOFE&list=PLkijGuhvmuKTG2Ve2n2juJwGoFnTa6tLY">レール演奏解説</a><br>
-  <a href="https://twitter.com/fnjxbf0b5/status/1601536592879161345">レールループ生成</a><br>
-  <a href="https://sites.google.com/view/loopingmusiclab/%E3%83%9B%E3%83%BC%E3%83%A0">演奏コース研究会</a><br>
-  <a href="https://drive.google.com/file/d/1weXp44U6FBnwNdutBvv3uM4hxlOpGpgn/view">縦断線式集音法によるレール演奏の設計</a><br>
-  </span><br><br><br>
-
-  <p class="p3 bold"><a href="https://twitter.com/Shamoji_SMM">作った人</a></p><br>
-  <p class="p2 copyright">(C)opyright (2023 ~ currentTime) null</p>
-
-  <script src="script.js"></script>
+      <img src="images/info/landing.png" alt="landing patterns" height="240">
+    </section>
+  </main>
 </body>
 </html>
