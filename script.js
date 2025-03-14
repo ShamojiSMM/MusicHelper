@@ -1,30 +1,8 @@
-var languageIndex = 0;
-
-if (window.navigator.language == "ja") {
-  selectLanguage.selectedIndex = 0;
-
-} else {
-  selectLanguage.selectedIndex = 1;
-  funLanguage(1);
-
-  languageIndex = 1;
-}
-
-function funLanguage(selectedIndex) {
-  document.querySelectorAll(".ja").forEach(elm => elm.style.display = ["inline", "none"][selectedIndex]);
-  document.querySelectorAll(".en").forEach(elm => elm.style.display = ["none", "inline"][selectedIndex]);
-
-  var shift = [-1, 1][selectedIndex];
-  [selectLoopType, selectCycle, selectInstrument, selectTableInput, selectLoading, selectLoadingSpeedInput, selectLanding, selectTableInput.selectedIndex, selectSort].forEach(select => {
-    select.selectedIndex += shift;
-  });
-
-  languageIndex = selectedIndex;
-}
+"use strict";
 
 function isNum(...values) {
   if (!values.length) return false;
-  for (var value of values) {
+  for (const value of values) {
     if (value === 0) return true;
     if (["", null, Infinity, true, false].includes(value) || isNaN(value)) return false;
   }
@@ -32,997 +10,676 @@ function isNum(...values) {
   return true;
 }
 
-var magnifications = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, (4 / 3), (4 / 6), (4 / 12)];
-
-function funBeatValue(beatValue) {
-  if (beatValue == 0) {
-    spanBpm.textContent = "";
-
-    for (var i = 1; i < tableBeats.rows.length; i ++) {
-      tableBeats.rows[i].cells[3].textContent = "";
-    }
-
-    return;
-  }
-
-  spanBpm.textContent = (3600 / beatValue).toFixed(3);
-
-  for (var i = 1; i < tableBeats.rows.length; i ++) {
-    tableBeats.rows[i].cells[3].textContent = (beatValue * magnifications[i - 1]).toFixed(3);
-  }
+function getElm(selector) {
+  return document.querySelector(selector);
 }
 
-function funBpm(bpm) {
-  spanBeatValue.textContent = bpm == 0 ? "" : (3600 / bpm).toFixed(3);
+function getElmAll(selector) {
+  return document.querySelectorAll(selector);
 }
 
-function funBarValue() {
-  if (isNum(inputBarBeatValue.value, inputSignature0.value, inputSignature0.value, inputBarNumber.value)) {
-    spanBarValue.textContent = (inputBarNumber.value * (inputSignature0.value * ((4 * inputBarBeatValue.value) / inputSignature1.value))).toFixed(3);
-  
+function addOption(select, text, value) {
+  const option = document.createElement("option");
+  option.text = text || "";
+  if (value != undefined) option.value = value;
+
+  select.append(option);
+}
+
+function changeEditable(element, isEditable) {
+  const classList = element.parentNode.classList;
+
+  if (isEditable) classList.remove("uneditable");
+  else classList.add("uneditable");
+}
+
+function changeVisible(element, isVisible, isToParent = true) {
+  const classList = (isToParent ? element.parentNode : element).classList;
+
+  if (isVisible) classList.remove("invisible");
+  else classList.add("invisible");
+}
+
+function clearRow(tableInd, rowInd, startCellInd = 1) {
+  const cells = tables[tableInd].rows[rowInd].cells;
+  for (let c = startCellInd; c <= tableLength; c ++) cells[c].textContent = "";
+}
+
+function clearRows(tableInd, rowInds, startCellInd = 1) {
+  rowInds.forEach(r => clearRow(tableInd, r, startCellInd));
+}
+
+function clearCell(tableInd, rowInd, cellInd) {
+  tables[tableInd].rows[rowInd].cells[cellInd].textContent = "";
+}
+
+const tableLength = 150;
+const sortableRange = 6;
+
+const selectTrack = getElm("#selectTrack");
+for (let i = 1; i <= 16; i ++) addOption(selectTrack, i);
+selectTrack.selectedIndex = 2;
+
+const keyNames = ["ド", "ド#", "レ", "レ#", "ミ", "ファ", "ファ#", "ソ", "ソ#", "ラ", "ラ#", "シ"];
+
+const selectBaseKey = getElm("#selectBaseKey");
+
+for (let i = 27; i >= 0; i --) {
+  const text = `${Math.floor(i / 12) + 1}-${keyNames[i % 12]}`;
+  addOption(selectBaseKey, text);
+}
+
+selectBaseKey.selectedIndex = 15;
+
+const inputTickUnit = getElm("#inputTickUnit");
+const selectNoteInput = getElm("#selectNoteInput");
+
+let tickUnit = 480;
+inputTickUnit.addEventListener("input", () => {
+  tickUnit = inputTickUnit.value;
+
+  calcAllNotes();
+});
+
+function changeNoteInput(isClearRows = true)  {
+  const index = selectNoteInput.selectedIndex;
+
+  changeEditable(inputTickUnit, index == 0);
+  if (isClearRows) clearRows(0, [2, 3]);
+
+  selectNoteInput.parentNode.parentNode.title = selectNoteInput.options[index].title;
+}
+
+selectNoteInput.addEventListener("change", () => changeNoteInput);
+changeNoteInput(false);
+
+const selectLanding = getElm("#selectLanding");
+
+let typeKeys;
+
+function changeType(isClearRow = true) {
+  typeKeys = selectType.value.split("-");
+  const landings = dataAssets[typeKeys[0]][typeKeys[1]].landings;
+
+  selectLanding.options.length = 1;
+  landings.forEach(landing => addOption(selectLanding, landing.name));
+
+  if (isClearRow) clearRow(1, 3, 2);
+}
+
+const selectType = getElm("#selectType");
+selectType.addEventListener("change", changeType);
+
+changeType(false);
+
+const selectLoading = getElm("#selectLoading");
+const selectLoadingInput = getElm("#selectLoadingInput");
+const inputScrollSlownessAve = getElm("#inputScrollSlownessAve");
+const inputScrollSlownessCycle = getElm("#inputScrollSlownessCycle");
+
+selectLoading.addEventListener("change", () => {
+  const index = selectLoading.selectedIndex;
+  if (index == 3) {
+    changeVisible(selectLoadingInput, true);
+    changeLoadingInput();
+
+    changeVisible(tables[1].rows[4], true, false);
+
   } else {
-    spanBarValue.textContent = "";
+    changeVisible(selectLoadingInput, false);
+    changeVisible(inputScrollSlownessCycle, false);
+
+    changeVisible(inputScrollSlownessAve, index == 2);
+    changeVisible(tables[1].rows[4], false, false);
   }
+});
+
+function changeLoadingInput() {
+  const isVisibles = [
+    [false, false], [true, false], [false, true]
+  ][selectLoadingInput.selectedIndex];
+
+  changeVisible(inputScrollSlownessAve, isVisibles[0]);
+  changeVisible(inputScrollSlownessCycle, isVisibles[1]);
+
+  inputScrollSlownessAve.value = "";
+  inputScrollSlownessCycle.value = "";
+  clearRow(1, 4, 2);
 }
 
-function funLoopType(loopType) {
-  pLoopsText.style.display = [2, 3].includes(loopType) ? "none" : "inline-block";
-}
+selectLoadingInput.addEventListener("change", changeLoadingInput);
 
-function funLoop() {
-  var loopValue = parseInt(inputLoop.value);
-  var resultLoops = [];
+const tables = getElmAll("table");
+const spanWiringData = getElm("#spanWiringData");
 
-  switch (selectLoopType.selectedIndex - languageIndex) {
-    case 0:
-      divSpecial.style.display = "none";
+tables.forEach((table, t) => {
+  const rows = Array.from(table.children[0].children);
 
-      for (var s = 0; s <= loopValue / 42; s ++) {
-        for (var d = 0; d <= loopValue / 60; d ++) {
-          for (var c = 0; c <= loopValue / 72; c ++) {
-            for (var u = 0; u <= s / 3; u ++) {
-              if (s * 42 + d * 60 + c * 72 + u * 2 == loopValue) {
-                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
-              }
-            }
-          }
+  rows.forEach((row, r) => {
+    let elm = "td";
+    let fun = () => {}
+
+    switch (true) {
+      case r == 1:
+      default:
+        fun = cell => {
+          cell.contentEditable = true;
+          cell.addEventListener("blur", () => cell.scrollLeft = 0);
         }
-      }
+        break;
 
-      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
-      break;
+      case r == 0:
+        elm = "th";
+        fun = (cell, c) => { cell.textContent = c }
+        break;
 
-    case 2:
-      var subStraights = [1, 3, 3, 4, 3, 4, 3, 4, 4, 3, 3, 4, 4, 4, 3, 2, 4, 4, 1, 4, 4, 3, 4, 3, 4, 4, 4, 2, 4, 4, 1, 4, 4, 4, 4, 2, 2, 2, 4, 4, 4, 4];
-      var addStraights = parseInt(loopValue / 42) - subStraights[loopValue % 42];
+      case t == 2:
+        if (r == 5) fun = (cell, c) => {
+          cell.addEventListener("click", () => {
+            const rows = tables[2].rows;
+            const [delay, height] = [
+              rows[2].cells[c].textContent, rows[3].cells[c].textContent
+            ];
 
-      if (addStraights >= 0) {
-        spanLoops.textContent = "";
+            if (!isNum(delay, height)) return;
+            getElm(".wiringDisplay")?.classList.remove("wiringDisplay");
+            cell.classList.add("wiringDisplay");
 
-        spanSpecial.textContent = addStraights;
-        divSpecial.style.display = "block";
-        imageLoop.style.width = "12rem";
-        imageLoop.src = `images/tracks/base${loopValue % 42}.jpg`;
+            const keyName = selectBaseKey.options[
+              selectBaseKey.selectedIndex - height + parseInt(inputBaseHeight.value)
+            ].text;
 
-      } else {
-        if ([90, 96].includes(loopValue)) {
-          spanLoops.textContent = "";
-          spanSpecial.textContent = "";
+            spanWiringData.textContent = `
+              列: ${c},
+              音階: ${keyName},
+              遅延: ${delay},
+              高さ: ${height}
+            `;
 
-          divSpecial.style.display = "block";
-          imageLoop.style.width = "12rem";
-          imageLoop.src = `images/tracks/other${loopValue}.jpg`;
+            const context = canvasOverviewSelect.getContext("2d");
+            const canvasHeight = canvasOverview.height;
 
-        } else {
-          spanLoops.textContent = "Not Found";
-          divSpecial.style.display = "none";
+            context.clearRect(0, 0, canvasOverview.width, canvasHeight);
+            context.fillStyle = "#98fb98";
+            context.fillRect((c - 1) * 16, 0, 16, canvasHeight);
+
+            [inputWiringDelay.value, inputWiringHeight.value] = [delay, height];
+            selectWiringType.selectedIndex = selectType.selectedIndex;
+            changeWiringType();
+
+            let accelerationType = "general";
+
+            const landingType = selectLanding.value;
+            if (c == 1) {
+              accelerationType = {
+                "1v": "vertical",
+                "1d": "diagonal",
+                "2a": "second"
+              }[landingType] || accelerationType;
+
+            } else if (
+              typeKeys[0] == "wing" && typeKeys[1] == "ground"
+              && (c == 2 && ["1v", "1d", "4a"].includes(landingType))
+            ) accelerationType = "second";
+
+            selectWiringLanding.value = accelerationType;
+            findWiring();
+          });
         }
-      }
-      break;
+        break;
 
-    case 4:
-      divSpecial.style.display = "none";
-
-      for (var s = 0; s <= loopValue / 21; s ++) {
-        for (var d = 0; d <= loopValue / 30; d ++) {
-          for (var c = 0; c <= loopValue / 36; c ++) {
-            for (var u = 0; u <= s / 3; u ++) {
-              if (s * 21 + d * 30 + c * 36 + u == loopValue && s % 2 == 0 && loopValue >= 72) {
-                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
-              }
-            }
-          }
+      case t == 0 && r == 2:
+        fun = (cell, c) => {
+          cell.contentEditable = true;
+          cell.addEventListener("blur", () => cell.scrollLeft = 0);
+          cell.addEventListener("input", () => calcNote(c));
         }
-      }
-
-      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
-      break;
-
-    case 6:
-      divSpecial.style.display = "none";
-
-      for (var s = 0; s <= loopValue / 84; s ++) {
-        for (var d = 0; d <= loopValue / 120; d ++) {
-          for (var c = 0; c <= loopValue / 142; c ++) {
-            for (var u = 0; u <= s / 2; u ++) {
-              if (s * 84 + d * 120 + c * 142 + u * 2 == loopValue) {
-                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
-              }
-            }
-          }
-        }
-      }
-
-      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
-      break;
-
-    case 8:
-      divSpecial.style.display = "none";
-
-      for (var s = 0; s <= loopValue / 42; s ++) {
-        for (var d = 0; d <= loopValue / 60; d ++) {
-          for (var c = 0; c <= loopValue / 71; c ++) {
-            for (var u = 0; u <= s / 2; u ++) {
-              if (s * 42 + d * 60 + c * 71 + u == loopValue && s % 2 == 0 && loopValue >= 144) {
-                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
-              }
-            }
-          }
-        }
-      }
-
-      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
-      break;
-
-    case 6:
-      divSpecial.style.display = "none";
-
-      for (var s = 0; s <= loopValue / 84; s ++) {
-        for (var d = 0; d <= loopValue / 120; d ++) {
-          for (var c = 0; c <= loopValue / 142; c ++) {
-            for (var u = 0; u <= s / 2; u ++) {
-              if (s * 84 + d * 120 + c * 142 + u * 2 == loopValue) {
-                resultLoops.push(` (${s}, ${d}, ${c}, ${u}) `);
-              }
-            }
-          }
-        }
-      }
-
-      spanLoops.textContent = resultLoops.length ? resultLoops.reverse() : "Not Found";
-  }
-}
-
-function funCycle() {
-  var straight = parseInt(inputCycleStraight.value || 0);
-  var diagonal = parseInt(inputCycleDiagonal.value || 0);
-  var curved = parseInt(inputCycleCurved.value || 0);
-  var correction = parseInt(inputCycleCorrection.value || 0);
-
-  var coefficients = [[42, 60, 72, 2], [21, 30, 36, 1], [84, 120, 142, 2], [42, 60, 71, 1]][(selectCycle.selectedIndex - languageIndex) / 2];
-
-  spanCycle.textContent = coefficients[0] * straight + coefficients[1] * diagonal + coefficients[2] * curved + coefficients[3] * correction;
-}
-
-var tableWiringLength = 100;
-
-var _atob = function(string) {
-  var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-  var b64re = /^(?:[A-Za-z\d+\/]{4})*?(?:[A-Za-z\d+\/]{2}(?:==)?|[A-Za-z\d+\/]{3}=?)?$/;
-
-  string = String(string.replace(/^.*?base64,/, "")).replace(/[\t\n\f\r ]+/g, "");
-  
-  if (!b64re.test(string)) throw new TypeError("Failed to execute _atob() : The string to be decoded is not correctly encoded.");
-
-  string += "==".slice(2 - (string.length & 3));
-  var bitmap, result = "";
-  var r1, r2, i = 0;
-
-  for (; i < string.length; ) {
-    bitmap = (b64.indexOf(string.charAt(i ++)) << 18) |
-      (b64.indexOf(string.charAt(i ++)) << 12) |
-      ((r1 = b64.indexOf(string.charAt(i ++))) << 6) |
-      (r2 = b64.indexOf(string.charAt(i ++)));
-
-    result += r1 == 64 ? String.fromCharCode((bitmap >> 16) & 255)
-    : r2 == 64 ? String.fromCharCode((bitmap >> 16) & 255, (bitmap >> 8) & 255)
-    : String.fromCharCode((bitmap >> 16) & 255, (bitmap >> 8) & 255, bitmap & 255);
-  }
-  
-  return result;
-}
-
-var MidiParser = {
-  debug: false,
-
-  parse: function(input, _callback) {
-    if (input instanceof Uint8Array) return MidiParser.Uint8(input);
-    else if (typeof input == "string") return MidiParser.Base64(input);
-    else if (input instanceof HTMLElement && input.type == "file") return MidiParser.addListener(input, _callback);
-    else throw new Error("MidiParser.parse() : Invalid input provided");
-  },
-
-  addListener: function(_fileElement, _callback) {
-    if (!File || !FileReader) throw new Error("The File|FileReader APIs are not supported in this browser. Use instead MidiParser.Base64() or MidiParser.Uint8()");
-
-    if (_fileElement == undefined || !(_fileElement instanceof HTMLElement)
-      || _fileElement.tagName != "INPUT" || _fileElement.type.toLowerCase() != "file") return false;
-    
-    _callback = _callback || function() {};
-
-    buttonLoadSmf.addEventListener("click", function() {
-      if (!inputSmf.files.length) return false;
-
-      var reader = new FileReader();
-      reader.readAsArrayBuffer(inputSmf.files[0]);
-
-      reader.onload = function(e) {
-        _callback(MidiParser.Uint8(new Uint8Array(e.target.result)));
-      };
-    });
-  },
-
-  Base64: function(b64String) {
-    b64String = String(b64String);
-
-    var raw = _atob(b64String);
-    var rawLength = raw.length;
-    var t_array = new Uint8Array(new ArrayBuffer(rawLength));
-
-    for (var i = 0; i < rawLength; i ++) t_array[i] = raw.charCodeAt(i);
-    return MidiParser.Uint8(t_array);
-  },
-
-  Uint8: function(FileAsUint8Array) {
-    var file = {
-      data: null,
-      pointer: 0,
-      movePointer: function(_bytes) {
-        this.pointer += _bytes;
-        return this.pointer;
-      },
-
-      readInt: function(_bytes) {
-        _bytes = Math.min(_bytes, this.data.byteLength - this.pointer);
-
-        if (_bytes < 1) return -1;
-        var value = 0;
-
-        if (_bytes > 1) {
-          for (var i = 1; i <= _bytes - 1; i ++) {
-            value += this.data.getUint8(this.pointer) * Math.pow(256, _bytes - i);
-            this.pointer ++;
-          }
-        }
-
-        value += this.data.getUint8(this.pointer);
-        this.pointer ++;
-        return value;
-      },
-
-      readStr: function(_bytes) {
-        var text = "";
-
-        for (var char = 1; char <= _bytes; char ++) text += String.fromCharCode(this.readInt(1));
-        return text;
-      },
-
-      readIntVLV: function() {
-        var value = 0;
-
-        if (this.pointer >= this.data.byteLength) {
-          return -1;
-
-        } else if (this.data.getUint8(this.pointer) < 128) {
-          value = this.readInt(1);
-
-        } else {
-          var FirstBytes = [];
-
-          while (this.data.getUint8(this.pointer) >= 128) {
-            FirstBytes.push(this.readInt(1) - 128);
-          }
-
-          var lastByte = this.readInt(1);
-
-          for (var dt = 1; dt <= FirstBytes.length; dt ++) {
-            value += FirstBytes[FirstBytes.length - dt] * Math.pow(128, dt);
-          }
-
-          value += lastByte;
-        }
-
-        return value;
-      },
-    };
-
-    file.data = new DataView(
-      FileAsUint8Array.buffer,
-      FileAsUint8Array.byteOffset,
-      FileAsUint8Array.byteLength
-    );
-
-    if (file.readInt(4) != 0x4d546864) {
-      return false;
     }
 
-    file.readInt(4);
-
-    var MIDI = {};
-    MIDI.formatType = file.readInt(2);
-    MIDI.trackNum = file.readInt(2);
-    MIDI.tracks = [];
-
-    var timeUnitByte1 = file.readInt(1);
-    var timeUnitByte2 = file.readInt(1);
-    
-    if (timeUnitByte1 >= 128) {
-      MIDI.timeUnit = [];
-      MIDI.timeUnit[0] = timeUnitByte1 - 128;
-      MIDI.timeUnit[1] = timeUnitByte2;
-    
-    } else {
-      MIDI.timeUnit = timeUnitByte1 * 256 + timeUnitByte2;
-    }
-
-    for (var t = 1; t <= MIDI.trackNum; t ++) {
-      MIDI.tracks[t - 1] = { events: [] };
-      var headerValidation = file.readInt(4);
-
-      if (headerValidation == -1) break;
-      if (headerValidation != 0x4d54726b) return false;
-      
-      file.readInt(4);
-      var e = 0;
-      var endOfTrack = false;
-
-      var statusByte;
-      var laststatusByte;
-
-      while (!endOfTrack) {
-        e ++;
-        MIDI.tracks[t - 1].events[e - 1] = {};
-        MIDI.tracks[t - 1].events[e - 1].deltaTime = file.readIntVLV();
-        statusByte = file.readInt(1);
-
-        if (statusByte == -1) break;
-        else if (statusByte >= 128) laststatusByte = statusByte;
-        else {
-          statusByte = laststatusByte;
-          file.movePointer(-1);
-        }
-
-        if (statusByte == 0xff) {
-          MIDI.tracks[t - 1].events[e - 1].type = 0xff;
-          MIDI.tracks[t - 1].events[e - 1].metaType = file.readInt(1);
-          
-          var metaEventLength = file.readIntVLV();
-          
-          switch (MIDI.tracks[t - 1].events[e - 1].metaType) {
-            case 0x2f:
-            case -1:
-              endOfTrack = true;
-              break;
-            
-            case 0x01:
-            case 0x02:
-            case 0x03:
-            case 0x04:
-            case 0x05:
-            case 0x07:
-            case 0x06:
-              MIDI.tracks[t - 1].events[e - 1].data = file.readStr(metaEventLength);
-              break;
-
-            case 0x21:
-            case 0x59:
-            case 0x51:
-              MIDI.tracks[t - 1].events[e - 1].data = file.readInt(metaEventLength);
-              break;
-
-            case 0x54:
-              MIDI.tracks[t - 1].events[e - 1].data = [];
-              MIDI.tracks[t - 1].events[e - 1].data[0] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[1] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[2] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[3] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[4] = file.readInt(1);
-              break;
-
-            case 0x58:
-              MIDI.tracks[t - 1].events[e - 1].data = [];
-              MIDI.tracks[t - 1].events[e - 1].data[0] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[1] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[2] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[3] = file.readInt(1);
-              break;
-
-            default:
-              if (this.customInterpreter != null) {
-                MIDI.tracks[t - 1].events[e - 1].data = this.customInterpreter(
-                  MIDI.tracks[t - 1].events[e - 1].metaType, file, metaEventLength);
-              }
-
-              if (this.customInterpreter == null || !MIDI.tracks[t - 1].events[e - 1].data) {
-                file.readInt(metaEventLength);
-                MIDI.tracks[t - 1].events[e - 1].data = file.readInt(metaEventLength);
-              }
-          }
-
-        } else {
-          statusByte = statusByte.toString(16).split("");
-
-          if (!statusByte[1]) statusByte.unshift("0");
-          MIDI.tracks[t - 1].events[e - 1].type = parseInt(statusByte[0], 16);
-          MIDI.tracks[t - 1].events[e - 1].channel = parseInt(statusByte[1], 16);
-
-          switch (MIDI.tracks[t - 1].events[e - 1].type) {
-            case 0xf: 
-              if (this.customInterpreter != null) {
-                MIDI.tracks[t - 1].events[e - 1].data = this.customInterpreter(
-                  MIDI.tracks[t - 1].events[e - 1].type, file, false);
-              }
-
-              if (this.customInterpreter == null || !MIDI.tracks[t - 1].events[e - 1].data) {
-                var eventLength = file.readIntVLV();
-                MIDI.tracks[t - 1].events[e - 1].data = file.readInt(eventLength);
-              }
-              break;
-            
-            case 0xa:
-            case 0xb:
-            case 0xe:
-            case 0x8:
-            case 0x9:
-              MIDI.tracks[t - 1].events[e - 1].data = [];
-              MIDI.tracks[t - 1].events[e - 1].data[0] = file.readInt(1);
-              MIDI.tracks[t - 1].events[e - 1].data[1] = file.readInt(1);
-              break;
-
-            case 0xc:
-            case 0xd:
-              MIDI.tracks[t - 1].events[e - 1].data = file.readInt(1);
-              break;
-
-            case -1:
-              endOfTrack = true;
-              break;
-
-            default:
-              if (this.customInterpreter != null) {
-                MIDI.tracks[t - 1].events[e - 1].data = this.customInterpreter(
-                  MIDI.tracks[t - 1].events[e - 1].metaType, file, false);
-              }
-
-              if (this.customInterpreter == null || !MIDI.tracks[t - 1].events[e - 1].data) return false;
-          }
-        }
-      }
-    }
-
-    return MIDI;
-  },
-
-  customInterpreter: null,
-};
-
-if (typeof module != "undefined") module.exports = MidiParser;
-else {
-  var _global = (typeof window == "object" && window.self == window && window)
-  || (typeof self == "object" && self.self == self && self)
-  || (typeof global == "object" && global.global == global && global);
-
-  _global.MidiParser = MidiParser;
-}
-
-MidiParser.parse(inputSmf, (midiData) => {
-  if (!midiData) {
-    alert(["SMFが無効かもです。", "Invalid SMF."][languageIndex]);
-    return;
-  }
-
-  if (midiData.formatType != 1) {
-    alert(["フォーマット1しか対応してません。申し訳ない...", "Sorry, we only support Format 1."][languageIndex]);
-    return;
-  }
-
-  var timeUnit = midiData.timeUnit;
-
-  var track = midiData.tracks[selectTrack.selectedIndex]; 
-  var notes = [];
-
-  if (!track) {
-    alert(["トラックがありません。", "There is no such track."][languageIndex]);
-    return;    
-  }
-
-  for (var event of track.events) {
-    var type = event.type;
-    var data = event.data;
-
-    if (type == 255 && event.metaType == 1) {
-      if (data == "MMstart") {
-        notes = [];
-        continue;
-      }
-      
-      if (data == "MMend") break;
-    }
-
-    if (notes.length) notes[notes.length - 1].time += event.deltaTime;
-    if (type == 9 && data[1] > 0) {
-      notes.push({time: 0, key: data[0]});
-      continue;
-    }    
-  }
- 
-  if (!notes.length) {
-    alert(["そのトラックにはなんもありません。", "That track is empty."][languageIndex]);
-    return;
-  }
-
-  notes[notes.length - 1].time = timeUnit;
-  var baseKey = notes[0].key;
-
-  selectTableInput.selectedIndex = languageIndex;
-  inputTimeUnit.value = timeUnit;
-
-  funStopPlay();
-
-  for (var i = 2; i <= 4; i ++) {
-    for (var j = 1; j <= tableWiringLength; j ++) {
-      tableInput.rows[i].cells[j].textContent = "";
-    }
-  }
-
-  notes.forEach((event, i) => {
-    if (i >= tableWiringLength) return;
-
-    tableInput.rows[2].cells[i + 1].textContent = event.time;
-    tableInput.rows[4].cells[i + 1].textContent = event.key - baseKey;
-  });
-
-  funTimeUnit(timeUnit);
-});
-
-var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-for (var i = 27; i >= 0; i --) {
-  var option = document.createElement("option");
-  
-  var octave = 1;
-  if (i >= 12) octave = i >= 24 ? 3 : 2;
-
-  option.text = `${octave}-${keys[i % 12]}`;
-  selectScale.appendChild(option);
-}
-
-selectScale.selectedIndex = 15;
-
-document.querySelectorAll(".tableWirings").forEach(table => {
-  table.style.width = `${tableWiringLength * 4}rem`;
-});
-
-for (var i = 1; i <= tableWiringLength; i ++) {
-  var th0 = document.createElement("th");
-  th0.textContent = i;
-  tableInput.rows[0].appendChild(th0);
-
-  var th1 = document.createElement("th");
-  th1.textContent = i;
-  tableWiring.rows[0].appendChild(th1);
-
-  var th2 = document.createElement("th");
-  th2.textContent = i;
-  tableSort.rows[0].appendChild(th2);
-
-  for (var j = 1; j <= 4; j ++) {
-    var cell = tableInput.rows[j].insertCell();
-    cell.contentEditable = true;
-
-    if (j == 2) cell.addEventListener("input", funNote);
-  }
-
-  tableWiring.rows[1].insertCell().contentEditable = true;
-  tableWiring.rows[2].insertCell().contentEditable = true;
-
-  if (i >= 2) {
-    tableWiring.rows[3].insertCell().contentEditable = true;
-    tableWiring.rows[4].insertCell().contentEditable = true;
-    tableWiring.rows[5].insertCell().contentEditable = true;
-  }
-
-  tableSort.rows[1].insertCell().contentEditable = true;
-  tableSort.rows[2].insertCell();
-  tableSort.rows[3].insertCell();
-  tableSort.rows[4].insertCell();
-
-  var buttonCell = tableSort.rows[5].insertCell();
-
-  var button = document.createElement("button");
-  button.style = "width: 3.4rem; height: 1.5rem;";
-  button.addEventListener("click", funTableButton);
-
-  buttonCell.style.textAlign = "center";
-  buttonCell.style.varticalAlign = "middle";
-  buttonCell.appendChild(button);
-}
-
-document.querySelectorAll(".tableWirings td").forEach(table => {
-  table.addEventListener("blur", event => event.target.scrollLeft = 0);
-});
-
-var arrows = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
-
-tableInput.addEventListener("keydown", event => {
-  if (event.ctrlKey) {
-    var row = event.target.parentNode.rowIndex;
-    var cell = event.target.cellIndex;
-
-    var shifts = [[0, 1], [0, -1], [-1, 0], [1, 0]][arrows.indexOf(event.key)];
-    if (!shifts) return;
-
-    var destination = tableInput.rows[row + shifts[0]].cells[cell + shifts[1]];
-    destination.focus();
-  }
-});
-
-tableWiring.addEventListener("keydown", event => {
-  if (!event.ctrlKey) return;
-
-  var row = event.target.parentNode.rowIndex;
-  var cell = event.target.cellIndex;
-  
-  var shifts = [[0, 1], [0, -1], [-(selectLoading.selectedIndex == 3 ? 1 : (row == 5 ? 2 : 1)), 0], [(selectLoading.selectedIndex == 3 ? 1 : (row == 3 ? 2 : 1)), 0]][arrows.indexOf(event.key)];
-  if (!shifts) return;
-  
-  var destination = tableWiring.rows[row + shifts[0]].cells[cell + shifts[1]];
-  destination.focus();
-});
-
-tableSort.addEventListener("keydown", event => {
-  if (!event.ctrlKey) return;
-  
-  var row = event.target.parentNode.rowIndex;
-  var cell = event.target.cellIndex;
-  
-  var shift = [1, -1][arrows.indexOf(event.key)];
-  if (!shift) return;
-  
-  var destination = tableSort.rows[row].cells[cell + shift];
-  destination.focus();
-});
-
-function funTableBeat(tableBeatValue) {
-  var bpm = 3600 / tableBeatValue;
-  spanTableBpm.textContent = isFinite(bpm) ? bpm.toFixed(3) : "";
-
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    funNote(i);
-  }
-}
-
-function funTableInput() {
-  [2, 3].forEach(i => {
-    for (var j = 1; j <= tableWiringLength; j ++) {
-      tableInput.rows[i].cells[j].textContent = "";
+    for (let c = 1; c <= tableLength; c ++) {
+      const cell = document.createElement(elm);
+      fun(cell, c);
+
+      row.append(cell);
     }
   });
+});
 
-  divTimeUnit.style.display = ["block", "none"][selectTableInput.selectedIndex];
-}
+[3, 4, 5].forEach(r => {
+  const cell = tables[1].rows[r].cells[1];
+  cell.contentEditable = false;
+  cell.textContent = 0;
+});
 
-function funTimeUnit() {
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    funNote(i);
-  }
-}
+const inputSmf = getElm("#inputSmf");
+getElm("#buttonLoadSmf").addEventListener("click", () => {
+  const files = inputSmf.files;
+  if (!files.length) return;
 
-function funNote(cellIndex) {
-  var beat = inputTableBeat.value;
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(files[0]);
 
-  if (selectTableInput.selectedIndex - languageIndex == 0) {
-    var cellIndex = isNum(cellIndex) ? cellIndex : this.cellIndex;
-    var timeUnit = parseInt(inputTimeUnit.value);
-    var targetTime = tableInput.rows[2].cells[cellIndex].textContent;
-    
-    if (!timeUnit || !beat || targetTime == "") {
-      tableInput.rows[3].cells[cellIndex].textContent = "";
+  reader.onload = () => {
+    const midi = MidiParser.parse(new Uint8Array(reader.result));
+
+    if (!midi) {
+      alert("無効なMIDIファイルです。");
       return;
     }
 
-    tableInput.rows[3].cells[cellIndex].textContent = beat * (targetTime / timeUnit);
-
-  } else {
-    var target = isNum(cellIndex) ? tableInput.rows[2].cells[cellIndex] : this;
-    var parts = target.textContent.match(/[\+\-]*\d+(?:\.\d+)?\:*/g);
-  
-    if (target.textContent == "" || !beat || !parts) {
-      tableInput.rows[3].cells[target.cellIndex].textContent = "";
+    if (midi.format != 1) {
+      alert("フォーマット1しか対応してません。申し訳ない...");
       return;
     }
-  
-    var calNotes = 0;
-        
+
+    tickUnit = midi.tickUnit;
+    inputTickUnit.value = tickUnit;
+
+    const track = midi.tracks[selectTrack.selectedIndex];
+
+    if (!track) {
+      alert("トラックがありません。");
+      return;
+    }
+
+    const events = track.events;
+    const eventsLength = events.length;
+    let notes = [];
+    let lastNote = {};
+
+    for (let i = 0; i < eventsLength; i ++) {
+      const event = events[i];
+      const { type, data } = event;
+
+      if (type == 255 && event.meta == 1) {
+        const text = data.toLowerCase();
+        if (text == "mmstart") {
+          notes = [];
+          continue;
+        }
+
+        if (text == "mmend") break;
+      }
+
+      if (notes.length) notes[notes.length - 1].tick += event.dt;
+      if (type == 9 && data[1] > 0) {
+        const key = data[0];
+
+        notes.push({ tick: 0, key });
+        lastNote = { index: i, key, tick: event.tick };
+      }
+    }
+
+    const notesLength = notes.length;
+    if (!notesLength) {
+      alert("そのトラックにはなんもありません。");
+      return;
+    }
+
+    for (let i = lastNote.index; i < eventsLength; i ++) {
+      const event = events[i];
+
+      if (event.type == 8 && event.data[0] == lastNote.key) {
+        notes[notesLength - 1].tick = event.tick - lastNote.tick;
+        break;
+      }
+    }
+
+    const baseKey = notes[0].key;
+
+    selectNoteInput.selectedIndex = 0;
+    changeNoteInput(false);
+
+    stopPlay();
+    clearRows(0, [2, 3, 4]);
+
+    const row2Cells = tables[0].rows[2].cells;
+    const row4Cells = tables[0].rows[4].cells;
+
+    const minLength = Math.min(tableLength, notesLength);
+    for (let c = 1; c <= minLength; c ++) {
+      row2Cells[c].textContent = notes[c - 1].tick;
+      row4Cells[c].textContent = notes[c - 1].key - baseKey;
+    }
+
+    calcAllNotes();
+  }
+});
+
+const inputBeatValue = getElm("#inputBeatValue");
+const spanBpm = getElm("#spanBpm");
+
+let beatValue;
+inputBeatValue.addEventListener("input", () => {
+  beatValue = inputBeatValue.value;
+
+  spanBpm.textContent = (beatValue == 0) ? "" : (3600 / beatValue).toFixed(3);
+  calcAllNotes();
+});
+
+function calcNote(cellIndex) {
+  const cell = tables[0].rows[2].cells[cellIndex];
+
+  const text = cell.textContent;
+  if (text == "") {
+    clearCell(0, 3, cellIndex);
+    return;
+  }
+
+  if (!isNum(beatValue)) {
+    clearCell(0, 3, cellIndex);
+    return;
+  }
+
+  let targetText;
+
+  if (selectNoteInput.selectedIndex == 0) {
+    if (!isNum(text, tickUnit)) {
+      clearCell(0, 3, cellIndex);
+      return;
+    }
+
+    targetText = beatValue * text / tickUnit;
+
+  } else {
+    const parts = text.match(/[\+\-]?\d+\.*/g);
+
+    if (!parts) {
+      clearCell(0, 3, cellIndex);
+      return;
+    }
+
+    let sumNoteValue = 0;
+
     parts.forEach(part => {
-      var note = beat * 4 / part.replace(/[\+\-\:]/g, "");
-      note = 2 * note - note * (2 ** -(part.match(/\:/g) || []).length);
-  
-      calNotes += (part.startsWith("-") ? -1 : 1) * note;
+      let noteValue = beatValue * 4 / part.replace(/[\+\-\.]/g, "");
+      noteValue *= 2 - (2 ** -(part.match(/\./g) || []).length);
+
+      sumNoteValue += (part.startsWith("-") ? -1 : 1) * noteValue;
     });
-  
-    tableInput.rows[3].cells[target.cellIndex].textContent = isFinite(calNotes) ? calNotes : "";
-  }
-}
 
-var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-var instruments = ["sine", "triangle", "square", "sawtooth"];
-var soundData = [];
-
-for (var i = 0; i < selectInstrument.options.length / 2 - 4; i ++) {
-  (function(i) {
-    var xml = new XMLHttpRequest();
-    xml.responseType = "arraybuffer";
-    xml.open("GET", `sounds/sound${i}.mp3`, true);
-  
-    xml.onload = function() {
-      audioContext.decodeAudioData(xml.response, (data) => {
-        soundData[i] = data;
-      });
-    };
-  
-    xml.send();
-  })(i);
-}
-
-function funPlaySound(column) {
-  if (selectInstrument.selectedIndex <= 7) {
-    var oscillator = audioContext.createOscillator();
-    var gainNode = audioContext.createGain();
-
-    oscillator.type = instruments[(selectInstrument.selectedIndex - languageIndex) / 2];
-    oscillator.frequency.setValueAtTime(440 * (2 ** ((18 - selectScale.selectedIndex + parseFloat(tableInput.rows[4].cells[column].textContent)) / 12)), audioContext.currentTime);
-    oscillator.connect(gainNode);      
-
-    gainNode.gain.value = 0.2;     
-    gainNode.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.1);
-
-  } else {
-    var bufferSource = audioContext.createBufferSource();
-    var gainNode = audioContext.createGain();
-
-    bufferSource.buffer = soundData[(selectInstrument.selectedIndex - languageIndex) / 2 - 4];
-    bufferSource.playbackRate.value = 2 ** ((18 - selectScale.selectedIndex + parseInt(tableInput.rows[4].cells[column].textContent)) / 12);
-    bufferSource.connect(gainNode);
-
-    gainNode.gain.value = 0.45;
-    gainNode.connect(audioContext.destination);
-
-    bufferSource.start(0);
-    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6);
-  }
-}
-
-var stopFlag = false;
-
-function funResetPlay() {
-  for (var j = 1; j <= tableWiringLength; j ++) {
-    tableInput.rows[0].cells[j].style.backgroundColor = "#ffffe0";
-  }
-}
-
-var timeoutId;
-
-function funPlay() {
-  stopFlag = false;
-  
-  var loop = () => {
-    if (stopFlag) return;
-
-    if (i > tableWiringLength) {
-      funResetPlay();
+    if (!isNum(sumNoteValue)) {
+      clearCell(0, 3, cellIndex);
       return;
     }
 
-    var delay = tableInput.rows[3].cells[i].textContent;
-    var height = tableInput.rows[4].cells[i].textContent;
+    targetText = sumNoteValue;
+  }
+
+  tables[0].rows[3].cells[cellIndex].textContent = targetText;
+}
+
+function calcAllNotes() {
+  for (var c = 1; c <= tableLength; c ++) calcNote(c);
+}
+
+const selectInstrument = getElm("#selectInstrument");
+
+let ac;
+const instruments = ["sine", "triangle", "square", "sawtooth"];
+
+let isPlaying = false;
+let timeoutId;
+
+function play() {
+  isPlaying = true;
+
+  if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+
+  const rows = tables[0].rows;
+  const cells = rows[0].cells;
+
+  const gainNode = new GainNode(ac, { gain: 0.1 });
+
+  function loop() {
+    if (!isPlaying) return;
+
+    if (c > tableLength) {
+      resetPlayLighting();
+      return;
+    }
+
+    const delay = rows[3].cells[c].textContent;
+    const height = rows[4].cells[c].textContent;
 
     if (!isNum(delay, height)) {
-      funResetPlay();
+      resetPlayLighting();
       return;
     }
 
-    if (isNum(height)) funPlaySound(i);
-    if (i >= 2) tableInput.rows[0].cells[i - 1].style.backgroundColor = "#ffffe0";
-    tableInput.rows[0].cells[i].style.backgroundColor = "#98fb98";
-    i ++;
+    playSound(height, gainNode);
+
+    if (c >= 2) cells[c - 1].classList.remove("playing");
+    cells[c].classList.add("playing");
+    c ++;
 
     timeoutId = setTimeout(loop, delay * 50 / 3);
   }
 
-  var i = 1;
+  let c = 1;
   loop();
 }
 
-function funStopPlay() {
-  stopFlag = true;
+function stopPlay() {
+  isPlaying = false;
 
-  funResetPlay();
+  resetPlayLighting();
   clearTimeout(timeoutId);
 }
 
-function funLoading(selectedIndex) {
-  divLoadingSpeedCycle.style.display = "none";
-
-  switch ((selectedIndex - languageIndex) / 2) {
-    case 0:
-    case 1:
-      divLoadingSpeedAverage.style.display = "none";
-      selectLoadingSpeedInput.style.display = "none";
-
-      tableWiring.rows[4].style.display = "none";
-      break;
-
-    case 2:
-      divLoadingSpeedAverage.style.display = "block";
-      selectLoadingSpeedInput.style.display = "none";
-
-      tableWiring.rows[4].style.display = "none";
-      break;
-    
-    case 3:
-      divLoadingSpeedAverage.style.display = "block";
-      selectLoadingSpeedInput.style.display = "inline-block";
-      selectLoadingSpeedInput.selectedIndex = 2 + languageIndex;
-
-      tableWiring.rows[4].style.display = "table-row";
-  }
+function resetPlayLighting() {
+  const cells = tables[0].rows[0].cells;
+  for (let c = 1; c <= tableLength; c ++) cells[c].classList.remove("playing");
 }
 
-function funLoadingSpeedInput(selectedIndex) {
-  switch ((selectedIndex - languageIndex) / 2) {
-    case 0:
-      divLoadingSpeedAverage.style.display = "none";
-      divLoadingSpeedCycle.style.display = "none";
-      break;
+const rootRatio = 2 ** (1 / 12);
 
-    case 1: 
-      divLoadingSpeedCycle.style.display = "none";
-      divLoadingSpeedAverage.style.display = "block";
-      break;
+function playSound(height, gainNode) {
+  const oscNode = new OscillatorNode(ac, {
+    type: instruments[selectInstrument.selectedIndex],
+    frequency: 440 * rootRatio ** (18 - selectBaseKey.selectedIndex + parseInt(height))
+  });
 
-    case 2:
-      divLoadingSpeedAverage.style.display = "none";
-      divLoadingSpeedCycle.style.display = "block";
-  }
+  oscNode.connect(gainNode).connect(ac.destination);
+
+  oscNode.start();
+  oscNode.stop(ac.currentTime + 0.1);
 }
 
-function funLanding(selectedIndex) {
-  var firstCorrection = "";
-  var correctionPattern = [];
+getElm("#buttonPlay").addEventListener("click", play);
+getElm("#buttonStopPlay").addEventListener("click", stopPlay);
 
-  switch (selectedIndex) {
-    case 2:
-      firstCorrection = 8;
-      correctionPattern = [11, 11, 10];
-      break;
-    
-    case 3:
-      firstCorrection = 11;
-      correctionPattern = [11, 10, 11];
-      break;
+getElm("#buttonCalcTable0").addEventListener("click", () => {
+  let totalDelay = 0;
 
-    case 4:
-      firstCorrection = 11;
-      correctionPattern = [10, 11, 11];
-      break;
+  const table0Rows = tables[0].rows;
+  const table1Rows = tables[1].rows;
+  const baseHeight = table0Rows[4].cells[1].textContent;
 
-    case 5:
-      firstCorrection = 10;
-      correctionPattern = [11, 11, 10];
+  if (!isNum(baseHeight)) return;
+
+  for (let c = 1; c <= tableLength; c ++) {
+    const delay = table0Rows[3].cells[c].textContent;
+
+    const isDelayNum = isNum(delay);
+    table1Rows[2].cells[c].textContent = isDelayNum ? totalDelay : "";
+    if (isDelayNum) totalDelay += parseFloat(delay);
+
+    const height = table0Rows[4].cells[c].textContent;
+    table1Rows[5].cells[c].textContent = isNum(height) ? height - baseHeight : ""
   }
+});
 
-  for (var i = 2; i <= tableWiringLength; i ++) {
-    if (i == 2) {
-      tableWiring.rows[3].cells[2].textContent = firstCorrection;
+selectLanding.addEventListener("change", () => {
+  const index = selectLanding.selectedIndex;
 
-    } else {
-      tableWiring.rows[3].cells[i].textContent = correctionPattern[i % 3];
+  if (index == 0) clearRow(1, 3, 2);
+  else {
+    const wingType = dataAssets[typeKeys[0]];
+    const landings = wingType[typeKeys[1]].landings;
+    const landing = landings[index - 1];
+
+    const cells = tables[1].rows[3].cells;
+    cells[2].textContent = landing.second;
+
+    const offset = parseInt(landing.name[0]);
+    const blockDelays = wingType.blockDelays;
+
+    for (let c = 3; c <= tableLength; c ++) {
+      cells[c].textContent = blockDelays[(offset + c) % 3];
     }
   }
-}
+});
 
-function funLoadingSpeedAverage(loadingSpeed) {
-  if (selectLoading.selectedIndex - languageIndex == 6) {
-    if (loadingSpeed != "") {
-      for (var i = 2; i <= tableWiringLength; i ++) {
-        tableWiring.rows[4].cells[i].textContent = parseFloat(loadingSpeed);
-      }
+inputScrollSlownessAve.addEventListener("input", () => {
+  if (selectLoading.selectedIndex != 3) return;
 
-    } else {
-      for (var i = 2; i <= tableWiringLength; i ++) {
-        tableWiring.rows[4].cells[i].textContent = "";
-      }
+  const delay = inputScrollSlownessAve.value;
+  const cells = tables[1].rows[4].cells;
+
+  for (var c = 2; c <= tableLength; c ++) cells[c].textContent = delay;
+});
+
+inputScrollSlownessCycle.addEventListener("input", () => {
+  const text = inputScrollSlownessCycle.value;
+  const delays = text.split(",").map(delay => parseFloat(delay));
+
+  const cells = tables[1].rows[4].cells;
+
+  if (isNum(...delays)) {
+    const length = delays.length;
+    for (let c = 2; c <= tableLength; c ++) cells[c].textContent = delays[(c - 2) % length];
+
+  } else clearRow(1, 4, 2);
+});
+
+function isWirable(delay, height, column) {
+  let near = 0, far = 0;
+
+  delay = Math.round(delay);
+
+  const asset = dataAssets[typeKeys[0]][typeKeys[1]];
+  const {
+    relativeRailDelays, landings, accelerationsList, upOptions, gaps
+  } = asset;
+
+  const isWingWater = typeKeys[0] == "wing" && typeKeys[1] == "water";
+  let accelerations;
+
+  if (!isWingWater) {
+    let accelerationType = "general";
+
+    const landingIndex = selectLanding.selectedIndex;
+    if (landingIndex != 0) {
+      const landingType = landings[landingIndex - 1].name;
+
+      if (column == 0) {
+        accelerationType = {
+          "1v": "vertical",
+          "1d": "diagonal",
+          "2a": "second"
+        }[landingType] || accelerationType;
+
+      } else if (
+        typeKeys[0] == "wing" && typeKeys[1] == "ground"
+        && (column == 1 && ["1v", "1d", "4a"].includes(landingType))
+      ) accelerationType = "second";
     }
+
+    accelerations = accelerationsList[accelerationType];
   }
-}
 
-function funLoadingSpeedCycle(loadingSpeeds) {
-  if (loadingSpeeds == "") {
-    for (var i = 2; i <= tableWiringLength; i ++) {
-      tableWiring.rows[4].cells[i].textContent = "";
-    }
-  
-    return;
+  const accelerationsLen = accelerations?.length;
+  function getAcceleration(distance) {
+    if (isWingWater) return 0;
+
+    return (distance <= accelerationsLen) ? accelerations[distance - 1] : 0;
   }
-  
-  var loadingSpeeds = loadingSpeeds.split(",").map(speed => parseFloat(speed));
-  
-  for (var i = 2; i <= tableWiringLength; i ++) {
-    tableWiring.rows[4].cells[i].textContent = (loadingSpeeds[(i - 2) % loadingSpeeds.length]);
-  }
-}
 
-function funAllocation() {
-  var totalDelay = 0;
+  const upOptionsLen = upOptions.length;
+  const gapsLen = gaps.length;
 
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    tableWiring.rows[2].cells[i].textContent = "";
-    tableWiring.rows[5].cells[i].textContent = "";
+  function addDownOption(_delay, _distance, count) {
+    for (let g = 0; g < gapsLen; g ++) {
+      const gap = gaps[g];
 
-    var delay = tableInput.rows[3].cells[i].textContent;
-    var height = tableInput.rows[4].cells[i].textContent;
+      let dDelay = 0;
+      let d = 1;
+      for (; ; d ++) {
+        const distance = _distance - (gap.down + d * 2);
+        if (distance <= 0) {
+          if (d == 1) return;
+          else break;
+        }
 
-    if (isNum(delay, height)) {
-      tableWiring.rows[2].cells[i].textContent = totalDelay;
-      tableWiring.rows[5].cells[i].textContent = parseInt(height);
+        dDelay += relativeRailDelays[(gap.offset + d - 1) % 3];
 
-      totalDelay += parseFloat(delay);
-    }
-  }
-}
+        const optionDelay = _delay + gap.delay + dDelay;
+        const totalDelay = optionDelay - getAcceleration(distance);
 
-function isWirable(target, height) {
-  var near = 0, far = 0;
-  target = Math.round(target);
+        const difference = totalDelay - delay;
+        const error = Math.abs(difference);
 
-  for (var i = 0; i < startingList.length; i ++) {
-    var starting = startingList[i];
-    if (starting.delay > target + 13 || starting.down >= height) continue;
-
-    for (var j = 0; j < gapList.length; j ++) {
-      var gap0 = gapList[j];
-      if (starting.delay + gap0.delay > target + 13 || starting.down + gap0.down >= height) continue;
-
-      for (var k = 0; k < gapList.length; k ++) {
-        var gap1 = gapList[k];
-        if (starting.delay + gap0.delay + gap1.delay > target + 13 || starting.down + gap0.down + gap1.down >= height) continue;
-
-        for (var l = 0; l < gapList.length; l ++) {
-          var gap2 = gapList[l];
-          var distance = height - (starting.down + gap0.down + gap1.down + gap2.down);
-
-          if (distance <= 0) continue;
-
-          var totalDelay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (distance <= accelerations.length ? accelerations[distance - 1] : 0);
-          
-          switch (Math.abs(target - totalDelay)) {
-            case 0:
-              return 0;
+        if (error <= 2) {
+          switch (error) {
+            case 0: return true;
 
             case 1:
               near = 1;
               break;
 
-            case 2:
-              far = 1;
+            case 2: far = 1;
           }
+          break;
+
+        } else if ((isWingWater ? -1 : 1) * difference > 0) break;
+
+        if (count > 1) {
+          const isMatch = addDownOption(optionDelay, distance, count - 1);
+          if (isMatch) return true;
         }
       }
     }
+  }
+
+  for (let u = 0; u < upOptionsLen; u ++) {
+    const upOption = upOptions[u];
+
+    if (isWingWater && upOption.delay < delay) continue;
+
+    let dDelay = 0;
+    let d = 0;
+    for (; ; d ++) {
+      const distance = height - d * 2;
+      if (distance <= 0) break;
+
+      if (d != 0) dDelay += relativeRailDelays[(upOption.offset + d - 1) % 3];
+
+      const startingDelay = upOption.delay + dDelay;
+      const totalDelay = startingDelay - getAcceleration(distance);
+
+      const difference = totalDelay - delay;
+      const error = Math.abs(difference);
+
+      if (error <= 2) {
+        switch (error) {
+          case 0: return 0;
+
+          case 1:
+            near = 1;
+            break;
+
+          case 2: far = 1;
+        }
+        break;
+
+      } else if ((isWingWater ? -1 : 1) * difference > 0) break;
+
+      const isMatch = addDownOption(startingDelay, distance, 3);
+      if (isMatch) return 0;
+    }
+
+    if (d == 0) break;
   }
 
   if (near == 1) return 1;
@@ -1030,1048 +687,518 @@ function isWirable(target, height) {
   return 3;
 }
 
-var sortableRange = 4;
+const inputBaseDelay = getElm("#inputBaseDelay");
+const inputBaseHeight = getElm("#inputBaseHeight");
+const spanEvals = getElm("#spanEvals");
 
-function funWiringSort() {
-  var totalXDelay = 0;
-  var wirings = [];
+function sortWirings() {
+  let totalXDelay = 0;
+  const wirings = [];
 
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    var delay = tableWiring.rows[2].cells[i].textContent;
-    var xDelay = tableWiring.rows[3].cells[i].textContent;
+  const table1Rows = tables[1].rows;
 
-    var xScrollDelay = selectLoading.selectedIndex - languageIndex == 6 ? tableWiring.rows[4].cells[i].textContent : 0;
-    var yScrollDelay = 0;
-    
-    switch ((selectLoading.selectedIndex - languageIndex) / 2) {
+  for (let c = 1; c <= tableLength; c ++) {
+    const delay = table1Rows[2].cells[c].textContent;
+    const xDelay = table1Rows[3].cells[c].textContent;
+
+    const xScrollDelay = (selectLoading.selectedIndex == 3)
+      ? table1Rows[4].cells[c].textContent : 0;
+    let yScrollDelay = 0;
+
+    const isWater = typeKeys[1] == "water";
+
+    switch (selectLoading.selectedIndex) {
       case 1:
-        yScrollDelay = -4;
+        yScrollDelay = -(isWater ? 32/3 : 4);
         break;
-      
+
       case 2:
-        yScrollDelay = parseFloat(inputLoadingSpeedAverage.value);
+        yScrollDelay = paeseFloat(inputScrollSlownessAve.value);
     }
 
-    var height = parseInt(tableWiring.rows[5].cells[i].textContent);
+    const height = table1Rows[5].cells[c].textContent;
 
-    var baseDelay = inputBaseDelay.value;
-    var baseHeight = parseInt(inputBaseHeight.value) - parseInt(tableWiring.rows[5].cells[1].textContent);
+    const baseDelay = inputBaseDelay.value;
+    const baseHeight = inputBaseHeight.value;
 
     if (!isNum(delay, xDelay, xScrollDelay, height, baseDelay, baseHeight)) break;
 
     totalXDelay += (parseFloat(xDelay) + parseFloat(xScrollDelay));
-    wirings.push({index: i, delay: parseFloat(baseDelay) + parseFloat(delay) - parseInt(height) * (yScrollDelay + 4), xDelay: totalXDelay, height: baseHeight + height});
+    wirings.push({
+      index: c,
+      delay:
+        parseFloat(baseDelay) + parseFloat(delay)
+        - parseInt(height) * (yScrollDelay + (isWater ? 16 : 4)),
+      xDelay: totalXDelay,
+      height: parseInt(baseHeight) + parseInt(height)
+    });
   }
 
-  if (!wirings.length) {
-    funRemoveOverview();
+  const wiringsLen = wirings.length
+  if (!wiringsLen) {
+    if (isOverview) changeOverview(false);
     return;
   }
 
-  var evals = [];
+  let evals = [];
 
-  for (var i = 0; i < wirings.length; i ++) {
-    evals[i] = evals[i] ?? isWirable(wirings[i].delay - wirings[i].xDelay, wirings[i].height);        
+  for (let i = 0; i < wiringsLen; i ++) {
+    const wiring = wirings[i];
+
+    evals[i] ??= isWirable(wiring.delay - wiring.xDelay, wiring.height, i);
     if (evals[i] == 0) continue;
 
-    var backI = wirings.length - 1 - i;
-    var shifts = [];
+    const backI = wiringsLen - 1 - i;
+    const shifts = [];
 
-    for (var num = 1; num <= sortableRange; num ++) {
+    for (let num = 1; num <= sortableRange; num ++) {
       if (i >= num) shifts.push(-num);
       if (backI >= num) shifts.push(num);
-    };
+    }
 
-    var movedEvals = [];
-    var evalSums = [];
+    const movedEvals = [];
+    const evalSums = [];
 
     shifts.forEach(shift => {
-      if (shift > 0) evals[i + shift] = evals[i + shift] ?? isWirable(wirings[i + shift].delay - wirings[i + shift].xDelay, wirings[i + shift].height);
-    
-      var current = isWirable(wirings[i].delay - wirings[i + shift].xDelay, wirings[i].height);
-      var destination = isWirable(wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].height);
-    
-      movedEvals.push({shift, current, destination});
-      evalSums.push(current + destination);
+      if (shift > 0) {
+        const shiftWiring = wirings[i + shift];
+        evals[i + shift] ??= isWirable(
+          shiftWiring.delay - shiftWiring.xDelay, shiftWiring.height, i + shift
+        );
+      }
+
+      const origin = isWirable(
+        wirings[i].delay - wirings[i + shift].xDelay, wirings[i].height, i + shift
+      );
+      const destination = isWirable(
+        wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].height, i
+      );
+
+      movedEvals.push({ shift, origin, destination });
+      evalSums.push(origin + destination);
     });
 
-    var movedEval = movedEvals[evalSums.indexOf(Math.min(...evalSums))];
-    var shift = movedEval.shift;
-    var current = movedEval.current;
-    var destination = movedEval.destination;
+    const movedEval = movedEvals[evalSums.indexOf(Math.min(...evalSums))];
+    const { shift, origin, destination } = movedEval;
 
-    if (current + destination < evals[i] + evals[i + shift]) {
+    if (origin + destination < evals[i] + evals[i + shift]) {
       [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
       [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
-      
+
       evals[i] = destination;
-      evals[i + shift] = current;
+      evals[i + shift] = origin;
     }
   }
 
-  for (var i = 2; i <= 4; i ++) {
-    for (var j = 1; j <= tableWiringLength; j ++) tableSort.rows[i].cells[j].textContent = "";
-  }
+  clearRows(2, [2, 3, 4], 1);
+  getElm(".wiringDisplay")?.classList.remove("wiringDisplay");
 
-  for (var i = 1; i <= wirings.length; i ++) {
-    var th = tableSort.rows[0].cells[i];
-    var movedInd = wirings[i - 1].index;
+  const table2Rows = tables[2].rows;
+  for (let i = 0; i < wiringsLen; i ++) {
+    const th = table2Rows[0].cells[i + 1];
+    const movedInd = wirings[i].index;
+
     th.textContent = movedInd;
-    th.style.backgroundColor = i == movedInd ? "#ffffe0" : "#ffedc4";
+    if (i + 1 == movedInd) th.classList.remove("movedInd");
+    else th.classList.add("movedInd");
 
-    tableSort.rows[2].cells[i].textContent = Math.round(wirings[i - 1].delay - wirings[i - 1].xDelay);
-    tableSort.rows[3].cells[i].textContent = wirings[i - 1].height;
-    tableSort.rows[4].cells[i].textContent = ["◎", "○", "△", "×"][evals[i - 1]];
+    table2Rows[2].cells[i + 1].textContent = Math.round(wirings[i].delay - wirings[i].xDelay);
+    table2Rows[3].cells[i + 1].textContent = wirings[i].height;
+    table2Rows[4].cells[i + 1].textContent = ["◎", "○", "△", "×"][evals[i]];
   }
 
-  var evalsCount = [0, 0, 0, 0];
-  evals.forEach(e => evalsCount[e] ++);
-  spanEvaluations.textContent = `◎: ${evalsCount[0]}, ○: ${evalsCount[1]}, △: ${evalsCount[2]}, ×: ${evalsCount[3]}`;
-
-  if (canvasOverview.height > 0) {
-    funOverview();
-  }
-}
-
-var selectedButton = 0;
-
-function funTableButton() {
-  if (selectedButton != 0) tableSort.rows[5].cells[selectedButton].firstChild.style.backgroundColor = "";
-
-  var button = this;
-  var cellIndex = button.parentNode.cellIndex;
-  selectedButton = cellIndex;
-  
-  button.style.backgroundColor = "#a8fb98";
-
-  var target = tableSort.rows[2].cells[cellIndex].textContent;
-  var height = tableSort.rows[3].cells[cellIndex].textContent;
-
-  if (isNum(target, height)) {
-    inputTarget.value = target;
-    inputHeight.value = height;
-    
-    funTarget();
-  }
-}
-
-document.addEventListener("keydown", e => {
-  if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
-    if (selectedButton == 0) return;
-    
-    var shift = e.key == "ArrowLeft" ? -1 : 1;
-    tableSort.rows[5].cells[selectedButton + shift].firstChild.click();
-  }
-});
-
-function funOverview() {
-  var heights = [];
-
-  for (var i = 1; i <= tableWiringLength; i ++) {
-    var height = tableSort.rows[3].cells[i].textContent;
-
-    if (!isNum(height)) break;
-    heights.push(height);
-  }
-
-  if (!heights.length) return;
-  divOverview.style.display = "block";
-
-  var maxHeight = Math.max(...heights);
-  var tileX = heights.length;
-  var tileY = maxHeight - Math.min(...heights) + 3;
-
-  canvasOverview.width = 16 * tileX;
-  canvasOverview.height = 16 * tileY;
-
-  var distances = heights.map(height => maxHeight - height);
-  var context = canvasOverview.getContext("2d");
-
-  var space = new Image();
-  space.src = `images/railParts/space.png`;
-
-  space.onload = () => {
-    context.globalAlpha = 0.6;
-
-    for (var x = 0; x < tileX; x ++) {
-      for (var y = 0; y < tileY; y ++) {
-        context.drawImage(space, 16 * x, 16 * y, 16, 16);
-      }
-    }
-
-    context.globalAlpha = 1;
-  }
-
-  var parts = [];
-
-  for (var i = 0; i <= 2; i ++) {
-    parts[i] = new Image();
-    parts[i].src = `images/railParts/${["openU", "note", "openD"][i]}.png`;
-  };
-
-  parts[2].onload = () => {
-    distances.forEach((distance, x) => {
-      for (var i = 0; i <= 2; i ++) {
-        context.drawImage(parts[i], 16 * x, 16 * (distance + i), 16, 16);
-      }
-    });
-
-    context.imageSmoothingEnabled = false;
-  }
-}
-
-function funRemoveOverview() {
-  canvasOverview.height = 0;
-  divOverview.style.display = "none";
-
-  spanOverview.textContent = "";
-}
-
-function funColumnOverviw(event) {
-  var x = event.clientX - event.target.getBoundingClientRect().left;
-
-  if (x < 0) x = 0;
-  if (x > canvasOverview.width) x = canvasOverview.width;
-
-  return parseInt(x / 16) + 1;
-}
-
-canvasOverview.addEventListener("click", event => {
-  var column = funColumnOverviw(event);
-
-  var delay = tableSort.rows[2].cells[column].textContent;
-  var height = tableSort.rows[3].cells[column].textContent;
-  var key = selectScale.options[selectScale.selectedIndex - (height - parseInt(inputBaseHeight.value))].text;
-
-  var title = `
-    ${["列", "Column"][languageIndex]}: ${column}, 
-    ${["音階", "Key"][languageIndex]}: ${key}, 
-    ${["遅延", "Delay"][languageIndex]}: ${delay}, 
-    ${["高さ", "Height"][languageIndex]}: ${height}
+  const evalCounts = [0, 0, 0, 0];
+  evals.forEach(e => evalCounts[e] ++);
+  spanEvals.textContent = `
+    ◎: ${evalCounts[0]}, ○: ${evalCounts[1]}, △: ${evalCounts[2]}, ×: ${evalCounts[3]}
   `;
 
-  spanOverview.textContent = title;
-  tableSort.rows[5].cells[column].firstChild.click();
-});
+  if (isOverview) changeOverview(true);
+}
 
-function funTarget() {
-  resultsSame = [], resultsNear = [], resultsFar = [];
+getElm("#buttonSortWirings").addEventListener("click", sortWirings);
 
-  var target = parseInt(inputTarget.value);
-  var height = parseInt(inputHeight.value);
-  if (!isNum(target, height)) return;
+function setCanvasSize(canvas, width, height) {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+}
 
-  for (var i = 0; i < startingList.length; i ++) {
-    var starting = startingList[i];
-    if (starting.delay > target + 13 || starting.down >= height) continue;
+let isOverview = false;
+const canvasOverview = getElm("#canvasOverview");
+const canvasOverviewSelect = getElm("#canvasOverviewSelect");
 
-    for (var j = 0; j < gapList.length; j ++) {
-      var gap0 = gapList[j];
-      if (starting.delay + gap0.delay > target + 13 || starting.down + gap0.down >= height) continue;
+function changeOverview(isShow) {
+  if (isShow) {
+    const heights = [];
 
-      for (var k = 0; k < gapList.length; k ++) {
-        var gap1 = gapList[k];
-        if (starting.delay + gap0.delay + gap1.delay > target + 13 || starting.down + gap0.down + gap1.down >= height) continue;
+    const cells = tables[2].rows[3].cells;
+    for (let c = 1; c <= tableLength; c ++) {
+      const height = cells[c].textContent;
 
-        for (var l = 0; l < gapList.length; l ++) {
-          var gap2 = gapList[l];
-          var distance = height - (starting.down + gap0.down + gap1.down + gap2.down);
+      if (!isNum(height)) break;
+      heights.push(height);
+    }
 
-          if (distance <= 0) continue;
+    if (!heights.length) return;
 
-          var totalDelay = starting.delay + gap0.delay + gap1.delay + gap2.delay - (distance <= accelerations.length ? accelerations[distance - 1] : 0);
-          var targetResult = {delay: totalDelay, down: starting.down + gap0.down + gap1.down + gap2.down, up: starting.up, disp: `${starting.disp}${gap0.disp}${gap1.disp}${gap2.disp}`};
+    isOverview = true;
+    changeVisible(canvasOverview, true);
 
-          var error = Math.abs(target - totalDelay);
-          if (error <= 2) [resultsSame, resultsNear, resultsFar][error].push(targetResult);
+    const maxHeight = Math.max(...heights);
+    const xTilesLen = heights.length;
+    const yTilesLen = maxHeight - Math.min(...heights) + 3;
+
+    const [canvasWidth, canvasHeight] = [16 * xTilesLen, 16 * yTilesLen];
+
+    canvasOverview.parentNode.style.height = `${canvasHeight}px`;
+    [canvasOverview, canvasOverviewSelect].forEach(canvas => {
+      setCanvasSize(canvas, canvasWidth, canvasHeight);
+    });
+
+    const distances = heights.map(height => maxHeight - height);
+    const context = canvasOverview.getContext("2d");
+    context.imageSmoothingEnabled = false;
+
+    const space = new Image();
+    space.src = `images/railParts/space.png`;
+
+    space.onload = () => {
+      context.globalAlpha = 0.6;
+
+      for (let x = 0; x < xTilesLen; x ++) {
+        for (let y = 0; y < yTilesLen; y ++) {
+          context.drawImage(space, 16 * x, 16 * y, 16, 16);
         }
       }
-    }
-  } 
 
-  funSort();
+      context.globalAlpha = 1;
+
+      ["openU", "note", "openD"].forEach((name, p) => {
+        const image = new Image();
+        image.src = `images/railParts/${name}.png`;
+
+        image.onload = () => {
+          distances.forEach((distance, x) => {
+            context.drawImage(image, 16 * x, 16 * (distance + p), 16, 16);
+          });
+        }
+      });
+    }
+
+  } else {
+    isOverview = false;
+    changeVisible(canvasOverview, false);
+  }
 }
 
-function funSort() {
-  var sorting = (selectSort.selectedIndex - languageIndex) / 2;
-  var direction = sorting <= 1 ? 0 : 1;
-  var order = sorting % 2 == 0 ? 1 : -1;
+getElm("#buttonChangeOverview").addEventListener("click", () => changeOverview(!isOverview));
 
-  var resultsList = [resultsSame, resultsNear, resultsFar];
+canvasOverviewSelect.addEventListener("click", event => {
+  let x = event.clientX - event.target.getBoundingClientRect().left;
 
-  [resultsSame, resultsNear, resultsFar] = resultsList.map(results => {
-    return results.sort((a, b) => {
-      var [a0, a1] = [[a.up, a.down], [a.up, a.down]][direction];
-      var [b0, b1] = [[b.up, b.down], [b.up, b.down]][direction];
+  const canvasWidth = canvasOverview.width;
 
-      if (a0 > b0) return order;
-      if (a0 < b0) return -order;
-    
-      if (a1 > b1) return order;
-      if (a1 < b1) return -order;
-    
-      return 0;
-    });
-  });
+  if (x < 0) x = 0;
+  if (x > canvasWidth) x = canvasWidth;
 
-  var newResultsSame = [], newResultsNear = [], newResultsFar = [];
-  var newResultsList = [newResultsSame, newResultsNear, newResultsFar];
+  const tile = parseInt(x / 16);
+  tables[2].rows[5].cells[tile + 1].click();
+});
 
-  [resultsSame, resultsNear, resultsFar].forEach((results, i) => {
-    results.forEach(result => {
-      newResultsList[i].push(` (${result.delay}/${parseInt(result.up)}/${result.down}/${result.disp})`);
-    });
-  });
+document.addEventListener("keydown", event => {
+  const key = event.key;
+  const index = ["ArrowLeft", "ArrowRight"].indexOf(key);
+  if (index == -1) return;
 
-  newResultsSame = Array.from(new Set(newResultsSame));
-  newResultsNear = Array.from(new Set(newResultsNear));
-  newResultsFar = Array.from(new Set(newResultsFar));
+  const selectedCell = getElm("td.wiringDisplay");
+  if (!selectedCell) return;
 
-  [divSame, divNear, divFar].forEach((div, i) => {
-    while (div.firstChild) div.removeChild(div.firstChild);
+  const destinationInd = selectedCell.cellIndex + [-1, 1][index];
+  if (destinationInd < 1 || destinationInd > tableLength) return;
 
-    [newResultsSame, newResultsNear, newResultsFar][i].forEach(result => {
-      var span = document.createElement("span");
-      span.textContent = `${result},`;
+  tables[2].rows[5].cells[destinationInd].click();
+  event.preventDefault();
+});
 
-      span.addEventListener("click", function(event) {
-        var str = event.target.textContent.match(/[↑↓][^)]+\)/)[0].replace(")", "");
-      
-        var direction = str[0];
-        var optsList = [];
-        var parts = [];
-        var partsIndex = ["noteU", "noteD", "space", "openU", "openD", "close", "connection", "middle"];
+const selectWiringType = getElm("#selectWiringType");
+Array.from(selectType.options).forEach(option => {
+  selectWiringType.append(option.cloneNode(true));
+});
 
-        str.slice(1).split("-").map(str => optsList.push(str.match(/[RGF]\d*/g) || []));
+const selectWiringLanding = getElm("#selectWiringLanding");
 
-        if (direction == "↑") {
-          optsList[0].forEach((option, i) => {
-            switch (option[0]) {
-              case "R":
-                if (i == 0) {
-                  if (option[1] == 0) {
-                    parts.unshift(5);
-                  
-                  } else {
-                    parts.unshift(6);
-                    [...Array(option[1] - 1)].map(() => parts.unshift(6, 7));
-                    parts.unshift((i < optsList[0].length - 1 ? 3 : 5), 7);
-                  }
-                
-                } else {
-                  parts.unshift(4);
-                  [...Array(option[1] - 1)].map(() => parts.unshift(6, 7));
-                  parts.unshift((i < optsList[0].length - 1 ? 3 : 5), 7);
-                }
-                break;
-              
-              case "G":
-                if (i == 0) parts.unshift(3);
-                [...Array(option[1] - 1)].map(() => parts.unshift(2));
-                break;
-              
-              case "F":
-                if (i == 0) parts.unshift(3);
-            }
-          });
-        
-          parts.push(0);
-        
-        } else {
-          parts.unshift(3);
-          parts.push(1);
+function changeWiringType() {
+  let keys = selectWiringType.value.split("-");
+  selectWiringLanding.options.length = 0;
+
+  if (keys[1] == "water") keys = ["noWing", "ground"];
+
+  const landingKeys = Object.keys(dataAssets[keys[0]][keys[1]].accelerationsList);
+  landingKeys.forEach(key => addOption(selectWiringLanding, landingNames[key], key));
+}
+
+changeWiringType();
+selectWiringType.addEventListener("change", changeWiringType);
+
+const inputWiringDelay = getElm("#inputWiringDelay");
+const inputWiringHeight = getElm("#inputWiringHeight");
+const selectWiringOrder = getElm("#selectWiringOrder");
+
+function findWiringResults(delay, height) {
+  const resultsList = [[], [], []];
+
+  const keys = selectWiringType.value.split("-");
+  const asset = dataAssets[keys[0]][keys[1]];
+  const {
+    relativeRailDelays, accelerationsList, upOptions, gaps
+  } = asset;
+
+  const isWingWater = keys[0] == "wing" && typeKeys[1] == "water";
+  let accelerations;
+
+  if (!isWingWater) accelerations = accelerationsList[selectWiringLanding.value];
+
+  const accelerationsLen = accelerations?.length;
+  function getAcceleration(distance) {
+    if (isWingWater) return 0;
+
+    return (distance <= accelerationsLen) ? accelerations[distance - 1] : 0;
+  }
+
+  const upOptionsLen = upOptions.length;
+  const gapsLen = gaps.length;
+
+  function addDownOption(_delay, _distance, count, _str) {
+    for (let g = 0; g < gapsLen; g ++) {
+      const gap = gaps[g];
+
+      let dDelay = 0;
+      let d = 1;
+      for (; ; d ++) {
+        const distance = _distance - (gap.down + d * 2);
+        if (distance <= 0) {
+          if (d == 1) return;
+          else break;
         }
 
-        if (optsList[1] == "") parts.push(4);
+        dDelay += relativeRailDelays[(gap.offset + d - 1) % 3];
 
-        optsList[1].forEach((option, i) => {
-          if (option[0] == "R") {
-            parts.push(i == 0 ? 6 : 3);
-            [...Array(option[1] - 1)].map(() => parts.push(7, 6));
-            parts.push(7, 4);
-          
+        const optionDelay = _delay + gap.delay + dDelay;
+        const totalDelay = optionDelay - getAcceleration(distance);
+
+        const str = `${_str}G${gap.down}R${d}`;
+
+        const difference = totalDelay - delay;
+        const error = Math.abs(difference);
+
+        if (error <= 2) {
+          resultsList[error].push({
+            delay: totalDelay,
+            up: startingUp,
+            down: height - distance,
+            str
+          });
+          break;
+
+        } else if ((isWingWater ? -1 : 1) * difference > 0) break;
+
+        if (count > 1) addDownOption(optionDelay, distance, count - 1, str);
+      }
+    }
+  }
+
+  let startingUp;
+
+  for (let u = 0; u < upOptionsLen; u ++) {
+    const upOption = upOptions[u];
+    startingUp = upOption.up;
+
+    if (isWingWater && upOption.delay < delay) continue;
+
+    let dDelay = 0;
+    let d = 0;
+    for (; ; d ++) {
+      const startingDown = d * 2;
+      const distance = height - startingDown;
+      if (distance <= 0) break;
+
+      if (d != 0) dDelay += relativeRailDelays[(upOption.offset + d - 1) % 3];
+
+      const startingDelay = upOption.delay + dDelay;
+      const totalDelay = startingDelay - getAcceleration(distance);
+
+      const str = `${upOption.str}-${(d == 0) ? "" : "R" + d}`;
+
+      const difference = totalDelay - delay;
+      const error = Math.abs(difference);
+
+      if (error <= 2) {
+        resultsList[error].push({
+          delay: totalDelay,
+          up: startingUp,
+          down: startingDown,
+          str
+        });
+        break;
+
+      } else if ((isWingWater ? -1 : 1) * difference > 0) break;
+
+      addDownOption(startingDelay, distance, 3, str);
+    }
+
+    if (d == 0) break;
+  }
+
+  return resultsList;
+}
+
+const canvasWiring = getElm("#canvasWiring");
+
+const partsNames = [
+  "noteU", "noteD", "space", "openU", "openD", "close", "connection", "middle"
+];
+
+function drawWiring(str) {
+  const direction = str[0];
+  const optsList = [];
+  const parts = [];
+
+  str.split("-").forEach(optionsStr => {
+    optsList.push(optionsStr.match(/[RGF]\d*/g) || []);
+  });
+
+  if (direction == "↑") {
+    optsList[0].forEach((option, i) => {
+      switch (option[0]) {
+        case "R":
+          if (i == 0) {
+            if (option[1] == 0) parts.unshift(5);
+            else {
+              parts.unshift(6);
+              [...Array(option[1] - 1)].forEach(() => parts.unshift(6, 7));
+              parts.unshift(((i < optsList[0].length - 1) ? 3 : 5), 7);
+            }
+
           } else {
-            if (i == 0) parts.push(4);
-            [...Array(option.substring(1) - 1)].map(() => parts.push(2));
+            parts.unshift(4);
+            [...Array(option[1] - 1)].forEach(() => parts.unshift(6, 7));
+            parts.unshift(((i < optsList[0].length - 1) ? 3 : 5), 7);
           }
-        });
+          break;
 
-        var context = canvasWiring.getContext("2d");
+        case "G":
+          if (i == 0) parts.unshift(3);
+          [...Array(option[1] - 1)].forEach(() => parts.unshift(2));
+          break;
 
-        context.clearRect(0, 0, 32, 1000);
-        canvasWiring.height = 32 * parts.length;
+        case "F": if (i == 0) parts.unshift(3);
+      }
+    });
 
-        parts.forEach((part, i) => {
-          var image = new Image();
-          image.src = `images/railParts/${partsIndex[`${part}`[0]]}.png`;
+    parts.push(0);
 
-          image.onload = () => {
-            context.drawImage(image, 0, 32 * i, 32, 32);
-          }
-        });
+  } else {
+    parts.unshift(3);
+    parts.push(1);
+  }
 
-        context.imageSmoothingEnabled = false;
-      });
+  if (optsList[1] == "") parts.push(4);
 
-      div.appendChild(span);
+  optsList[1].forEach((option, i) => {
+    if (option[0] == "R") {
+      parts.push((i == 0) ? 6 : 3);
+      [...Array(option[1] - 1)].forEach(() => parts.push(7, 6));
+      parts.push(7, 4);
+
+    } else {
+      if (i == 0) parts.push(4);
+      [...Array(option.slice(1) - 1)].forEach(() => parts.push(2));
+    }
+  });
+
+  const context = canvasWiring.getContext("2d");
+
+  const canvasHeight = 32 * parts.length;
+  canvasWiring.height = canvasHeight;
+  canvasWiring.style.height = `${canvasHeight}px`;
+
+  context.imageSmoothingEnabled = false;
+
+  parts.forEach((part, i) => {
+    const image = new Image();
+    image.src = `images/railParts/${partsNames[`${part}`[0]]}.png`;
+
+    image.onload = () => context.drawImage(image, 0, 32 * i, 32, 32);
+  });
+}
+
+const spanWiringResults = getElmAll(".spanWiringResults");
+const checkWiringView = getElm("#checkWiringView");
+
+let resultsList;
+
+function setWiringResult() {
+  if (!resultsList) return;
+  const sortIndex = selectWiringOrder.selectedIndex;
+
+  resultsList.forEach(results => {
+    results.sort((a, b) => {
+      return [
+        () => a.up - b.up || a.down - b.down,
+        () => b.up - a.up || a.down - b.down,
+        () => a.down - b.down || a.up - b.up,
+        () => b.down - a.down || a.up - b.up
+      ][sortIndex]();
     });
   });
 
-  if (checkWiringImage.checked) {
-    if (divSame.firstChild) {
-      divSame.firstChild.click();
-    
+  spanWiringResults.forEach((container, i) => {
+    while (container.firstChild) container.removeChild(container.firstChild);
+
+    resultsList[i].forEach(result => {
+      const span = document.createElement("span");
+
+      span.textContent = `${result.str}, `;
+      span.title = `遅延: ${result.delay}, ↑: ${result.up}, ↓: ${result.down}`;
+      span.addEventListener("click", () => drawWiring(result.str));
+
+      container.append(span);
+    });
+  });
+
+  if (checkWiringView.checked) {
+    if (spanWiringResults[0].firstChild) {
+      spanWiringResults[0]?.firstChild.click();
+
     } else {
-      canvasWiring.getContext("2d").clearRect(0, 0, 32, 1000);
       canvasWiring.height = 320;
+      canvasWiring.style.height = "320px";
     }
   }
 }
 
-window.onload = function() {
-  for (var i = 0; i < sets.length; i ++) {
-    var divSet = document.createElement("div");
-    divSet.classList = "divSet";
-    divSetsParent.appendChild(divSet);
-
-    var divImgs = document.createElement("div");
-    divImgs.classList = "divItems";
-    divSet.appendChild(divImgs);
-    
-    ["a", "b"].forEach(e => {
-      var imgSet = document.createElement("img");
-      imgSet.classList = "imgSet";
-      imgSet.src = `images/sets/set${i}${e}.jpg`;
-      divImgs.appendChild(imgSet);
+function findWiring() {
+  const [delay, height] = [inputWiringDelay.value, inputWiringHeight.value];
+  if (!isNum(delay, height)) {
+    spanWiringResults.forEach(container => {
+      while (container.firstChild) container.removeChild(container.firstChild);
     });
 
-    var divTexts = document.createElement("div");
-    divTexts.classList = "divItems";
-    divSet.appendChild(divTexts);
-
-    var spanData = document.createElement("span");
-    spanData.textContent = `コスト: ${sets[i].cost}, 複合: ${sets[i].combine ? "○" : "×"}`;
-    spanData.classList = "spanData";
-    divTexts.appendChild(spanData);
-
-    var spanNote = document.createElement("span");
-    spanNote.textContent = sets[i].note;
-    divTexts.appendChild(spanNote);
-
-    for (var skin = 0; skin < 4; skin ++) {
-      var divSkin = document.createElement("div");
-      divSkin.id = `divSkin${skin}`;
-      divSkin.classList = "divSkin";
-      divTexts.appendChild(divSkin);
-
-      var enmList = {sm1: [], sm3: [], smW: [], smU: []};
-
-      var imgSkin = document.createElement("img");
-      imgSkin.classList = "imgSkin";
-      imgSkin.src = `images/skins/${skins[skin]}.jpg`;
-      divSkin.appendChild(imgSkin);
-
-      sets[i][skins[skin]].forEach(numEnm => {
-        var imgEnm = document.createElement("img");
-        imgEnm.classList = "imgEnm";
-
-        var enmType = "";
-        if (skin == 1 && numEnm == 2) enmType = "t";
-        if (skin == 3 && numEnm == 2) enmType = "u";
-        if (skin == 2 && numEnm == 10) enmType = "w";
-        if ([2, 3].includes(skin) && numEnm == 8) enmType = "w";
-
-        imgEnm.src = `images/enms/enm${numEnm}${enmType}.jpg`;
-        imgEnm.title = skinsEnms[skin][numEnm];
-        divSkin.appendChild(imgEnm);
-
-        enmList[skins[skin]].push(skinsEnms[skin][numEnm]);
-      });
-
-      imgSkin.title = enmList[skins[skin]];
-    }
+    canvasWiring.height = 320;
+    canvasWiring.style.height = "320px";
+    return;
   }
+
+  resultsList = findWiringResults(parseInt(delay), parseInt(height));
+  setWiringResult();
 }
 
-function funContraptions() {
-  divSetsParent.style.display = divSetsParent.style.display == "none" ? "block" : "none";
-}
+getElm("#buttonFindWiring").addEventListener("click", findWiring);
+selectWiringOrder.addEventListener("change", setWiringResult);
 
-var accelerations = [11, 8, 5, 3, 2, 1, 1];
-
-var startingList = [
-  {delay: 0, disp: "↓-", down: 0, up: 0},
-  {delay: 14, disp: "↓-R1", down: 2, up: 0},
-  {delay: 27, disp: "↓-R2", down: 4, up: 0},
-  {delay: 40, disp: "↓-R3", down: 6, up: 0},
-  {delay: 54, disp: "↓-R4", down: 8, up: 0},
-  {delay: 67, disp: "↓-R5", down: 10, up: 0},
-  {delay: 80, disp: "↓-R6", down: 12, up: 0},
-
-  {delay: 21, disp: "↑R0-", down: 0, up: 0.1},
-  {delay: 34, disp: "↑R0-R1", down: 2, up: 0.1},
-  {delay: 48, disp: "↑R0-R2", down: 4, up: 0.1},
-  {delay: 61, disp: "↑R0-R3", down: 6, up: 0.1},
-  {delay: 74, disp: "↑R0-R4", down: 8, up: 0.1},
-  {delay: 88, disp: "↑R0-R5", down: 10, up: 0.1},
-  {delay: 101, disp: "↑R0-R6", down: 12, up: 0.1},
-
-  {delay: 64, disp: "↑R1-", down: 0, up: 2},
-  {delay: 78, disp: "↑R1-R1", down: 2, up: 2},
-  {delay: 91, disp: "↑R1-R2", down: 4, up: 2},
-  {delay: 104, disp: "↑R1-R3", down: 6, up: 2},
-  {delay: 118, disp: "↑R1-R4", down: 8, up: 2},
-  {delay: 131, disp: "↑R1-R5", down: 10, up: 2},
-  {delay: 144, disp: "↑R1-R6", down: 12, up: 2},
-
-  {delay: 82, disp: "↑G1R1-", down: 0, up: 3},
-  {delay: 95, disp: "↑G1R1-R1", down: 2, up: 3},
-  {delay: 108, disp: "↑G1R1-R2", down: 4, up: 3},
-  {delay: 122, disp: "↑G1R1-R3", down: 6, up: 3},
-  {delay: 135, disp: "↑G1R1-R4", down: 8, up: 3},
-  {delay: 148, disp: "↑G1R1-R5", down: 10, up: 3},
-  {delay: 162, disp: "↑G1R1-R6", down: 12, up: 3},
-
-  {delay: 98, disp: "↑G2R1-", down: 0, up: 4},
-  {delay: 112, disp: "↑G2R1-R1", down: 2, up: 4},
-  {delay: 125, disp: "↑G2R1-R2", down: 4, up: 4},
-  {delay: 138, disp: "↑G2R1-R3", down: 6, up: 4},
-  {delay: 152, disp: "↑G2R1-R4", down: 8, up: 4},
-  {delay: 165, disp: "↑G2R1-R5", down: 10, up: 4},
-  {delay: 178, disp: "↑G2R1-R6", down: 12, up: 4},
-
-  {delay: 107, disp: "↑R2-", down: 0, up: 4},
-  {delay: 120, disp: "↑R2-R1", down: 2, up: 4},
-  {delay: 133, disp: "↑R2-R2", down: 4, up: 4},
-  {delay: 147, disp: "↑R2-R3", down: 6, up: 4},
-  {delay: 160, disp: "↑R2-R4", down: 8, up: 4},
-  {delay: 173, disp: "↑R2-R5", down: 10, up: 4},
-  {delay: 187, disp: "↑R2-R6", down: 12, up: 4},
-
-  {delay: 111, disp: "↑F-", down: 0, up: 0.2},
-  {delay: 124, disp: "↑F-R1", down: 2, up: 0.2},
-  {delay: 137, disp: "↑F-R2", down: 4, up: 0.2},
-  {delay: 151, disp: "↑F-R3", down: 6, up: 0.2},
-  {delay: 164, disp: "↑F-R4", down: 8, up: 0.2},
-  {delay: 177, disp: "↑F-R5", down: 10, up: 0.2},
-  {delay: 191, disp: "↑F-R6", down: 12, up: 0.2},
-
-  {delay: 120, disp: "↑G3R1-", down: 0, up: 5},
-  {delay: 133, disp: "↑G3R1-R1", down: 2, up: 5},
-  {delay: 146, disp: "↑G3R1-R2", down: 4, up: 5},
-  {delay: 160, disp: "↑G3R1-R3", down: 6, up: 5},
-  {delay: 173, disp: "↑G3R1-R4", down: 8, up: 5},
-  {delay: 186, disp: "↑G3R1-R5", down: 10, up: 5},
-  {delay: 200, disp: "↑G3R1-R6", down: 12, up: 5},
-
-  {delay: 124, disp: "↑G1R2-", down: 0, up: 5},
-  {delay: 137, disp: "↑G1R2-R1", down: 2, up: 5},
-  {delay: 150, disp: "↑G1R2-R2", down: 4, up: 5},
-  {delay: 164, disp: "↑G1R2-R3", down: 6, up: 5},
-  {delay: 177, disp: "↑G1R2-R4", down: 8, up: 5},
-  {delay: 190, disp: "↑G1R2-R5", down: 10, up: 5},
-  {delay: 204, disp: "↑G1R2-R6", down: 12, up: 5},
-
-  {delay: 125, disp: "↑R1G1R1-", down: 0, up: 5},
-  {delay: 138, disp: "↑R1G1R1-R1", down: 2, up: 5},
-  {delay: 152, disp: "↑R1G1R1-R2", down: 4, up: 5},
-  {delay: 165, disp: "↑R1G1R1-R3", down: 6, up: 5},
-  {delay: 178, disp: "↑R1G1R1-R4", down: 8, up: 5},
-  {delay: 192, disp: "↑R1G1R1-R5", down: 10, up: 5},
-  {delay: 205, disp: "↑R1G1R1-R6", down: 12, up: 5},
-
-  {delay: 140, disp: "↑G2R2-", down: 0, up: 6},
-  {delay: 154, disp: "↑G2R2-R1", down: 2, up: 6},
-  {delay: 167, disp: "↑G2R2-R2", down: 4, up: 6},
-  {delay: 180, disp: "↑G2R2-R3", down: 6, up: 6},
-  {delay: 194, disp: "↑G2R2-R4", down: 8, up: 6},
-  {delay: 207, disp: "↑G2R2-R5", down: 10, up: 6},
-  {delay: 220, disp: "↑G2R2-R6", down: 12, up: 6},
-
-  {delay: 149, disp: "↑R3-", down: 0, up: 6},
-  {delay: 162, disp: "↑R3-R1", down: 2, up: 6},
-  {delay: 176, disp: "↑R3-R2", down: 4, up: 6},
-  {delay: 189, disp: "↑R3-R3", down: 6, up: 6},
-  {delay: 202, disp: "↑R3-R4", down: 8, up: 6},
-  {delay: 216, disp: "↑R3-R5", down: 10, up: 6},
-  {delay: 229, disp: "↑R3-R6", down: 12, up: 6},
-
-  {delay: 159, disp: "↑G1R1G2R1-", down: 0, up: 7},
-  {delay: 172, disp: "↑G1R1G2R1-R1", down: 2, up: 7},
-  {delay: 185, disp: "↑G1R1G2R1-R2", down: 4, up: 7},
-  {delay: 199, disp: "↑G1R1G2R1-R3", down: 6, up: 7},
-  {delay: 212, disp: "↑G1R1G2R1-R4", down: 8, up: 7},
-  {delay: 225, disp: "↑G1R1G2R1-R5", down: 10, up: 7},
-  {delay: 239, disp: "↑G1R1G2R1-R6", down: 12, up: 7},
-
-  {delay: 159, disp: "↑G2R1G1R1-", down: 0, up: 7},
-  {delay: 173, disp: "↑G2R1G1R1-R1", down: 2, up: 7},
-  {delay: 185, disp: "↑G2R1G1R1-R2", down: 4, up: 7},
-  {delay: 199, disp: "↑G2R1G1R1-R3", down: 6, up: 7},
-  {delay: 213, disp: "↑G2R1G1R1-R4", down: 8, up: 7},
-  {delay: 226, disp: "↑G2R1G1R1-R5", down: 10, up: 7},
-  {delay: 239, disp: "↑G2R1G1R1-R6", down: 12, up: 7},
-
-  {delay: 162, disp: "↑G3R2-", down: 0, up: 7},
-  {delay: 175, disp: "↑G3R2-R1", down: 2, up: 7},
-  {delay: 188, disp: "↑G3R2-R2", down: 4, up: 7},
-  {delay: 202, disp: "↑G3R2-R3", down: 6, up: 7},
-  {delay: 215, disp: "↑G3R2-R4", down: 8, up: 7},
-  {delay: 228, disp: "↑G3R2-R5", down: 10, up: 7},
-  {delay: 243, disp: "↑G3R2-R6", down: 12, up: 7},
-
-  {delay: 163, disp: "↑R1G3R1-", down: 0, up: 7},
-  {delay: 176, disp: "↑R1G3R1-R1", down: 2, up: 7},
-  {delay: 190, disp: "↑R1G3R1-R2", down: 4, up: 7},
-  {delay: 203, disp: "↑R1G3R1-R3", down: 6, up: 7},
-  {delay: 216, disp: "↑R1G3R1-R4", down: 8, up: 7},
-  {delay: 230, disp: "↑R1G3R1-R5", down: 10, up: 7},
-  {delay: 244, disp: "↑R1G3R1-R6", down: 12, up: 7},
-
-  {delay: 154, disp: "↑R1F-", down: 0, up: 2},
-  {delay: 167, disp: "↑R1F-R1", down: 2, up: 2},
-  {delay: 181, disp: "↑R1F-R2", down: 4, up: 2},
-  {delay: 194, disp: "↑R1F-R3", down: 6, up: 2},
-  {delay: 207, disp: "↑R1F-R4", down: 8, up: 2},
-  {delay: 221, disp: "↑R1F-R5", down: 10, up: 2},
-  {delay: 234, disp: "↑R1F-R6", down: 12, up: 2},
-
-  {delay: 142, disp: "↑R1G2R1-", down: 0, up: 6},
-  {delay: 155, disp: "↑R1G2R1-R1", down: 2, up: 6},
-  {delay: 168, disp: "↑R1G2R1-R2", down: 4, up: 6},
-  {delay: 182, disp: "↑R1G2R1-R3", down: 6, up: 6},
-  {delay: 195, disp: "↑R1G2R1-R4", down: 8, up: 6},
-  {delay: 208, disp: "↑R1G2R1-R5", down: 10, up: 6},
-  {delay: 222, disp: "↑R1G2R1-R6", down: 12, up: 6},
-
-  {delay: 167, disp: "↑G1R3-", down: 0, up: 7},
-  {delay: 180, disp: "↑G1R3-R1", down: 2, up: 7},
-  {delay: 193, disp: "↑G1R3-R2", down: 4, up: 7},
-  {delay: 207, disp: "↑G1R3-R3", down: 6, up: 7},
-  {delay: 220, disp: "↑G1R3-R4", down: 8, up: 7},
-  {delay: 233, disp: "↑G1R3-R5", down: 10, up: 7},
-  {delay: 247, disp: "↑G1R3-R6", down: 12, up: 7},
-
-  {delay: 175, disp: "↑G2R1G2R1-", down: 0, up: 8},
-  {delay: 189, disp: "↑G2R1G2R1-R1", down: 2, up: 8},
-  {delay: 202, disp: "↑G2R1G2R1-R2", down: 4, up: 8},
-  {delay: 215, disp: "↑G2R1G2R1-R3", down: 6, up: 8},
-  {delay: 229, disp: "↑G2R1G2R1-R4", down: 8, up: 8},
-  {delay: 242, disp: "↑G2R1G2R1-R5", down: 10, up: 8},
-  {delay: 255, disp: "↑G2R1G2R1-R6", down: 12, up: 8},
-
-  {delay: 167, disp: "↑R1G1R2-", down: 0, up: 5},
-  {delay: 180, disp: "↑R1G1R2-R1", down: 2, up: 5},
-  {delay: 194, disp: "↑R1G1R2-R2", down: 4, up: 5},
-  {delay: 207, disp: "↑R1G1R2-R3", down: 6, up: 5},
-  {delay: 220, disp: "↑R1G1R2-R4", down: 8, up: 5},
-  {delay: 234, disp: "↑R1G1R2-R5", down: 10, up: 5},
-  {delay: 247, disp: "↑R1G1R2-R6", down: 12, up: 5},
-
-  {delay: 167, disp: "↑R2G1R1-", down: 0, up: 5},
-  {delay: 181, disp: "↑R2G1R1-R1", down: 2, up: 5},
-  {delay: 194, disp: "↑R2G1R1-R2", down: 4, up: 5},
-  {delay: 207, disp: "↑R2G1R1-R3", down: 6, up: 5},
-  {delay: 221, disp: "↑R2G1R1-R4", down: 8, up: 5},
-  {delay: 234, disp: "↑R2G1R1-R5", down: 10, up: 5},
-  {delay: 247, disp: "↑R2G1R1-R6", down: 12, up: 5},
-
-  {delay: 172, disp: "↑G1R1F-", down: 0, up: 3},
-  {delay: 185, disp: "↑G1R1F-R1", down: 2, up: 3},
-  {delay: 198, disp: "↑G1R1F-R2", down: 4, up: 3},
-  {delay: 212, disp: "↑G1R1F-R3", down: 6, up: 3},
-  {delay: 225, disp: "↑G1R1F-R4", down: 8, up: 3},
-  {delay: 238, disp: "↑G1R1F-R5", down: 10, up: 3},
-  {delay: 252, disp: "↑G1R1F-R6", down: 12, up: 3},
-
-  {delay: 184, disp: "↑G2R3-", down: 0, up: 8},
-  {delay: 198, disp: "↑G2R3-R1", down: 2, up: 8},
-  {delay: 211, disp: "↑G2R3-R2", down: 4, up: 8},
-  {delay: 224, disp: "↑G2R3-R3", down: 6, up: 8},
-  {delay: 238, disp: "↑G2R3-R4", down: 8, up: 8},
-  {delay: 251, disp: "↑G2R3-R5", down: 10, up: 8},
-  {delay: 264, disp: "↑G2R3-R6", down: 12, up: 8},
-
-  {delay: 184, disp: "↑R1G2R2-", down: 0, up: 8},
-  {delay: 197, disp: "↑R1G2R2-R1", down: 2, up: 8},
-  {delay: 210, disp: "↑R1G2R2-R2", down: 4, up: 8},
-  {delay: 224, disp: "↑R1G2R2-R3", down: 6, up: 8},
-  {delay: 237, disp: "↑R1G2R2-R4", down: 8, up: 8},
-  {delay: 250, disp: "↑R1G2R2-R5", down: 10, up: 8},
-  {delay: 264, disp: "↑R1G2R2-R6", down: 12, up: 8},
-
-  {delay: 184, disp: "↑R2G2R1-", down: 0, up: 8},
-  {delay: 197, disp: "↑R2G2R1-R1", down: 2, up: 8},
-  {delay: 211, disp: "↑R2G2R1-R2", down: 4, up: 8},
-  {delay: 224, disp: "↑R2G2R1-R3", down: 6, up: 8},
-  {delay: 237, disp: "↑R2G2R1-R4", down: 8, up: 8},
-  {delay: 251, disp: "↑R2G2R1-R5", down: 10, up: 8},
-  {delay: 264, disp: "↑R2G2R1-R6", down: 12, up: 8},
-
-  {delay: 196, disp: "↑R2F-", down: 0, up: 4},
-  {delay: 210, disp: "↑R2F-R1", down: 2, up: 4},
-  {delay: 223, disp: "↑R2F-R2", down: 4, up: 4},
-  {delay: 236, disp: "↑R2F-R3", down: 6, up: 4},
-  {delay: 250, disp: "↑R2F-R4", down: 8, up: 4},
-  {delay: 263, disp: "↑R2F-R5", down: 10, up: 4},
-  {delay: 276, disp: "↑R2F-R6", down: 12, up: 4},
-
-  {delay: 192, disp: "↑R4-", down: 0, up: 8},
-  {delay: 206, disp: "↑R4-R1", down: 2, up: 8},
-  {delay: 219, disp: "↑R4-R2", down: 4, up: 8},
-  {delay: 232, disp: "↑R4-R3", down: 6, up: 8},
-  {delay: 246, disp: "↑R4-R4", down: 8, up: 8},
-  {delay: 259, disp: "↑R4-R5", down: 10, up: 8},
-  {delay: 272, disp: "↑R4-R6", down: 12, up: 8},
-
-  {delay: 235, disp: "↑R5-", down: 0, up: 10},
-  {delay: 248, disp: "↑R5-R1", down: 2, up: 10},
-  {delay: 261, disp: "↑R5-R2", down: 4, up: 10},
-  {delay: 275, disp: "↑R5-R3", down: 6, up: 10},
-  {delay: 288, disp: "↑R5-R4", down: 8, up: 10},
-  {delay: 301, disp: "↑R5-R5", down: 10, up: 10},
-  {delay: 315, disp: "↑R5-R6", down: 12, up: 10},
-
-  {delay: 197, disp: "↑G2R1G3R1-", down: 0, up: 9},
-  {delay: 211, disp: "↑G2R1G3R1-R1", down: 2, up: 9},
-  {delay: 224, disp: "↑G2R1G3R1-R2", down: 4, up: 9},
-  {delay: 237, disp: "↑G2R1G3R1-R3", down: 6, up: 9},
-  {delay: 251, disp: "↑G2R1G3R1-R4", down: 8, up: 9},
-  {delay: 264, disp: "↑G2R1G3R1-R5", down: 10, up: 9},
-  {delay: 277, disp: "↑G2R1G3R1-R6", down: 12, up: 9},
-
-  {delay: 197, disp: "↑G3R1G2R1-", down: 0, up: 9},
-  {delay: 210, disp: "↑G3R1G2R1-R1", down: 2, up: 9},
-  {delay: 223, disp: "↑G3R1G2R1-R2", down: 4, up: 9},
-  {delay: 237, disp: "↑G3R1G2R1-R3", down: 6, up: 9},
-  {delay: 250, disp: "↑G3R1G2R1-R4", down: 8, up: 9},
-  {delay: 263, disp: "↑G3R1G2R1-R5", down: 10, up: 9},
-  {delay: 277, disp: "↑G3R1G2R1-R6", down: 12, up: 9},
-
-  {delay: 239, disp: "↑R3F-", down: 0, up: 6},
-  {delay: 252, disp: "↑R3F-R1", down: 2, up: 6},
-  {delay: 265, disp: "↑R3F-R2", down: 4, up: 6},
-  {delay: 279, disp: "↑R3F-R3", down: 6, up: 6},
-  {delay: 292, disp: "↑R3F-R4", down: 8, up: 6},
-  {delay: 305, disp: "↑R3F-R5", down: 10, up: 6},
-  {delay: 319, disp: "↑R3F-R6", down: 12, up: 6},
-
-  {delay: 188, disp: "↑G2R1F-", down: 0, up: 4},
-  {delay: 202, disp: "↑G2R1F-R1", down: 2, up: 4},
-  {delay: 215, disp: "↑G2R1F-R2", down: 4, up: 4},
-  {delay: 228, disp: "↑G2R1F-R3", down: 6, up: 4},
-  {delay: 242, disp: "↑G2R1F-R4", down: 8, up: 4},
-  {delay: 255, disp: "↑G2R1F-R5", down: 10, up: 4},
-  {delay: 268, disp: "↑G2R1F-R6", down: 12, up: 4},
-
-  {delay: 210, disp: "↑G3R1F-", down: 0, up: 5},
-  {delay: 223, disp: "↑G3R1F-R1", down: 2, up: 5},
-  {delay: 236, disp: "↑G3R1F-R2", down: 4, up: 5},
-  {delay: 250, disp: "↑G3R1F-R3", down: 6, up: 5},
-  {delay: 263, disp: "↑G3R1F-R4", down: 8, up: 5},
-  {delay: 276, disp: "↑G3R1F-R5", down: 10, up: 5},
-  {delay: 290, disp: "↑G3R1F-R6", down: 12, up: 5},
-
-  {delay: 202, disp: "↑G1R2G2R1-", down: 0, up: 9},
-  {delay: 215, disp: "↑G1R2G2R1-R1", down: 2, up: 9},
-  {delay: 228, disp: "↑G1R2G2R1-R2", down: 4, up: 9},
-  {delay: 242, disp: "↑G1R2G2R1-R3", down: 6, up: 9},
-  {delay: 255, disp: "↑G1R2G2R1-R4", down: 8, up: 9},
-  {delay: 268, disp: "↑G1R2G2R1-R5", down: 10, up: 9},
-  {delay: 282, disp: "↑G1R2G2R1-R6", down: 12, up: 9},
-
-  {delay: 202, disp: "↑G2R1G1R2-", down: 0, up: 9},
-  {delay: 216, disp: "↑G2R1G1R2-R1", down: 2, up: 9},
-  {delay: 229, disp: "↑G2R1G1R2-R2", down: 4, up: 9},
-  {delay: 242, disp: "↑G2R1G1R2-R3", down: 6, up: 9},
-  {delay: 256, disp: "↑G2R1G1R2-R4", down: 8, up: 9},
-  {delay: 269, disp: "↑G2R1G1R2-R5", down: 10, up: 9},
-  {delay: 282, disp: "↑G2R1G1R2-R6", down: 12, up: 9},
-
-  {delay: 205, disp: "↑G3R3-", down: 0, up: 9},
-  {delay: 218, disp: "↑G3R3-R1", down: 2, up: 9},
-  {delay: 231, disp: "↑G3R3-R2", down: 4, up: 9},
-  {delay: 245, disp: "↑G3R3-R3", down: 6, up: 9},
-  {delay: 258, disp: "↑G3R3-R4", down: 8, up: 9},
-  {delay: 271, disp: "↑G3R3-R5", down: 10, up: 9},
-  {delay: 285, disp: "↑G3R3-R6", down: 12, up: 9},
-
-  {delay: 205, disp: "↑R1G3R2-", down: 0, up: 9},
-  {delay: 218, disp: "↑R1G3R2-R1", down: 2, up: 9},
-  {delay: 232, disp: "↑R1G3R2-R2", down: 4, up: 9},
-  {delay: 245, disp: "↑R1G3R2-R3", down: 6, up: 9},
-  {delay: 258, disp: "↑R1G3R2-R4", down: 8, up: 9},
-  {delay: 272, disp: "↑R1G3R2-R5", down: 10, up: 9},
-  {delay: 285, disp: "↑R1G3R2-R6", down: 12, up: 9},
-
-  {delay: 205, disp: "↑R2G3R1-", down: 0, up: 9},
-  {delay: 219, disp: "↑R2G3R1-R1", down: 2, up: 9},
-  {delay: 232, disp: "↑R2G3R1-R2", down: 4, up: 9},
-  {delay: 245, disp: "↑R2G3R1-R3", down: 6, up: 9},
-  {delay: 259, disp: "↑R2G3R1-R4", down: 8, up: 9},
-  {delay: 272, disp: "↑R2G3R1-R5", down: 10, up: 9},
-  {delay: 285, disp: "↑R2G3R1-R6", down: 12, up: 9},
-
-  {delay: 210, disp: "↑R1G1R3-", down: 0, up: 9},
-  {delay: 223, disp: "↑R1G1R3-R1", down: 2, up: 9},
-  {delay: 237, disp: "↑R1G1R3-R2", down: 4, up: 9},
-  {delay: 250, disp: "↑R1G1R3-R3", down: 6, up: 9},
-  {delay: 263, disp: "↑R1G1R3-R4", down: 8, up: 9},
-  {delay: 277, disp: "↑R1G1R3-R5", down: 10, up: 9},
-  {delay: 290, disp: "↑R1G1R3-R6", down: 12, up: 9},
-
-  {delay: 209, disp: "↑R2G1R2-", down: 0, up: 9},
-  {delay: 223, disp: "↑R2G1R2-R1", down: 2, up: 9},
-  {delay: 236, disp: "↑R2G1R2-R2", down: 4, up: 9},
-  {delay: 249, disp: "↑R2G1R2-R3", down: 6, up: 9},
-  {delay: 263, disp: "↑R2G1R2-R4", down: 8, up: 9},
-  {delay: 276, disp: "↑R2G1R2-R5", down: 10, up: 9},
-  {delay: 289, disp: "↑R2G1R2-R6", down: 12, up: 9},
-
-  {delay: 214, disp: "↑G1R2F-", down: 0, up: 5},
-  {delay: 227, disp: "↑G1R2F-R1", down: 2, up: 5},
-  {delay: 240, disp: "↑G1R2F-R2", down: 4, up: 5},
-  {delay: 254, disp: "↑G1R2F-R3", down: 6, up: 5},
-  {delay: 267, disp: "↑G1R2F-R4", down: 8, up: 5},
-  {delay: 280, disp: "↑G1R2F-R5", down: 10, up: 5},
-  {delay: 294, disp: "↑G1R2F-R6", down: 12, up: 5},
-
-  {delay: 230, disp: "↑G2R2F-", down: 0, up: 6},
-  {delay: 244, disp: "↑G2R2F-R1", down: 2, up: 6},
-  {delay: 257, disp: "↑G2R2F-R2", down: 4, up: 6},
-  {delay: 270, disp: "↑G2R2F-R3", down: 6, up: 6},
-  {delay: 284, disp: "↑G2R2F-R4", down: 8, up: 6},
-  {delay: 297, disp: "↑G2R2F-R5", down: 10, up: 6},
-  {delay: 310, disp: "↑G2R2F-R6", down: 12, up: 6},
-
-  {delay: 232, disp: "↑R1G2R1F-", down: 0, up: 6},
-  {delay: 245, disp: "↑R1G2R1F-R1", down: 2, up: 6},
-  {delay: 258, disp: "↑R1G2R1F-R2", down: 4, up: 6},
-  {delay: 272, disp: "↑R1G2R1F-R3", down: 6, up: 6},
-  {delay: 285, disp: "↑R1G2R1F-R4", down: 8, up: 6},
-  {delay: 298, disp: "↑R1G2R1F-R5", down: 10, up: 6},
-  {delay: 312, disp: "↑R1G2R1F-R6", down: 12, up: 6}
-];
-
-var gapList = [
-  {delay: 0, disp: "", down: 0},
-
-  {delay: 19, disp: "G1R1", down: 3},
-  {delay: 32, disp: "G1R2", down: 5},
-  {delay: 45, disp: "G1R3", down: 7},
-  {delay: 59, disp: "G1R4", down: 9},
-  {delay: 72, disp: "G1R5", down: 11},
-
-  {delay: 22, disp: "G2R1", down: 4},
-  {delay: 36, disp: "G2R2", down: 6},
-  {delay: 49, disp: "G2R3", down: 8},
-  {delay: 62, disp: "G2R4", down: 10},
-  {delay: 76, disp: "G2R5", down: 12},
-
-  {delay: 25, disp: "G3R1", down: 5},
-  {delay: 38, disp: "G3R2", down: 7},
-  {delay: 51, disp: "G3R3", down: 9},
-  {delay: 65, disp: "G3R4", down: 11},
-
-  {delay: 26, disp: "G4R1", down: 6},
-  {delay: 40, disp: "G4R2", down: 8},
-  {delay: 53, disp: "G4R3", down: 10},
-  {delay: 66, disp: "G4R4", down: 12},
-
-  {delay: 28, disp: "G5R1", down: 7},
-  {delay: 41, disp: "G5R2", down: 9},
-  {delay: 54, disp: "G5R3", down: 11},
-
-  {delay: 28, disp: "G6R1", down: 8},
-  {delay: 42, disp: "G6R2", down: 10},
-  {delay: 55, disp: "G6R3", down: 12},
-
-  {delay: 30, disp: "G7R1", down: 9},
-  {delay: 43, disp: "G7R2", down: 11},
-  {delay: 56, disp: "G7R3", down: 13},
-
-  {delay: 29, disp: "G8R1", down: 10},
-  {delay: 42, disp: "G8R2", down: 12},
-  {delay: 56, disp: "G8R3", down: 14},
-
-  {delay: 29, disp: "G9R1", down: 11},
-  {delay: 42, disp: "G9R2", down: 13},
-  {delay: 56, disp: "G9R3", down: 15},
-
-  {delay: 29, disp: "G10R1", down: 12}
-];
-
-var commonEnms = ["チョロプー", "ガボン", "ボムへい", "メカクッパ", "ミサイルメカクッパ(赤メカクッパ)", "ビームメカクッパ(青メカクッパ)", "クッパJr.", "ハナチャン", "ハンマーブロス", "メガブロス", "サンボ", "カメック", "プー", "トゲメット", "緑ノコノコ", "赤ノコノコ", "カロン", "メット", "トゲメット", "カロンこうら", "メットこうら", "トゲメットこうら", "杭なしワンワン", "ブラックパックン", "POWブロック", "Pスイッチ", "縦ジャンプ台(縦バネ)", "横ジャンプ台(横バネ)", "砲台", "キラー砲台", "ドッスン", "クッパ", "ブンブン", "ラリー", "イギー", "ウェンディ", "レミー", "ロイ", "モートン", "ルドウィッグ", "ワンワンの杭"];
-    
-var sm1Enms = ["スーパーキノコ", "1UPキノコ", "マリオUSAのキノコ(USAキノコ)", "スーパースター", "ファイアフラワー", "スーパーボールフラワー", "マスターソード", "でかキノコ", "くつクリボー", "クイーンくつクリボー", "パックンフラワー", "ファイアパックン", "クッパクラウン", "クリボー", "カキボー"].concat(commonEnms);
-var sm3Enms = ["スーパーキノコ", "1UPキノコ", "カエルスーツ", "スーパースター", "ファイアフラワー", "-", "-", "-", "くつクリボー", "クイーンくつクリボー", "パックンフラワー", "ファイアパックン", "クッパクラウン", "クリボー", "カキボー"].concat(commonEnms);
-var smWEnms = ["スーパーキノコ", "1UPキノコ", "-", "スーパースター", "ファイアフラワー", "-", "-", "-", "ヨッシー", "-", "ピーパックン", "ファイアパックン", "クッパクラウン", "クリボン", "カキボン"].concat(commonEnms);
-var smUEnms = ["スーパーキノコ", "1UPキノコ", "スーパードングリ", "スーパースター", "ファイアフラワー", "-", "-", "-", "ヨッシー", "-", "パックンフラワー", "ファイアパックン", "クッパクラウン", "クリボー", "カキボー"].concat(commonEnms);
-
-var skins = ["sm1", "sm3", "smW", "smU"];
-var skinsEnms = [sm1Enms, sm3Enms, smWEnms, smUEnms];
-
-var sets = [
-  {
-    cost: 0,
-    combine: false,
-    sm1: [8, 9, 29, 30, 31, 33, 37],
-    sm3: [8, 9, 29, 30, 31, 33, 37],
-    smW: [29, 30, 31, 33, 37],
-    smU: [33, 37],
-    note: "これらの音源を単体で使いたいならこれが一番。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [29, 30, 31],
-    sm3: [29, 30, 31],
-    smW: [29, 30, 31],
-    smU: [],
-    note: "ノコノコ系のみ。smUで使えないのはたぶん背が高いせいの可能性が高い。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [10, 11],
-    sm3: [10, 11],
-    smW: [11],
-    smU: [10, 11],
-    note: "オーソドックスなパックン音源。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [41],
-    sm3: [41],
-    smW: [41],
-    smU: [41],
-    note: "ドラム系で唯一音符ブロックに埋め込んでグローバルになる。近くだとうるさい。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [38],
-    sm3: [38],
-    smW: [38],
-    smU: [38],
-    note: "ブラパ単体のグローバル化だとコンベアと坂を用いた手法が主流だけどこれの方がコンパクト。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [25],
-    sm3: [25],
-    smW: [25],
-    smU: [25],
-    note: "白音符ブロックを使用するため近くだと雑音あり。音の間隔が短いと鳴らなかったり壊れたり。"
-  },
-  {
-    cost: 1,
-    combine: false,
-    sm1: [24],
-    sm3: [24],
-    smW: [24],
-    smU: [],
-    note: "たつまきを使用してメガブロスにジャンプさせない。smUは少し違う配置。"
-  },
-  {
-    cost: 1,
-    combine: false,
-    sm1: [],
-    sm3: [],
-    smW: [],
-    smU: [24],
-    note: "これはその他のスキンよりもコンパクトにできる。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [23],
-    sm3: [23],
-    smW: [23],
-    smU: [23],
-    note: "空中飛ばしを活用してソフトタッチ(?)。スペースはとるけどスネークブロック不使用で環境と財布にやさしい。"
-  },
-  {
-    cost: 0,
-    combine: false,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 7],
-    sm3: [0, 1, 2, 3, 4],
-    smW: [0, 1, 3, 4],
-    smU: [0, 1, 2, 3, 4],
-    note: "古典的な坂を使った押さえつけ。下からは無理でも横からなら。"
-  },
-  {
-    cost: 2,
-    combine: false,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    sm3: [0, 1, 2, 3, 4, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    smW: [0, 1, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    smU: [0, 1, 2, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 47],
-    note: "だいたいなんでもいける。クレーンを動かすことで複合できる。プレイヤーが近づくとPOWを放してしまうので注意。"
-  },
-  {
-    cost: 2,
-    combine: true,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    sm3: [0, 1, 2, 3, 4, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    smW: [0, 1, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 46, 47],
-    smU: [0, 1, 2, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37, 47],
-    note: "複合可能なものとしては最も広く使われているであろう配置。高コストに目を瞑れば便利。プレイヤーが近づくとPOWを放してしまうので注意。"
-  },
-  {
-    cost: 0,
-    combine: true,
-    sm1: [7, 13, 15, 16, 17, 18, 21, 22],
-    sm3: [13, 15, 16, 17, 18, 21, 22],
-    smW: [13, 15, 16, 17, 18, 21, 22],
-    smU: [7, 13, 15, 16, 17, 18, 21, 22, 29],
-    note: "ほぼ同じ性質を持っているはずのカキボーや異色メカクッパ, 異色ノコノコは使えたり使えなかったり。音の間隔が短いと鳴らなかったり壊れたり。"
-  },
-  {
-    cost: 0,
-    combine: true,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 23, 34, 36],
-    sm3: [0, 1, 2, 3, 4, 8, 9, 10, 11, 23, 34, 36],
-    smW: [0, 1, 3, 4, 8, 10, 11, 23, 34, 36],
-    smU: [0, 1, 2, 3, 4, 8, 10, 11, 23, 34, 36],
-    note: "大ブラパに埋め込み。いろんな音符の当て方ができる。クリボーやメカクッパ, ノコノコなどもできるのだが埋め込みが安定しないため除外してある。"
-  },
-  {
-    cost: 0,
-    combine: true,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    sm3: [0, 1, 2, 3, 4, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    smW: [0, 1, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    smU: [0, 1, 2, 3, 4, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    note: "これも埋め込みであるため下から以外なら少々乱暴に扱ってもOK。とても汎用性が高く便利。"
-  },
-  {
-    cost: 1,
-    combine: true,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-    sm3: [0, 1, 2, 3, 4, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-    smW: [0, 1, 3, 4, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-    smU: [0, 1, 2, 3, 4, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31],
-    note: "たつまき不使用verに比べてコストが上がっているが, ハンマーブロス(かクッパJr.)を使う場合はスタックしなくていいので全体的にコストが下がる。注意として, アイテムやヨッシーのみでは使えず他の敵エネミーと一緒に使う必要がある(アイテムのみなら別の方法の方がいいけど)。"
-  },
-  {
-    cost: 2,
-    combine: false,
-    sm1: [38, 39, 40, 41, 42, 43, 44, 55],
-    sm3: [38, 39, 40, 41, 42, 43, 44, 55],
-    smW: [38, 39, 40, 41, 42, 43, 44, 55],
-    smU: [38, 39, 40, 41, 42, 43, 44, 55],
-    note: "スイッチで切り替えられるドラム。POW, 縦バネ, ブラパでうまくいかない時は一番下の砲台を大ブラパに変えるとよい。"
-  },
-  {
-    cost: 1,
-    combine: false,
-    sm1: [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    sm3: [0, 1, 2, 3, 4, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    smW: [0, 1, 3, 4, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    smU: [0, 1, 2, 3, 4, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-    note: "だいたいなんでもいける。音源ELAの節約と複合ができないのが玉に瑕。"
-  }
-];
+[...partsNames, "note"].forEach(name => {
+  const img = document.createElement("img");
+  img.src = `images/railParts/${name}.png`;
+});
